@@ -36,6 +36,9 @@ class Patient(Person):
         on_delete=models.CASCADE
     )
 
+    get_doctor(doctor_request):
+    #stubbed method for requesting a doctor_assignment
+
 class Nurse(Person):
     nurses = models.Manager()
     employment_date = models.DateTimeField('Employment Date')
