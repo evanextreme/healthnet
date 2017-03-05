@@ -1,2 +1,4 @@
 eventlog
 schedule
+django-scheduler
+
