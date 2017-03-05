@@ -1,0 +1,5 @@
+updates urls for calendar
+--This line, and those below, will be ignored--
+
+M    Calendar/urls.py
+M    pip-requirements.txt

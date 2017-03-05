@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'appointments',
     'eventlog',
     'schedule',
+    'appointments',
+    'HealthNet'
 ]
 
 MIDDLEWARE = [
