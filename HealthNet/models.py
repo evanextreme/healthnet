@@ -66,11 +66,6 @@ class Patient(Person):
 
 
 
-
-
-
-
-class Appointment(models.Model):
 class Appointment(models.Model):
     appointments = models.Manager()
     patient = models.ForeignKey(
