@@ -11,7 +11,7 @@ def new_appt(request):
     if request.method == 'POST':
         form = AppointmentForm(request.POST)
         if form.is_valid():
-            patient = form.cleaned_data['patient']
+            patient = form.data['patient']
             doctor = form.cleaned_data['doctor']
             nurse = form.cleaned_data['nurse']
             date = form.cleaned_data['date']
@@ -26,4 +26,15 @@ def new_appt(request):
 
 
 def create(request):
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        patient = form.data['patient']
+        doctor = form.data['doctor']
+        nurse = form.data['nurse']
+        date = form.data['date']
+        
+        notes = form.data['notes']
+        appointment_type = form.data['appointment_type']
+        a = Appointment(patient, doctor, nurse, date, notes, appointment_type)
+        a.save()
     return HttpResponse("Appointment Created!")
