@@ -8,14 +8,18 @@ from django.contrib.auth import logout
 from .form import *
 
 def home(request):
-	template = loader.get_template('main_page.html')
+	template = loader.get_template('index.html')
 	variables = Context({'user':request.user})
 	output = template.render(variables)
 	return HttpResponse(output)
 
+def login_page(request):
+	login(request)
+	return HttpResponseRedirect('main_page.html')
+
 def logout_page(request):
 	logout(request)
-	return HttpResponseRedirect('/login')
+	return HttpResponseRedirect('index.html')
 
 def register(request):
 	if request.method == 'POST':
