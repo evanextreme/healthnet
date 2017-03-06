@@ -18,7 +18,6 @@ class Person(models.Model):
     last_name = models.CharField(max_length=20)
     email = models.EmailField(null = True)
     date_of_birth = models.DateTimeField('Date of Birth', null=True)
-    username = models.CharField(max_length=20)
 
     def __str__(self):
         name = self.first_name + " " + self.last_name
@@ -42,7 +41,6 @@ class Doctor(Nurse):
 
 class Patient(Person):
     patients = models.Manager()
-    #username = models.CharField(max_length=20)
     patient_id = models.IntegerField(null=True)
     doctor_notes = models.TextField()
     height = models.IntegerField()
@@ -65,6 +63,7 @@ class Patient(Person):
         on_delete=models.CASCADE,
         null = True,
     )
+
 
 
 
