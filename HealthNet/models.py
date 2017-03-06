@@ -87,15 +87,6 @@ class Appointment(models.Model):
     )
     notes = models.TextField()
 
-    appt_type_choices = (
-        ('test', 'Test'),
-        ('surgery', 'Surgery'),
-        ('checkup', 'Check Up'),
-        (None, 'Misc')
-    )
-
     appointment_type = models.CharField(
         max_length=10,
-        choices = appt_type_choices,
-        default = None
     )
