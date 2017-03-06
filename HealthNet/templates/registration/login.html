@@ -1,9 +1,8 @@
-<html>
-<head>
-<title>HealthNet-Login</title>
-</head>
-<body>
-<h1>User Login</h1>
+{% extends "basic.html" %}
+
+{% block title %}User Login{% endblock %}
+{% block head %}User Login{% endblock %}
+{% block content %}
 {% if form.has_errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
@@ -16,5 +15,4 @@
 <input type="submit" value="login" />
 {% csrf_token %}
 </form>
-</body>
-</html>
+{% endblock %}

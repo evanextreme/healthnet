@@ -1,9 +1,8 @@
-<html>
-<head>
-<title>HealthNet</title>
-</head>
-<body>
-<h1>Welcome to HealthNET</h1>
+{% extends "basic.html" %}
+
+{% block title %}HealthNet{% endblock %}
+{% block head %}Welcome to HealthNet{% endblock %}
+{% block content %}
 {% if user.username %}
 <p> Welcome {{ user.username}}!</p>
 <p><a href='PLEASE FILL IN'>View Calendar</a></p>
@@ -12,7 +11,6 @@
 {% else %}
 <p>Welcome anonymous user!</p>
 <p>Please <b><a href="/login/">login</a></b> 
-    or <b><a href="/registration_form/">registration</a></b></p>
+    or <b><a href="/register/">registration</a></b></p>
 {% endif %}
-</body>
-</html>
+{% endblock %}
