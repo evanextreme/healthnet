@@ -1,16 +1,13 @@
 <html>
 <head>
-<title>Django Store</title>
+<title>HealthNet</title>
 </head>
 <body>
 <h1>Welcome to HealthNET</h1>
-{% if user.username %}
-<p>Welcome {{ user.username }}!
-Here you can view important information!</p><br/>
-<a href="logout">logout<>
-{% else %}
-<p>Welcome anonymous user!
-You need to <a href="/login/">login</a></p>
-{% endif %}
+<p> Welcome {{ user.username}}!</p>
+    
+<a href='logout'>logout</a>
+<p><a href='PLEASE FILL IN'>View Calendar</a></p>
+<p><a href='PLEASE FILL IN'>Make an Appointment</a></p>
 </body>
 </html>
