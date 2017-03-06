@@ -64,69 +64,8 @@
             <!-- form start -->
             <form action='/appt/create/' method='post'>
                 {% csrf_token %}
-              <div class="box-body">
-                <div class="form-group">
-                  <label for='patient'>Patient</label>
-                    <select class="form-control" title='patient'>
-                        {% for patient in patients %}
-                            <option>
-                                {{patient}}
-                            </option>
-                        {% endfor %}
-                      <option selected="selected">None</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for='doctor'>Doctor</label>
-                    <select class="form-control" title='doctor'>
-                        <option selected="selected">None</option>
-                        {% for doctor in doctors %}
-                            <option>
-                                {{doctor}}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                  <div class="form-group">
-                      <label for="apppointment_type">Type of Appointment</label>
-                      <select class="form-control" title='appointment_type'>
-                          <option>Check Up</option>
-                          <option>Test</option>
-                          <option>Surgery</option>
-                          <option>Misc</option>
-                      </select>
-                  </div>
-                  <div class="form-group">
-                      <label for='date'>Date:</label>
-                      <div class="input-group date">
-                          <div class="input-group-addon">
-                            <i class="fa fa-clock-o"></i>
-                          </div>
-                          <input type="text" title='date' class="form-control pull-right" id="datepicker">
-                      </div>
-                <!-- /.input group -->
-                </div>
-              <!-- /.form group -->
-                <div class="bootstrap-timepicker">
-                  <div class="form-group">
-                    <label for='time'>Time:</label>
-                    <div class="input-group">
-                        <div class="input-group-addon">
-                          <i class="fa fa-clock-o"></i>
-                        </div>
-                            <input type="text" title='time' class="form-control timepicker" />
-                    </div>
-                    <!-- /.input group -->
-                  </div>
-                  <!-- /.form group -->
-                </div>
-            </div>
-          </div>
-              <!-- /.box-body -->
-
-              <div class="box-footer">
-                <button type="submit" class="btn btn-primary">Submit</button>
-              </div>
+                {{ form }}
+                <input type="submit" value="Submit"/>
             </form>
           </div>
 

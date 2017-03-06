@@ -1,28 +1,29 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from HealthNet.models import Appointment, Patient, Doctor, Nurse
+from HealthNet.models import Appointment, Doctor, Patient
 from datetime import date, time, datetime
 from django.utils import timezone
+from django.views.decorators.http import require_http_methods
+from .forms import AppointmentForm
+
 
 def new_appt(request):
-    patients = Patient.patients.order_by('first_name')
-    doctors = Doctor.doctors.order_by('first_name')
-    return render(request, 'appointments/new_appt.html',
-                    {'patients': patients, 'doctors': doctors})
+    if request.method == 'POST':
+        form = AppointmentForm(request.POST)
+        if form.is_valid():
+            patient = form.cleaned_data['patient']
+            doctor = form.cleaned_data['doctor']
+            nurse = form.cleaned_data['nurse']
+            date = form.cleaned_data['date']
+            notes = form.cleaned_data['notes']
+            appointment_type = form.cleaned_data['appointment_type']
+            a = Appointment(patient, doctor, nurse, date, notes, appointment_type)
+            a.save()
+
+    else:
+        form = AppointmentForm()
+    return render(request, 'appointments/new_appt.html', {'form':form})
 
 
 def create(request):
-    if request.method == 'POST':
-        patient = request.POST.get('patient')
-        doctor = request.POST.get('doctor')
-        appointment_type = request.POST.get('appointment_type')
-        date = request.POST.get('date')
-        print(date)
-        time = request.POST.get('time')
-#        dtime = datetime.combine(date, time)
-        A = Appointment(date= timezone.now(),
-                        patient=patient,
-                        doctor=doctor,
-                        nurse=doctor,
-                        appointment_type = appointment_type)
-        A.save()
+    return HttpResponse("Appointment Created!")
