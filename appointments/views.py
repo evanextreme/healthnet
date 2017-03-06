@@ -1,12 +1,12 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from HealthNet.models import Appointment
+from HealthNet.models import Appointment, Patient, Doctor, Nurse
 from datetime import date, time, datetime
 from django.utils import timezone
 
 def new_appt(request):
-    patients = models.Patient.patients.order_by('first_name')
-    doctors = models.Doctor.doctors.order_by('first_name')
+    patients = Patient.patients.order_by('first_name')
+    doctors = Doctor.doctors.order_by('first_name')
     return render(request, 'appointments/new_appt.html',
                     {'patients': patients, 'doctors': doctors})
 
