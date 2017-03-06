@@ -1,3 +1,4 @@
 eventlog
 schedule
 django-scheduler
+django-registration
