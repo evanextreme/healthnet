@@ -1,8 +1,27 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from HealthNet import models
-
+import datetime
 
 
 def new_appt(request):
-    return HttpResponse("new_appt.html")
+    patients = models.Patient.patients.order_by('first_name')
+    doctors = models.Doctor.doctors.order_by('first_name')
+    return render(request, 'appointments/new_appt.html',
+                    {'patients': patients, 'doctors': doctors})
+
+
+def create(request):
+    if request.method == 'POST':
+        patient = request.POST.get('patient')
+        doctor = request.POST.get('doctor')
+        appointment_type = request.POST.get('appointment_type')
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        dtime = datetime.combine(date, time)
+        A = Appointment(date=dtime,
+                        patient=patient,
+                        doctor=doctor,
+                        nurse=doctor,
+                        appointment_type = appointment_type)
+        A.save()
