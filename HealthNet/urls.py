@@ -24,6 +24,5 @@ urlpatterns = [
     url(r'^appt/', include('appointments.urls')),
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^', include ('Calendar.urls')),
     url(r'^accounts/', include('registration.backends.hmac.urls')),
 ]
