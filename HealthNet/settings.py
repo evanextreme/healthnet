@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'Profile',
     'Calendar',
     'eventlog',
-    'schedule',
 ]
 
 MIDDLEWARE = [
