@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+    <head>
+        <style type="text/css">
+
+            body {font-family:Arial, Sans-Serif;}
+
+            #container {width:300px; margin:0 auto;}
+
+            /* Nicely lines up the labels. */
+            form label {display:inline-block; width:140px;}
+
+            /* You could add a class to all the input boxes instead, if you like. That would be safer, and more backwards-compatible */
+            form input[type="text"],
+            form input[type="password"],
+            form input[type="email"] {width:160px;}
+
+            form .line {clear:both;}
+            form .line.submit {text-align:right;}
+
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <form>
+                <h1>Register for HealthNET </h1>
+                <div class="line"><label for="first_name">First Name *: </label><input type="text" id="first_name" /></div>
+                <div class="line"><label for="last_name">Last Name *: </label><input type="text" id="last_name" /></div>
+                <div class="line"><label for="dob">Date of Birth *: </label><input type="text" id="dob" /></div>
+                <div class="line"><label for="email">Email *: </label><input type="email" id="email" /></div>
+                <div class="line"><label for="pwd">Password *: </label><input type="password" id="pwd" /></div>
+                <div class="line"><label for="conf_pwd">Confirm Password *: </label><input type="password" id="conf_pwd" /></div>
+                <div class="line submit"><input type="submit" value="Submit" /></div>
+
+                <p>Note: Please make sure that all fields marked with * are completed!.</p>
+            </form>
+        </div>
+    </body>
+</html>

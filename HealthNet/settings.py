@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'HealthNet',
     'Profile',
     'Calendar',
-    'appointments',
     'eventlog',
     'schedule',
 ]
