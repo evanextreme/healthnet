@@ -13,13 +13,9 @@ def home(request):
 	output = template.render(variables)
 	return HttpResponse(output)
 
-def login_page(request):
-	login(request)
-	return HttpResponseRedirect('main_page.html')
-
 def logout_page(request):
 	logout(request)
-	return HttpResponseRedirect('index.html')
+	return HttpResponseRedirect('/')
 
 def register(request):
 	if request.method == 'POST':
