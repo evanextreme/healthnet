@@ -26,8 +26,6 @@ def register_page(request):
 		form=RegistrationForm(request.POST)
 		if form.is_valid():
 			user=User.objects.create_user(username=form.cleaned_data['username'],password=form.cleaned_data['password1'],email=form.cleaned_data['email'])
-			log=Log(user=form.cleaned_data['username'],action='USER_REGISTRATION')
-			log.save()
 			return HttpResponseRedirect('/')
 	form=RegistrationForm()
 	variables=RequestContext(request,{'form':form})
