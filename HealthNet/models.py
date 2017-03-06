@@ -16,8 +16,8 @@ class Hospital(models.Model):
 class Person(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
-    email = models.EmailField()
-    date_of_birth = models.DateTimeField('Date of Birth')
+    email = models.EmailField(null = True)
+    date_of_birth = models.DateTimeField('Date of Birth', null=True)
     username = models.CharField(max_length=20)
 
     def __str__(self):
@@ -43,7 +43,7 @@ class Doctor(Nurse):
 class Patient(Person):
     patients = models.Manager()
     #username = models.CharField(max_length=20)
-    patient_id = models.IntegerField()
+    patient_id = models.IntegerField(null=True)
     doctor_notes = models.TextField()
     height = models.IntegerField()
     weight = models.IntegerField()
@@ -51,22 +51,26 @@ class Patient(Person):
     doctor_assignment = models.ForeignKey(
         Doctor,
         on_delete=models.CASCADE,
-        related_name ="doctor"
+        related_name ="doctor",
+        null=True,
     )
     nurse_assignment = models.ForeignKey(
         Nurse,
         on_delete=models.CASCADE,
-        related_name ="nurse"
+        related_name ="nurse",
+        null=True,
     )
     current_hospital_assignment = models.ForeignKey(
         Hospital,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null = True,
     )
 
 
 
 
 class Appointment(models.Model):
+    date = models.DateTimeField()
     appointments = models.Manager()
     patient = models.ForeignKey(
         Patient,

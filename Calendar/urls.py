@@ -26,5 +26,5 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^fullcalendar/', TemplateView.as_view(template_name="fullcalendar.html"), name='fullcalendar'),
-    url(r'^schedule/', include('schedule.urls')),
+    #url(r'^schedule/', include('schedule.urls')),
 ]
