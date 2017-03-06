@@ -30,3 +30,8 @@ def register_page(request):
 	form=RegistrationForm()
 	variables=RequestContext(request,{'form':form})
 	return render_to_response("registration/register.html",variables)
+
+def update_profile(request, user_id):
+    user = User.objects.get(pk=user_id)
+    user.profile.bio = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit...'
+    user.save()
