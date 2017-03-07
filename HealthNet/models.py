@@ -39,6 +39,7 @@ class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     date_of_birth = models.DateTimeField()
     patients = models.Manager()
+    """
     doctor_notes = models.TextField()
     height = models.IntegerField()
     weight = models.IntegerField()
@@ -60,7 +61,7 @@ class Patient(models.Model):
         on_delete=models.CASCADE,
         null = True,
     )
-
+    """
 
 
 @receiver(post_save, sender=User)
