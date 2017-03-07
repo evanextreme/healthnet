@@ -1,9 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from HealthNet.models import Appointment, Doctor, Patient
+from HealthNet.models import Doctor, Patient
+from .models import Appointment
 from datetime import date, time, datetime
 from django.utils import timezone
-from django.views.decorators.http import require_http_methods
 from .forms import AppointmentForm, CalendarEventForm
 
 
