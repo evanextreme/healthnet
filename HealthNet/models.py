@@ -20,20 +20,7 @@ class Hospital(models.Model):
 
 
 
-
-class Person(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=20)
-    email = models.EmailField(null = True)
-    date_of_birth = models.DateTimeField('Date of Birth', null=True)
-
-    def __str__(self):
-        name = self.first_name + " " + self.last_name
-        return name
-
-
-class Nurse(Person):
+class Nurse(models.Model):
     nurses = models.Manager()
     employment_date = models.DateTimeField('Employment Date')
     employee_id = models.IntegerField()
@@ -48,21 +35,13 @@ class Doctor(Nurse):
     doctors = models.Manager()
 
 
-class Patient(Person):
+class Patient(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    date_of_birth = models.DateTimeField()
     patients = models.Manager()
-    patient_id = models.IntegerField(null=True)
     doctor_notes = models.TextField()
     height = models.IntegerField()
     weight = models.IntegerField()
-
-    @receiver(post_save, sender=User)
-    def create_user_patient(sender, instance, created, **kwargs):
-        if created:
-            Patient.objects.create(user=instance)
-
-    @receiver(post_save, sender=User)
-    def save_user_patient(sender, instance, **kwargs):
-        instance.patient.save()
 
     doctor_assignment = models.ForeignKey(
         Doctor,
@@ -81,3 +60,14 @@ class Patient(Person):
         on_delete=models.CASCADE,
         null = True,
     )
+
+
+
+@receiver(post_save, sender=User)
+def create_user_patient(sender, instance, created, **kwargs):
+    if created:
+        Patient.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_patient(sender, instance, **kwargs):
+    instance.patient.save()
