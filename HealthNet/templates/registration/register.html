@@ -5,7 +5,8 @@
 {% block content %}
 <form method="post" action=".">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ userform.as_p }}
+    {{ patientform.as_p }}
     <input type="submit" name="csrfmiddlewaretoken" value="register" />
 </form>
 {% endblock %}

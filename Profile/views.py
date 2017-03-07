@@ -24,12 +24,15 @@ def logout_page(request):
 @csrf_exempt
 def register_page(request):
 	if request.method=='POST':
-		form=RegistrationForm(request.POST)
-		if form.is_valid():
-			user=Patient.objects.create_user(username=form.cleaned_data['username'],password=form.cleaned_data['password1'],email=form.cleaned_data['email'])
-			return HttpResponseRedirect('/')
-	form=RegistrationForm()
-	variables=RequestContext(request,{'form':form})
+		userform=UserForm(request.POST)
+		patientform=PatientForm(request.POST)
+		if userform.is_valid() and patientform.is_valid():
+			userform.save()
+			patientform.save()
+			return HttpResponse("YOURE REGISTERED IM SO PROUD OF YOU <3")
+	userform=UserForm()
+	patientform=PatientForm()
+	variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
 	return render_to_response("registration/register.html",variables)
 
 def update_profile(request):
