@@ -1,14 +1,21 @@
 from django import forms
+from Calendar.models import CalendarEvent
 from HealthNet.models import Doctor, Patient, Appointment, Nurse
+from datetime import datetime
+from django.forms import DateTimeField
 
 
+class CalendarEventForm(forms.ModelForm):
+    class Meta:
+        model = CalendarEvent
+        fields = ['title', 'start', 'end', 'all_day']
 
-class AppointmentForm(forms.Form):
-    patient = forms.ModelChoiceField(queryset=Patient.patients.all(), empty_label="None", label="Patient")
-    doctor = forms.ModelChoiceField(queryset=Doctor.doctors.all(), empty_label="None", label="Doctor")
-    nurse = forms.ModelChoiceField(queryset=Nurse.nurses.all(), empty_label="None", label="Nurse")
-    date = forms.DateField(label="Date")
-    notes = forms.CharField(label='Notes')
+
+class AppointmentForm(forms.ModelForm):
+
+    class Meta:
+        model = Appointment
+        fields = ['date','patient','doctor','nurse','notes']
 
     APPT_TYPE_CHOICES = (
         ('test', 'Test'),
