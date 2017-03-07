@@ -9,6 +9,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import csrf_exempt
 from eventlog.models import Log
+from HealthNet.models import *
 
 def home(request):
 	template = loader.get_template('index.html')
@@ -25,7 +26,7 @@ def register_page(request):
 	if request.method=='POST':
 		form=RegistrationForm(request.POST)
 		if form.is_valid():
-			user=User.objects.create_user(username=form.cleaned_data['username'],password=form.cleaned_data['password1'],email=form.cleaned_data['email'])
+			user=Patient.objects.create_user(username=form.cleaned_data['username'],password=form.cleaned_data['password1'],email=form.cleaned_data['email'])
 			return HttpResponseRedirect('/')
 	form=RegistrationForm()
 	variables=RequestContext(request,{'form':form})
