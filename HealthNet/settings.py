@@ -46,13 +46,6 @@ INSTALLED_APPS = [
     'fullcalendar'
 ]
 
-FULLCALENDAR = {
-    'css_url': <path_or_url_to_css_file>,
-    'print_css_url': <path_or_url_to_print_css_file>,
-    'javascript_url': <path_or_url_to_javascript_file>,
-    'jquery_url': <path_or_url_to_jquery_file>,
-    'jquery_ui_url': <path_or_url_to_jquery_ui_file>,
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
