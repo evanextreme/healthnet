@@ -14,6 +14,10 @@ class Hospital(models.Model):
     hospitals = models.Manager()
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=200)
+    def __str__(self):
+        name = self.name
+        return name
+
 
 
 
@@ -76,31 +80,4 @@ class Patient(Person):
         Hospital,
         on_delete=models.CASCADE,
         null = True,
-    )
-
-
-
-
-
-class Appointment(models.Model):
-    date = models.DateTimeField()
-    appointments = models.Manager()
-    patient = models.ForeignKey(
-        Patient,
-        on_delete=models.CASCADE
-    )
-    doctor = models.ForeignKey(
-        Doctor,
-        on_delete=models.CASCADE,
-        related_name="attending_doctor"
-    )
-    nurse = models.ForeignKey(
-        Nurse,
-        on_delete=models.CASCADE,
-        related_name ="attending_nurse"
-    )
-    notes = models.TextField()
-
-    appointment_type = models.CharField(
-        max_length=10,
     )

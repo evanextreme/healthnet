@@ -1,6 +1,7 @@
 from django import forms
 from Calendar.models import CalendarEvent
-from HealthNet.models import Doctor, Patient, Appointment, Nurse
+from HealthNet.models import Doctor, Patient, Nurse
+from .models import Appointment
 from datetime import datetime
 from django.forms import DateTimeField
 
