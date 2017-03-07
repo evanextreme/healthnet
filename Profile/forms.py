@@ -2,13 +2,27 @@ import re
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from HealthNet.models import Patient
+
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username','first_name', 'last_name', 'email']
+
+class PatientForm(forms.ModelForm):
+    class Meta:
+        model = Patient
+        fields = ['date_of_birth']
+
 
 class RegistrationForm(forms.Form):
     username=forms.CharField(label='Username',max_length=30)
     email=forms.EmailField(label='Email')
     password1=forms.CharField(label='Password',widget=forms.PasswordInput())
     password2=forms.CharField(label='Password(Again)',widget=forms.PasswordInput())
-    
+
     def clean_password2(self):
         if 'password1' in self.cleaned_data:
             password1=self.cleaned_data['password1']

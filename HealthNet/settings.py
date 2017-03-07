@@ -64,7 +64,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                 "../HealthNET/templates")],
+                 "../HealthNet/templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
