@@ -18,7 +18,7 @@ class Hospital(models.Model):
 
 
 class Person(models.Model):
-    #user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     email = models.EmailField(null = True)
@@ -50,6 +50,15 @@ class Patient(Person):
     doctor_notes = models.TextField()
     height = models.IntegerField()
     weight = models.IntegerField()
+
+    @receiver(post_save, sender=User)
+    def create_user_patient(sender, instance, created, **kwargs):
+        if created:
+            Patient.objects.create(user=instance)
+
+    @receiver(post_save, sender=User)
+    def save_user_patient(sender, instance, **kwargs):
+        instance.patient.save()
 
     doctor_assignment = models.ForeignKey(
         Doctor,
