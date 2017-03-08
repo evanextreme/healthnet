@@ -10,6 +10,8 @@ from django.shortcuts import render_to_response
 from django.views.decorators.csrf import csrf_exempt
 from eventlog.models import Log
 from HealthNet.models import *
+from django.contrib.auth.models import User
+
 
 def home(request):
 	template = loader.get_template('index.html')
@@ -24,12 +26,12 @@ def logout_page(request):
 @csrf_exempt
 def register_page(request):
 	if request.method=='POST':
-		userform=UserForm(request.POST, instance=user)
-		patientform=PatientForm(request.POST, instance=user.patient)
+		userform=UserForm(request.POST, instance=User)
+		patientform=PatientForm(request.POST, instance=Patient)
 		if userform.is_valid() and patientform.is_valid():
+			userform.save()
 			patientform.save()
 
-			userform.save()
 			return HttpResponse("YOURE REGISTERED IM SO PROUD OF YOU <3")
 	userform=UserForm()
 	patientform=PatientForm()
