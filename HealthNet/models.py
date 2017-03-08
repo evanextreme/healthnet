@@ -63,7 +63,7 @@ class Patient(models.Model):
     )
     """
 
-"""
+
 @receiver(post_save, sender=User)
 def create_user_patient(sender, instance, created, **kwargs):
     if created:
@@ -72,4 +72,3 @@ def create_user_patient(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_patient(sender, instance, **kwargs):
     instance.patient.save()
-"""
