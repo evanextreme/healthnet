@@ -37,7 +37,7 @@ class Doctor(Nurse):
 
 class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    date_of_birth = models.DateTimeField()
+    date_of_birth = models.DateTimeField(default=timezone.now(), blank=True)
     patients = models.Manager()
     """
     doctor_notes = models.TextField()
