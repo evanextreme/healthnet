@@ -24,11 +24,12 @@ def logout_page(request):
 @csrf_exempt
 def register_page(request):
 	if request.method=='POST':
-		userform=UserForm(request.POST)
-		patientform=PatientForm(request.POST)
+		userform=UserForm(request.POST, instance=user)
+		patientform=PatientForm(request.POST, instance=user.patient)
 		if userform.is_valid() and patientform.is_valid():
-			userform.save()
 			patientform.save()
+
+			userform.save()
 			return HttpResponse("YOURE REGISTERED IM SO PROUD OF YOU <3")
 	userform=UserForm()
 	patientform=PatientForm()
