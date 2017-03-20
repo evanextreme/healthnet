@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'Calendar',
     'eventlog',
     'schedule',
+    'fullcalendar',
     'appointments',
 ]
 
