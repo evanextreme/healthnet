@@ -8,7 +8,7 @@ from Profile.forms import *
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import csrf_exempt
-from eventlog.models import Log
+from eventlog.models import log
 from HealthNet.models import *
 from django.contrib.auth.models import User
 
@@ -25,18 +25,29 @@ def logout_page(request):
 
 @csrf_exempt
 def register_page(request):
-	if request.method=='POST':
-		userform=UserForm(request.POST, instance=User)
-		patientform=PatientForm(request.POST, instance=Patient)
-		if userform.is_valid() and patientform.is_valid():
-			userform.save()
-			patientform.save()
+    context = RequestContext(request)
 
-			return HttpResponse("YOURE REGISTERED IM SO PROUD OF YOU <3")
-	userform=UserForm()
-	patientform=PatientForm()
-	variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
-	return render_to_response("registration/register.html",variables)
+    if request.method=='POST':
+        userform=UserForm(data=request.POST)
+        patientform=PatientForm(data=request.POST)
+        if userform.is_valid() and patientform.is_valid():
+            user = userform.save(commit=False)
+            user.set_password(user.password)
+            user.save()
+
+            patient = patientform.save(commit=False)
+            patient.user = user
+            patient.save()
+
+
+            return HttpResponse("YOURE REGISTERED IM SO PROUD OF YOU <3")
+        else:
+            print(userform.errors, profileform.errors)
+    else:
+        userform=UserForm()
+        patientform=PatientForm()
+    variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
+    return render_to_response("registration/register.html",variables)
 
 def update_profile(request):
 	if request.method == 'POST':
