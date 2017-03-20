@@ -63,12 +63,11 @@ class Patient(models.Model):
     )
     """
 
-
-@receiver(post_save, sender=User)
-def create_user_patient(sender, instance, created, **kwargs):
+#@receiver(post_save, sender=User)
+def create_patient(sender, instance, created, **kwargs):
     if created:
         Patient.patients.create(user=instance)
 
-@receiver(post_save, sender=User)
-def save_user_patient(sender, instance, **kwargs):
+#@receiver(post_save, sender=User)
+def save_patient(sender, instance, **kwargs):
     instance.patient.save()
