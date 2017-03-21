@@ -7,6 +7,7 @@ To install, simply follow the following steps in your command line enviornment
 
 * Change to the root directory of the repository
 * `python -m pip install -r pip-requirements.txt`
+* `python manage.py migrate --run-syncdb`
 * `python manage.py migrate`
 
 # Use
