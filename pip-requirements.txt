@@ -2,4 +2,3 @@ eventlog
 schedule
 django-scheduler
 django-registration
-git+https://github.com/rodrigoamaral/django-fullcalendar.git#egg=django-fullcalendar
