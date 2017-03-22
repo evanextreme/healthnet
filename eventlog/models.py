@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 
 import jsonfield
 
-from .signals import event_logged
+from eventlog.signals import event_logged
 
 
 class Log(models.Model):
@@ -29,7 +29,7 @@ class Log(models.Model):
     class Meta:
         ordering = ["-timestamp"]
 
-
+#create_log
 def log(user, action, extra=None, obj=None):
     if (user is not None and not user.is_authenticated()):
         user = None

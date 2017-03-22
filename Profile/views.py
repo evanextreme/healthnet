@@ -11,7 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 from eventlog.models import log
 from HealthNet.models import *
 from django.contrib.auth.models import User
-
+from Calendar.models import CalendarEvent
+from Calendar.util import events_to_json, calendar_options
+from eventlog.models import log
 
 def home(request):
 	template = loader.get_template('index.html')
@@ -20,8 +22,10 @@ def home(request):
 	return HttpResponse(output)
 
 def logout_page(request):
-	logout(request)
-	return HttpResponseRedirect('/')
+    event = log(user=request.user, action="user_logout")
+    event.save()
+    logout(request)
+    return HttpResponseRedirect('/')
 
 @csrf_exempt
 def register_page(request):
@@ -39,7 +43,8 @@ def register_page(request):
             patient.user = user
             patient.save()
 
-
+            event = log(user=patient.user, action="patient_registration")
+            event.save()
             return HttpResponse("YOURE REGISTERED IM SO PROUD OF YOU <3")
         else:
             print(userform.errors, profileform.errors)
@@ -63,3 +68,7 @@ def update_profile(request):
     #user = User.objects.get(pk=user_id)
     #user.profile.name = 'elit'
     #user.save()
+
+def all_events(request):
+    events = CalendarEvent.objects.all()
+    return HttpResponse(events_to_json(events), content_type='application/json')
