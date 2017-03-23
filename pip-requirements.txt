@@ -2,3 +2,4 @@ eventlog
 schedule
 django-scheduler
 django-registration
+django-datetime-widget

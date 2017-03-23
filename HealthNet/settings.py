@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'eventlog',
     'schedule',
     'appointments',
+    'datetimewidget'
 ]
 
 
