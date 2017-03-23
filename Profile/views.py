@@ -45,7 +45,10 @@ def register_page(request):
 
             event = log(user=patient.user, action="patient_registration")
             event.save()
-            return HttpResponse("YOURE REGISTERED IM SO PROUD OF YOU <3")
+            response=HttpResponse()
+            response.write("<h1>Congratulation! You are registered!</h1>")
+            response.write("<h2>Please <a href='../login/'>log in</a>.</h2>")
+            return response
         else:
             print(userform.errors, profileform.errors)
     else:
