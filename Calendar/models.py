@@ -2,7 +2,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
+from HealthNet.models import Patient, Doctor
 
 class CalendarEvent(models.Model):
     """The event set a record for an 
@@ -28,10 +28,12 @@ class CalendarEvent(models.Model):
     start = models.DateTimeField(_('Start'))
     end = models.DateTimeField(_('End'))
     all_day = models.BooleanField(_('All day'), default=False)
-
+    doctor = models.ForeignKey(Doctor, default=None, null=True, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, default=None, null=True, on_delete=models.CASCADE)
     class Meta:
         verbose_name = _('Event')
         verbose_name_plural = _('Events')
-
+    def __str__(self):
+        return self.title
     def __unicode__(self):
         return self.title

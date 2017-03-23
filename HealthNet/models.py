@@ -22,8 +22,8 @@ class Hospital(models.Model):
 
 class Nurse(models.Model):
     nurses = models.Manager()
-    employment_date = models.DateTimeField('Employment Date')
-    employee_id = models.IntegerField()
+    #employment_date = models.DateTimeField('Employment Date')
+    #employee_id = models.IntegerField()
 
     current_hospital_assignment = models.ForeignKey(
         Hospital,
@@ -31,14 +31,25 @@ class Nurse(models.Model):
     )
 
 
-class Doctor(Nurse):
-    doctors = models.Manager()
-
+class Doctor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    doctor = models.Manager()
+    #employment_date = models.DateTimeField('Employment Date')
+    #employee_id = models.AutoField(primary_key=True)
+    def __str__(self):
+        return str(self.user.first_name + " " + self.user.last_name)
+    current_hospital_assignment = models.ForeignKey(
+        Hospital,
+        on_delete=models.CASCADE
+    )
 
 class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     date_of_birth = models.DateTimeField(default=timezone.now, blank=True)
     patients = models.Manager()
+    #appointments = models.ManyToManyField(CalendarEvent)
+    def __str__(self):
+        return str(self.user.first_name + ' ' + self.user.last_name)
     """
     doctor_notes = models.TextField()
     height = models.IntegerField()
