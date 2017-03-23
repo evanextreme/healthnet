@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from Calendar.models import CalendarEvent
 from Calendar.util import events_to_json, calendar_options
 from eventlog.models import log
+from Calendar.forms import CalendarEventForm
 
 def home(request):
 	template = loader.get_template('index.html')
@@ -71,6 +72,21 @@ def update_profile(request):
     #user = User.objects.get(pk=user_id)
     #user.profile.name = 'elit'
     #user.save()
+
+@csrf_exempt
+def new_appt(request):
+    if request.method == 'POST':
+        cal_form = CalendarEventForm(request.POST)
+        if cal_form.is_valid():
+            appt = cal_form.save()
+            appt.save()
+            return render_to_response("index.html")
+
+    else:
+        cal_form = CalendarEventForm()
+    variables=RequestContext(request,{'cal_form':cal_form})
+    return render_to_response("appointments/new_appt.html",variables)
+
 
 def all_events(request):
     events = CalendarEvent.objects.all()
