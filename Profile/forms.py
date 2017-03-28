@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from HealthNet.models import Patient
 
 
+
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
     class Meta:

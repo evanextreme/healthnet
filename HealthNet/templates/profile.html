@@ -1,5 +1,14 @@
+
+<head>
+  <meta charset="utf-8" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <link href="../../static/css/bootstrap.css" rel="stylesheet" type="text/css"/ />
+  <script src="../../static/js/bootstrap.js"></script>
+</head>
+
+
 <form method="post">
   {% csrf_token %}
-  {{ RegistrationForm.as_p }}
+  {{ reg_form.as_p }}
   <button type="submit">Save changes</button>
 </form>

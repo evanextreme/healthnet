@@ -1,3 +1,11 @@
+
+<head>
+  <meta charset="utf-8" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <link href="../../static/css/bootstrap.css" rel="stylesheet" type="text/css"/ />
+  <script src="../../static/js/bootstrap.js"></script>
+</head>
+
 {% extends "basic.html" %}
 
 {% block title %}HealthNet{% endblock %}
@@ -13,13 +21,14 @@
 
 </head>
 
-<p> Welcome {{ user.username}}!</p>
+<p> Welcome {{ user.first_name}}!</p>
 <p><a href='/appt/new'>Make an Appointment</a></p>
+<p><a href='/profile'>Update Profile</a></p>
 <p><a>{% calendar %}</a></p>
 <a href='logout'>logout</a>
 {% else %}
 <p>Welcome anonymous user!</p>
-<p>Please <b><a href="/login/">login</a></b> 
+<p>Please <b><a href="/login/">login</a></b>
     or <b><a href="/register/">registration</a></b></p>
 {% endif %}
 {% endblock %}
