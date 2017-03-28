@@ -6,7 +6,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from Calendar.models import CalendarEvent
 # Create your models here.
 
 
@@ -36,8 +35,7 @@ class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     doctor = models.Manager()
     #employment_date = models.DateTimeField('Employment Date')
-    #employee_id = models.AutoField(primary_key=True)
-    appointments = models.ForeignKey(CalendarEvent, default=None, blank=True)
+    doctor_id = models.AutoField(primary_key=True)
     def __str__(self):
         return str(self.user.first_name + " " + self.user.last_name)
     current_hospital_assignment = models.ForeignKey(
@@ -49,7 +47,7 @@ class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     date_of_birth = models.DateTimeField(default=timezone.now, blank=True)
     patients = models.Manager()
-    appointments = models.ForeignKey(CalendarEvent, default=None, blank=True)
+    patient_id = models.AutoField(primary_key=True)
     def __str__(self):
         return str(self.user.first_name + ' ' + self.user.last_name)
     """

@@ -21,6 +21,7 @@ def home(request):
 	template = loader.get_template('index.html')
 	variables = Context({'user':request.user})
 	output = template.render(variables)
+    
 	return HttpResponse(output)
 
 def logout_page(request):
@@ -86,13 +87,14 @@ def update_profile(request):
 
 @csrf_exempt
 def new_appt(request):
+    user = request.user
     if request.method == 'POST':
         cal_form = CalendarEventForm(request.POST)
         if cal_form.is_valid():
-            appt = cal_form.save()
+            appt = cal_form.save(commit=False)
+            appt.patient = user.patient
             appt.save()
             return render_to_response("index.html")
-
     else:
         cal_form = CalendarEventForm()
     variables=RequestContext(request,{'cal_form':cal_form})
@@ -100,5 +102,5 @@ def new_appt(request):
 
 
 def all_events(request):
-    events = CalendarEvent.objects.all()
+    events = CalendarEvent.appointments.all()
     return HttpResponse(events_to_json(events), content_type='application/json')
