@@ -66,7 +66,12 @@ def update_profile(request):
 			form.save()
 			return HttpResponseRedirect('/')
 	else:
-		form = UpdateUserForm()
+		user = request.user
+		form = UpdateUserForm(initial={
+			'username':user.username,
+			'email':user.email,
+			'first_name':user.first_name,
+			'last_name':user.last_name,})
 		variables = RequestContext(request, {'update_form':form})
 		return render_to_response('profile.html', variables)
 

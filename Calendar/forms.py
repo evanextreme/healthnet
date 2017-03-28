@@ -17,5 +17,4 @@ class CalendarEventForm(forms.ModelForm):
             #Use localization
             'start': DateTimeWidget(attrs={'class':"yourdatetime"}, usel10n = True),
             'end': DateTimeWidget(attrs={'class':"yourdatetime"}, usel10n = True),
-            #'end': DateTimeWidget(attrs={'id':"yourdatetimeid"}, usel10n = True),
             }
