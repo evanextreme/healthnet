@@ -15,6 +15,7 @@ from Calendar.models import CalendarEvent
 from Calendar.util import events_to_json, calendar_options
 from eventlog.models import log
 from Calendar.forms import CalendarEventForm
+from django.contrib.auth.forms import PasswordChangeForm
 
 def home(request):
 	template = loader.get_template('index.html')
@@ -60,20 +61,23 @@ def register_page(request):
 
 @csrf_exempt
 def update_profile(request):
-	if request.method == 'POST':
-		form = UpdateUserForm(request.POST, instance = request.user)
-		if form.is_valid():
-			form.save()
-			return HttpResponseRedirect('/')
-	else:
-		user = request.user
-		form = UpdateUserForm(initial={
-			'username':user.username,
-			'email':user.email,
-			'first_name':user.first_name,
-			'last_name':user.last_name,})
-		variables = RequestContext(request, {'update_form':form})
-		return render_to_response('profile.html', variables)
+    user = request.user
+    if request.method == 'POST':
+        updateform = UpdateUserForm(request.POST, instance = user)
+        passform = PasswordChangeForm(user, request.POST)
+        if updateform.is_valid() and passform.is_valid():
+            updateform.save()
+            user = passform.save()
+            auth.update_session_auth_hash(request, user)
+            return HttpResponseRedirect('/')
+    else:
+        updateform = UpdateUserForm(initial={
+            'email':user.email,
+            'first_name':user.first_name,
+            'last_name':user.last_name,})
+        passform = PasswordChangeForm(user)
+    variables = RequestContext(request, {'update_form':updateform,'password_form':passform})
+    return render_to_response('profile.html', variables)
 
 
     #user = User.objects.get(pk=user_id)
