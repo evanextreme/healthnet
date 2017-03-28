@@ -17,3 +17,13 @@ class PatientForm(forms.ModelForm):
     class Meta:
         model = Patient
         fields = ['date_of_birth']
+
+class UpdateUserForm(forms.ModelForm):
+    username = forms.CharField(required=True)
+    email = forms.EmailField(required=True)
+    first_name = forms.CharField(required=False)
+    last_name = forms.CharField(required=False)
+
+    class Meta:
+        model = User
+        fields = ['username','email','last_name','first_name']
