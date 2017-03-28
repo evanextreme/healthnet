@@ -10,5 +10,6 @@
 <form method="post">
   {% csrf_token %}
   {{ update_form.as_p }}
+  {{ password_form.as_p }}
   <button type="submit">Save changes</button>
 </form>

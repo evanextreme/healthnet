@@ -19,14 +19,10 @@ class PatientForm(forms.ModelForm):
         fields = ['date_of_birth']
 
 class UpdateUserForm(forms.ModelForm):
-    username = forms.CharField(required=True)
     email = forms.EmailField(required=True)
-    conf_pword = forms.CharField(widget=forms.PasswordInput(), label='Confirm Password')
     first_name = forms.CharField(required=False)
     last_name = forms.CharField(required=False)
-    password = forms.CharField(widget=forms.PasswordInput(), label='New Password')
-
 
     class Meta:
         model = User
-        fields = ['username','email','first_name','last_name','password']
+        fields = ['email','first_name','last_name']
