@@ -58,15 +58,17 @@ def register_page(request):
     variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
     return render_to_response("registration/register.html",variables)
 
+@csrf_exempt
 def update_profile(request):
 	if request.method == 'POST':
-		form = RegistrationForm(request.POST, instance = request.user)
+		form = UpdateUserForm(request.POST, instance = request.user)
 		if form.is_valid():
 			form.save()
 			return HttpResponseRedirect('/')
-		return render(request, 'profile.html', {
-				'RegistrationForm': RegistrationForm
-				})
+	else:
+		form = UpdateUserForm()
+		variables = RequestContext(request, {'update_form':form})
+		return render_to_response('profile.html', variables)
 
 
     #user = User.objects.get(pk=user_id)
