@@ -63,11 +63,11 @@ def update_profile(request):
 		form = RegistrationForm(request.POST, instance = request.user)
 		if form.is_valid():
 			form.save()
-		return HttpResponseRedirect('/')
-	#else:
-	return render(request, 'profile.html', {
-		'RegistrationForm': RegistrationForm
-	})
+			return HttpResponseRedirect('/')
+		return render(request, 'profile.html', {
+				'RegistrationForm': RegistrationForm
+				})
+
 
     #user = User.objects.get(pk=user_id)
     #user.profile.name = 'elit'
