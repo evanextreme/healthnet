@@ -25,8 +25,6 @@ def home(request):
 	return HttpResponse(output)
 
 def logout_page(request):
-    event = log(user=request.user, action="user_logout")
-    event.save()
     logout(request)
     return HttpResponseRedirect('/')
 
@@ -46,7 +44,7 @@ def register_page(request):
             patient.user = user
             patient.save()
 
-            event = log(user=patient.user, action="patient_registration")
+            event = log(user=patient.user, action="user_registered")
             event.save()
             response=HttpResponse()
             response.write("<h1>Congratulation! You are registered!</h1>")
