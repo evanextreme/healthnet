@@ -3,13 +3,29 @@
   <meta charset="utf-8" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   <link href="../../static/css/bootstrap.css" rel="stylesheet" type="text/css"/ />
+  <link href="../../static/css/forms.css" rel="stylesheet" type="text/css"/ />
   <script src="../../static/js/bootstrap.js"></script>
 </head>
 
+<div class="content-wrapper">
+    <section class="content-header">
+      <h1>Profile Update</h1>
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Update Profile</a></li>
+      </ol>
+    </section>
+    <section class="content">
 
-<form method="post">
-  {% csrf_token %}
-  {{ update_form.as_p }}
-  {{ password_form.as_p }}
-  <button type="submit">Save changes</button>
-</form>
+        <form method="post">
+          {% csrf_token %}
+          <table id='profile_form'>
+              {{ update_form.as_table }}
+          </table>
+          <table id ='password_form'>
+              {{ password_form.as_table }}
+          </table>
+          <button type="submit">Save changes</button>
+        </form>
+    </section>
+</div>

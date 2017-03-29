@@ -12,11 +12,7 @@
 
 
 <body class="hold-transition skin-blue sidebar-mini">
-<div class="wrapper">
-
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
+<div class="content-wrapper">
     <section class="content-header">
       <h1>Appointment Creation</h1>
       <ol class="breadcrumb">
@@ -26,30 +22,16 @@
     </section>
 
     <!-- Main content -->
-    <section class="content">
-      <div class="row">
-        <!-- left column -->
-        <div class="col-md-6">
-          <!-- general form elements -->
-          <div class="box box-primary">
-            <div class="box-header with-border">
-              <h3 class="box-title">Appointment</h3>
-            </div>
-            <!-- /.box-header -->
-            <!-- form start -->
-            <form action='/appt/create/' method='post'>
-                {% csrf_token %}
-                {{ cal_form.as_p }}
-                <input type="submit" value="Submit"/>
-            </form>
-          </div>
-        </div>
-
-      </div>
+    <div id="form">
+    <h3 class="box-title">Appointment</h3>
+        <form action='/appt/create/' method='post'>
+            {% csrf_token %}
+            <table>
+                {{ cal_form.as_table }}
+            </table>
+            <input type="submit" value="Submit"/>
+        </form>
     </div>
-  </div>
-
-    </section>
   </div>
 </body>
 </html>
