@@ -13,13 +13,11 @@ from HealthNet.models import *
 from django.contrib.auth.models import User
 from Calendar.models import CalendarEvent
 from Calendar.util import events_to_json, calendar_options
-from eventlog.models import log
 from Calendar.forms import CalendarEventForm
 from django.contrib.auth.forms import PasswordChangeForm
-from Calendar.util import events_to_json, calendar_options
 
 def home(request):
-    user = request.user
+    user = request.user                     
     template = loader.get_template('index.html')
     event_url = 'all_events/'
     name = ''

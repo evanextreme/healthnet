@@ -1,21 +1,32 @@
-{% extends "calendar/base.html" %}
-
+{% load staticfiles %}
 <html>
-    <head>
-        <title>HealthNet | {% block tile %}{% endblock %}</title>
-    </head>
-    <body>
-        <div id='nav'>
-            <a href="/">home</a>
-            {% if user.is_authenticated %}
-            welcome {{user.username}}
-            (<a href="/logout">logout</a>)
-            {% else %}
-            <a href="/login/">login</a>
-            <a href="/register/">register</a>
-            {% endif %}
-        </div>
-        <h1>{% block head %}{% endblock %}</h1>
-        {% block content %}{% endblock %}
-    </body>
+  <head>
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="{% static 'materialize/bin/materialize.css' %}"  media="screen,projection"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <nav>
+    <div class="nav-wrapper light-blue accent-3">
+      <a href="#" class="brand-logo">HealthNet</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        {% if user.is_authenticated %}
+        <li><a class="waves-effect waves-light" href="/appt/new">{{user.first_name}}'s Dashboard</a></li>
+        <li><a class="waves-effect waves-light" href="/logout">Logout</a></li>
+        {% else %}
+        <li><a class="waves-effect waves-light" href="/register">Register</a></li>
+        <li><a class="waves-effect waves-light" href="/login">Login</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+  </head>
+  <body>
+    {% block body %}
+        <p>Basic template loaded. Body not overwritten.</p>
+    {% endblock %}
+    <!--Import jQuery before materialize.js-->
+    {% block footer %}
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
+    {% endblock %}
+  </body>
 </html>

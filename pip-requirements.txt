@@ -1,5 +1,4 @@
 eventlog
-schedule
-django-scheduler
 django-registration
 django-datetime-widget
+django-materialize-css

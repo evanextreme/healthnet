@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'HealthNet',
     'Calendar',
     'eventlog',
-    'datetimewidget'
+    'datetimewidget',
+    'materialize'
 ]
 
 
