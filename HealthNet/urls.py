@@ -16,11 +16,18 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from . import signals, views
+
 
 urlpatterns = [
-    #url(r'^login/$', auth_views.login, name='login'),
-    #url(r'^logout/$', auth_views.logout, name='logout'),
-	url(r'^', include('Profile.urls')),
+	url(r'^$', views.home, name='home'),
+	url(r'^appt/new/$', views.new_appt, name='new_appt'),
+	url(r'^appt/create/$', views.new_appt, name='new_appt'),
+	url(r'^login/$', auth_views.login, name='login'),
+	url(r'^logout/$', views.logout_page, name='logout'),
+    url(r'^register/$', views.register_page,name='register'),
+	url(r'^profile/$', views.update_profile, name='profile'),
+	url(r'^all_events/', views.all_events, name='all_events'),
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include('registration.backends.hmac.urls')),
