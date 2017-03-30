@@ -38,11 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'HealthNet',
-    'Profile',
     'Calendar',
     'eventlog',
-    'schedule',
-    'appointments',
     'datetimewidget'
 ]
 
