@@ -16,13 +16,20 @@ from Calendar.util import events_to_json, calendar_options
 from eventlog.models import log
 from Calendar.forms import CalendarEventForm
 from django.contrib.auth.forms import PasswordChangeForm
+from Calendar.util import events_to_json, calendar_options
 
 def home(request):
-	template = loader.get_template('index.html')
-	variables = Context({'user':request.user})
-	output = template.render(variables)
-    
-	return HttpResponse(output)
+    user = request.user
+    template = loader.get_template('index.html')
+    event_url = 'all_events/'
+    name = ''
+    if user.is_authenticated:
+        if hasattr(user, 'doctor'):
+            name += 'Doctor '
+        name += user.first_name
+    variables = Context({'user':request.user,'calendar_config_options': calendar_options(event_url, OPTIONS),'name':name})
+    output = template.render(variables)
+    return HttpResponse(output)
 
 def logout_page(request):
     logout(request)
@@ -68,6 +75,8 @@ def update_profile(request):
             updateform.save()
             user = passform.save()
             auth.update_session_auth_hash(request, user)
+            event=log(user=user,action="user_updateprofile")
+            event.save()
             return HttpResponseRedirect('/')
     else:
         updateform = UpdateUserForm(initial={
@@ -92,13 +101,46 @@ def new_appt(request):
             appt = cal_form.save(commit=False)
             appt.patient = user.patient
             appt.save()
-            return render_to_response("index.html")
+            event=log(user=user,action="new_appt")
+            event.save()
+            return render_to_response('/')
     else:
         cal_form = CalendarEventForm()
     variables=RequestContext(request,{'cal_form':cal_form})
     return render_to_response("appointments/new_appt.html",variables)
 
-
 def all_events(request):
-    events = CalendarEvent.appointments.all()
-    return HttpResponse(events_to_json(events), content_type='application/json')
+    user = request.user
+    if hasattr(user, 'patient'):
+        appointments = request.user.patient.calendarevent_set.all()
+    elif hasattr(user, 'doctor'):
+        appointments = request.user.doctor.calendarevent_set.all()
+    return HttpResponse(events_to_json(appointments), content_type='application/json')
+
+OPTIONS = """{  timeFormat: "H:mm",
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay',
+                },
+                allDaySlot: false,
+                firstDay: 0,
+                weekMode: 'liquid',
+                slotMinutes: 15,
+                defaultEventMinutes: 30,
+                minTime: 8,
+                maxTime: 20,
+                editable: true,
+                dayClick: function(date, allDay, jsEvent, view) {
+                    if (allDay) {       
+                        $('#calendar').fullCalendar('gotoDate', date)      
+                        $('#calendar').fullCalendar('changeView', 'agendaDay')
+                    }
+                },
+                eventClick: function(event, jsEvent, view) {
+                    if (view.name == 'month') {     
+                        $('#calendar').fullCalendar('gotoDate', event.start)      
+                        $('#calendar').fullCalendar('changeView', 'agendaDay')
+                    }
+                },
+            }"""
