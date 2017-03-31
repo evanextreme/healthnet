@@ -82,7 +82,7 @@ def update_profile(request):
             'first_name':user.first_name,
             'last_name':user.last_name,})
         passform = PasswordChangeForm(user)
-    variables = RequestContext(request, {'update_form':updateform,'password_form':passform})
+    variables = RequestContext(request, {'user':user,'update_form':updateform,'password_form':passform})
     return render_to_response('profile.html', variables)
 
 
@@ -104,7 +104,7 @@ def new_appt(request):
             return render_to_response('/')
     else:
         cal_form = CalendarEventForm()
-    variables=RequestContext(request,{'cal_form':cal_form})
+    variables=RequestContext(request,{'user':user,'cal_form':cal_form})
     return render_to_response("appointments/new_appt.html",variables)
 
 def all_events(request):
