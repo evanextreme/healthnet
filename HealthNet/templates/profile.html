@@ -1,20 +1,7 @@
+{% extends "basic.html" %}
 
-<head>
-  <meta charset="utf-8" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-  <link href="../../static/css/bootstrap.css" rel="stylesheet" type="text/css"/ />
-  <link href="../../static/css/forms.css" rel="stylesheet" type="text/css"/ />
-  <script src="../../static/js/bootstrap.js"></script>
-</head>
-
+{% block body %}
 <div class="content-wrapper">
-    <section class="content-header">
-      <h1>Profile Update</h1>
-      <ol class="breadcrumb">
-        <li><a href="/"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Update Profile</a></li>
-      </ol>
-    </section>
     <section class="content">
 
         <form method="post">
@@ -25,7 +12,8 @@
           <table id ='password_form'>
               {{ password_form.as_table }}
           </table>
-          <button type="submit">Save changes</button>
+          <button class="waves-effect waves-light btn light-blue accent-3" type="submit" value="login">Save changes<i class="material-icons right">system_update_alt</i></button>
         </form>
     </section>
 </div>
+{% endblock %}

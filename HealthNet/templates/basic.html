@@ -1,15 +1,27 @@
+{% load fullcalendar_tags %}
 {% load staticfiles %}
+<!DOCTYPE html>
 <html>
   <head>
     <!--Import materialize.css-->
     <link type="text/css" rel="stylesheet" href="{% static 'materialize/bin/materialize.css' %}"  media="screen,projection"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Fullcalendar stuff, oh fun-->
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        {% fullcalendar_css %}        
+        {% fullcalendar_print_css %}        
+        {% fullcalendar_jquery %}
+        {% fullcalendar_jquery_ui %}
+        {% fullcalendar_javascript %}
+        
+        {% calendar_init calendar_config_options %}
+
   <nav>
     <div class="nav-wrapper light-blue accent-3">
       <a href="#" class="brand-logo">HealthNet</a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         {% if user.is_authenticated %}
-        <li><a class="waves-effect waves-light" href="/appt/new">{{user.first_name}}'s Dashboard</a></li>
+        <li><a class="waves-effect waves-light" href="/profile">{{user.first_name}}'s Profile</a></li>
         <li><a class="waves-effect waves-light" href="/logout">Logout</a></li>
         {% else %}
         <li><a class="waves-effect waves-light" href="/register">Register</a></li>
