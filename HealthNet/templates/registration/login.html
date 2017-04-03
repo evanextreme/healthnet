@@ -2,13 +2,12 @@
 
 {% block body %}
 
-{% block content %}
 {% if form.has_errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 <div class="container col s4">
 <form method="post" action=".">
-    <div class="input-field ">
+    <div class="input-field">
     <p><label for="id_username">Username:</label>
         {{ form.username }}</p>
     </div>
@@ -22,6 +21,5 @@
     {% csrf_token %}
 </form>
 </div>
-{% endblock %}
 
 {% endblock %}
