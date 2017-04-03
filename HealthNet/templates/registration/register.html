@@ -1,20 +1,12 @@
-<head>
-  <meta charset="utf-8" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-  <link href="../../static/css/bootstrap.css" rel="stylesheet" type="text/css"/ />
-  <script src="../../static/js/bootstrap.js"></script>
-</head>
-
-
 {% extends "basic.html" %}
-{% block title %}User Registration{% endblock %}
-{% block head %}User Registration{% endblock %}
+{% load material_form %} 
 
-{% block content %}
+{% block body %}
+<div class="container">
 <form method="post" action=".">
     {% csrf_token %}
-    {{ userform.as_p }}
-    {{ patientform.as_p }}
-    <input type="submit" name="csrfmiddlewaretoken" value="register" />
-</form>
+    {% form form=userform %}{% endform %}
+    {% form form=patientform %}{% endform %}
+    <button class="waves-effect waves-light btn light-blue accent-3" type="submit" value="register">Register<i class="material-icons right">system_update_alt</i></button>
+</div>
 {% endblock %}

@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'Calendar',
     'eventlog',
     'datetimewidget',
-    'materialize'
+    'materialize',
+    'material',
 ]
 
 

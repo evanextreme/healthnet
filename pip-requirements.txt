@@ -2,3 +2,4 @@ eventlog
 django-registration
 django-datetime-widget
 django-materialize-css
+django-material

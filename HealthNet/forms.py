@@ -13,7 +13,7 @@ class UserForm(forms.ModelForm):
         fields = ['username','first_name', 'last_name', 'email', 'password']
 
 class PatientForm(forms.ModelForm):
-    date_of_birth = forms.DateField(widget=forms.SelectDateWidget())
+    date_of_birth = forms.DateField(label="Date of Birth")
     class Meta:
         model = Patient
         fields = ['date_of_birth']
