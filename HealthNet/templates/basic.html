@@ -1,5 +1,7 @@
 {% load fullcalendar_tags %}
 {% load staticfiles %}
+{% load material_form %} 
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -15,13 +17,16 @@
         {% fullcalendar_javascript %}
         
         {% calendar_init calendar_config_options %}
+        {% include 'material/includes/material_css.html' %}
+   
+    {% include 'material/includes/material_css.html' %}
 
   <nav>
     <div class="nav-wrapper light-blue accent-3">
       <a href="#" class="brand-logo">HealthNet</a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         {% if user.is_authenticated %}
-        <li><a class="waves-effect waves-light" href="/profile">{{user.first_name}}'s Profile</a></li>
+        <li><a class="waves-effect waves-light" href="/account">{{user.first_name}}'s Account</a></li>
         <li><a class="waves-effect waves-light" href="/logout">Logout</a></li>
         {% else %}
         <li><a class="waves-effect waves-light" href="/register">Register</a></li>
@@ -35,10 +40,17 @@
     {% block body %}
         <p>Basic template loaded. Body not overwritten.</p>
     {% endblock %}
+  </body>
+    <footer>
     <!--Import jQuery before materialize.js-->
-    {% block footer %}
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
         <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
-    {% endblock %}
-  </body>
+        <script type="text/javascript"> $('.datepicker').pickadate({
+        selectMonths: true, // Creates a dropdown to control month
+        selectYears: 15 // Creates a dropdown of 15 years to control year
+        });</script>
+      {% include 'material/includes/material_css.html' %}
+      <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
+      {% include 'material/includes/material_js.html' %}
+    </footer>
 </html>

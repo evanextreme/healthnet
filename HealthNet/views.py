@@ -56,7 +56,7 @@ def register_page(request):
             response.write("<h2>Please <a href='../login/'>log in</a>.</h2>")
             return response
         else:
-            print(userform.errors, profileform.errors)
+            print(userform.errors, patientform.errors)
     else:
         userform=UserForm()
         patientform=PatientForm()
@@ -68,11 +68,9 @@ def update_profile(request):
     user = request.user
     if request.method == 'POST':
         updateform = UpdateUserForm(request.POST, instance = user)
-        passform = PasswordChangeForm(user, request.POST)
-        if updateform.is_valid() and passform.is_valid():
+        if updateform.is_valid():
             updateform.save()
             user = passform.save()
-            auth.update_session_auth_hash(request, user)
             event=log(user=user,action="user_updateprofile")
             event.save()
             return HttpResponseRedirect('/')
@@ -81,14 +79,34 @@ def update_profile(request):
             'email':user.email,
             'first_name':user.first_name,
             'last_name':user.last_name,})
+    variables = RequestContext(request, {'user':user,'update_form':updateform})
+    return render_to_response('account/profile.html', variables)
+
+@csrf_exempt
+def change_password(request):
+    user = request.user
+    if request.method == 'POST':
+        passform = PasswordChangeForm(user, request.POST)
+        if passform.is_valid():
+            user = passform.save()
+            auth.update_session_auth_hash(request, user)
+            event=log(user=user,action="user_updatepassword")
+            event.save()
+            return HttpResponseRedirect('/')
+    else:
         passform = PasswordChangeForm(user)
-    variables = RequestContext(request, {'user':user,'update_form':updateform,'password_form':passform})
-    return render_to_response('profile.html', variables)
+    variables = RequestContext(request, {'user':user,'password_form':passform})
+    return render_to_response('account/password.html', variables)
 
 
     #user = User.objects.get(pk=user_id)
     #user.profile.name = 'elit'
     #user.save()
+
+def account(request):
+    user = request.user
+    variables = RequestContext(request, {'user':user})
+    return render_to_response('account/index.html', variables)
 
 @csrf_exempt
 def new_appt(request):
