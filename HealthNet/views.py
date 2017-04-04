@@ -17,17 +17,9 @@ from Calendar.forms import CalendarEventForm
 from django.contrib.auth.forms import PasswordChangeForm
 
 def home(request):
-    user = request.user                     
-    template = loader.get_template('index.html')
     event_url = 'all_events/'
-    name = ''
-    if user.is_authenticated:
-        if hasattr(user, 'doctor'):
-            name += 'Doctor '
-        name += user.first_name
-    variables = Context({'user':request.user,'calendar_config_options': calendar_options(event_url, OPTIONS),'name':name})
-    output = template.render(variables)
-    return HttpResponse(output)
+    variables = Context({'user':request.user,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+    return render_to_response('index.html',variables)
 
 def logout_page(request):
     logout(request)
@@ -70,7 +62,6 @@ def update_profile(request):
         updateform = UpdateUserForm(request.POST, instance = user)
         if updateform.is_valid():
             updateform.save()
-            user = passform.save()
             event=log(user=user,action="user_updateprofile")
             event.save()
             return HttpResponseRedirect('/')
@@ -119,11 +110,11 @@ def new_appt(request):
             appt.save()
             event=log(user=user,action="new_appt")
             event.save()
-            return render_to_response('/')
+            return HttpResponseRedirect('/')
     else:
         cal_form = CalendarEventForm()
-    variables=RequestContext(request,{'user':user,'cal_form':cal_form})
-    return render_to_response("appointments/new_appt.html",variables)
+        variables=RequestContext(request,{'user':user,'cal_form':cal_form})
+        return render_to_response("appointments/new.html",variables)
 
 def all_events(request):
     user = request.user

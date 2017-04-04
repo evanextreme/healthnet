@@ -1,7 +1,24 @@
 {% extends "basic.html" %}
 {% load fullcalendar_tags %}
-    
-    {% block body %}
-    <p>Index Page. Make something cool!</p>
-    {% calendar %}
-    {% endblock %}
+{% block header %}
+
+        {% fullcalendar_css %}        
+        {% fullcalendar_print_css %}        
+        {% fullcalendar_jquery %}
+        {% fullcalendar_jquery_ui %}
+        {% fullcalendar_javascript %}
+        
+        {% calendar_init calendar_config_options %}
+
+{% endblock %}
+{% block body %}
+    {% if user.is_authenticated %}
+    <br>
+    <div class="container">
+        {% calendar %}
+    </div>
+    {% else %}
+    <p>YOU NEED TO LOG IN, MY BOY!</p>
+    {% endif %}
+{% endblock %}
+{% block footer %}{%endblock%}
