@@ -7,7 +7,7 @@ from django.contrib.auth import logout
 from HealthNet.forms import *
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from eventlog.models import log
 from HealthNet.models import *
 from django.contrib.auth.models import User
@@ -112,6 +112,24 @@ def new_appt(request):
         variables=RequestContext(request,{'user':user,'cal_form':cal_form})
         return render_to_response("appointments/new.html",variables)
 
+@csrf_protect
+def update_appointment(request):
+    if request.method == 'POST':
+        print(request.POST)
+        if 'appointmentid' in request.POST:
+            
+            post_id = request.POST['appointmentid']
+            appointment = CalendarEvent.appointments.get(appointment_id=post_id)
+
+            appointment.title = request.POST['title']
+            
+            appointment.save()
+
+            # doSomething with pieFact here...
+            return HttpResponse('success') # if everything is OK
+        
+    return HttpResponse('error')
+
 def all_events(request):
     user = request.user
     if hasattr(user, 'patient'):
@@ -137,10 +155,40 @@ OPTIONS = """{  timeFormat: "H:mm",
                 editable: true,
 
                 eventClick: function(event, jsEvent, view) {
+
                     var title = prompt('Event Title:', event.title, { buttons: { Ok: true, Cancel: false} });
                     if (title){
                         event.title = title;
                         $('#calendar').fullCalendar('updateEvent',event);
+
+                        $.ajaxSetup({ 
+                            beforeSend: function(xhr, settings) {
+                                function getCookie(name) {
+                                    var cookieValue = null;
+                                    if (document.cookie && document.cookie != '') {
+                                        var cookies = document.cookie.split(';');
+                                        for (var i = 0; i < cookies.length; i++) {
+                                            var cookie = jQuery.trim(cookies[i]);
+                                            // Does this cookie string begin with the name we want?
+                                            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    return cookieValue;
+                                }
+                                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                                    // Only send the token to relative URLs i.e. locally.
+                                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                                }
+                            } 
+                        });
+
+                        $.post('appointments/update/', event, function(response){
+                            if(response === 'success'){ alert('Appointment updated!'); }
+                            else{ alert(response); }
+                        });
                     }
                 },
             }"""
