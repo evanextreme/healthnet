@@ -27,8 +27,7 @@ def logout_page(request):
 
 @csrf_exempt
 def register_page(request):
-    context = RequestContext(request)
-
+    
     if request.method=='POST':
         userform=UserForm(data=request.POST)
         patientform=PatientForm(data=request.POST)
@@ -44,6 +43,7 @@ def register_page(request):
             event = log(user=patient.user, action="user_registered")
             event.save()
             response=HttpResponse()
+            #TODO fix response
             response.write("<h1>Congratulation! You are registered!</h1>")
             response.write("<h2>Please <a href='../login/'>log in</a>.</h2>")
             return response
@@ -52,8 +52,8 @@ def register_page(request):
     else:
         userform=UserForm()
         patientform=PatientForm()
-    variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
-    return render_to_response("registration/register.html",variables)
+        variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
+        return render_to_response("registration/register.html",variables)
 
 @csrf_exempt
 def update_profile(request):
@@ -70,8 +70,8 @@ def update_profile(request):
             'email':user.email,
             'first_name':user.first_name,
             'last_name':user.last_name,})
-    variables = RequestContext(request, {'user':user,'update_form':updateform})
-    return render_to_response('account/profile.html', variables)
+        variables = RequestContext(request, {'user':user,'update_form':updateform})
+        return render_to_response('account/profile.html', variables)
 
 @csrf_exempt
 def change_password(request):
@@ -86,13 +86,9 @@ def change_password(request):
             return HttpResponseRedirect('/')
     else:
         passform = PasswordChangeForm(user)
-    variables = RequestContext(request, {'user':user,'password_form':passform})
-    return render_to_response('account/password.html', variables)
+        variables = RequestContext(request, {'user':user,'password_form':passform})
+        return render_to_response('account/password.html', variables)
 
-
-    #user = User.objects.get(pk=user_id)
-    #user.profile.name = 'elit'
-    #user.save()
 
 def account(request):
     user = request.user
@@ -119,10 +115,11 @@ def new_appt(request):
 def all_events(request):
     user = request.user
     if hasattr(user, 'patient'):
-        appointments = request.user.patient.calendarevent_set.all()
+        appointments = user.patient.calendarevent_set.all()
     elif hasattr(user, 'doctor'):
-        appointments = request.user.doctor.calendarevent_set.all()
+        appointments = user.doctor.calendarevent_set.all()
     return HttpResponse(events_to_json(appointments), content_type='application/json')
+
 
 OPTIONS = """{  timeFormat: "H:mm",
                 header: {
@@ -138,16 +135,12 @@ OPTIONS = """{  timeFormat: "H:mm",
                 minTime: 8,
                 maxTime: 20,
                 editable: true,
-                dayClick: function(date, allDay, jsEvent, view) {
-                    if (allDay) {       
-                        $('#calendar').fullCalendar('gotoDate', date)      
-                        $('#calendar').fullCalendar('changeView', 'agendaDay')
-                    }
-                },
+
                 eventClick: function(event, jsEvent, view) {
-                    if (view.name == 'month') {     
-                        $('#calendar').fullCalendar('gotoDate', event.start)      
-                        $('#calendar').fullCalendar('changeView', 'agendaDay')
+                    var title = prompt('Event Title:', event.title, { buttons: { Ok: true, Cancel: false} });
+                    if (title){
+                        event.title = title;
+                        $('#calendar').fullCalendar('updateEvent',event);
                     }
                 },
             }"""
