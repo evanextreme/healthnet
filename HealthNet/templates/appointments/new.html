@@ -1,0 +1,18 @@
+{% extends "basic.html" %}
+{% load material_form %}
+
+<!DOCTYPE html>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+{% block body %}
+<div class="container">
+
+    <!-- Main content -->
+    <h3 class="box-title">New Appointment</h3>
+        <form action='.' method='post'>
+            {% csrf_token %}
+            {% form form=cal_form %}{% endform %}
+            <button class="waves-effect waves-light btn light-blue accent-3" type="submit" value="Submit">Create</button>
+  </div>
+{% endblock %}
