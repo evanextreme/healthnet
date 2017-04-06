@@ -9,7 +9,7 @@ from HealthNet.models import Doctor
 
 
 class CalendarEventForm(forms.ModelForm):
-    doctor = forms.ModelChoiceField(queryset=Doctor.doctor.all(), empty_label=None)
+    #doctor = forms.ModelChoiceField(queryset=Doctor.doctor.all(), empty_label=None)
     class Meta:
         model = CalendarEvent
         fields = ['title','start','end','all_day','doctor']
