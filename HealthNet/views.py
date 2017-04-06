@@ -27,7 +27,7 @@ def logout_page(request):
 
 @csrf_exempt
 def register_page(request):
-    
+
     if request.method=='POST':
         userform=UserForm(data=request.POST)
         patientform=PatientForm(data=request.POST)
@@ -60,7 +60,9 @@ def update_profile(request):
     user = request.user
     if request.method == 'POST':
         updateform = UpdateUserForm(request.POST, instance = user)
-        if updateform.is_valid():
+        p_updateform = UpdatePatientForm(request.POST, instance = user)
+        if updateform.is_valid() and p_updateform.is_valid():
+            p_updateform.save()
             updateform.save()
             event=log(user=user,action="user_updateprofile")
             event.save()
@@ -70,7 +72,12 @@ def update_profile(request):
             'email':user.email,
             'first_name':user.first_name,
             'last_name':user.last_name,})
-        variables = RequestContext(request, {'user':user,'update_form':updateform})
+        p_updateform = UpdatePatientForm(initial={
+            'height':user.patient.height,
+            'weight':user.patient.weight,
+            'assigned_doctor':user.patient.assigned_doctor,
+            'current_hospital_assignment':user.patient.current_hospital_assignment,})
+        variables = RequestContext(request, {'user':user,'update_form':updateform, 'p_updateform':p_updateform})
         return render_to_response('account/profile.html', variables)
 
 @csrf_exempt
@@ -117,17 +124,17 @@ def update_appointment(request):
     if request.method == 'POST':
         print(request.POST)
         if 'appointmentid' in request.POST:
-            
+
             post_id = request.POST['appointmentid']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
 
             appointment.title = request.POST['title']
-            
+
             appointment.save()
 
             # doSomething with pieFact here...
             return HttpResponse('success') # if everything is OK
-        
+
     return HttpResponse('error')
 
 def all_events(request):
@@ -161,7 +168,7 @@ OPTIONS = """{  timeFormat: "H:mm",
                         event.title = title;
                         $('#calendar').fullCalendar('updateEvent',event);
 
-                        $.ajaxSetup({ 
+                        $.ajaxSetup({
                             beforeSend: function(xhr, settings) {
                                 function getCookie(name) {
                                     var cookieValue = null;
@@ -182,7 +189,7 @@ OPTIONS = """{  timeFormat: "H:mm",
                                     // Only send the token to relative URLs i.e. locally.
                                     xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
                                 }
-                            } 
+                            }
                         });
 
                         $.post('appointments/update/', event, function(response){

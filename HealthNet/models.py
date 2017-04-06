@@ -58,29 +58,23 @@ class Patient(models.Model):
         variables = {'user':self.user}
         return(render_to_string('card/patient.html',variables))
 
-    """
-    doctor_notes = models.TextField()
+    doctor_notes = models.TextField(null=True) 
     height = models.IntegerField()
     weight = models.IntegerField()
 
-    doctor_assignment = models.ForeignKey(
+    assigned_doctor = models.ForeignKey(
         Doctor,
         on_delete=models.CASCADE,
         related_name ="doctor",
         null=True,
     )
-    nurse_assignment = models.ForeignKey(
-        Nurse,
-        on_delete=models.CASCADE,
-        related_name ="nurse",
-        null=True,
-    )
+
     current_hospital_assignment = models.ForeignKey(
         Hospital,
         on_delete=models.CASCADE,
         null = True,
     )
-    """
+
 
 #@receiver(post_save, sender=User)
 def create_patient(sender, instance, created, **kwargs):
