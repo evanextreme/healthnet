@@ -29,9 +29,10 @@ class PatientForm(forms.ModelForm):
     weight = forms.IntegerField()
     height.label = 'Height (Inches)'
     weight.label = 'Weight (Pounds)'
+    profile_picture = forms.ImageField(label="Upload a photo of yourself!")
     class Meta:
         model = Patient
-        fields = ['date_of_birth', 'height', 'weight', 'assigned_doctor', 'current_hospital_assignment']
+        fields = ['date_of_birth', 'height', 'weight', 'assigned_doctor', 'current_hospital_assignment', 'profile_picture']
 
 
 class UpdateUserForm(forms.ModelForm):
