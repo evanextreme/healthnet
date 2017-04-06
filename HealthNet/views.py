@@ -60,7 +60,7 @@ def update_profile(request):
     user = request.user
     if request.method == 'POST':
         updateform = UpdateUserForm(request.POST, instance = user)
-        p_updateform = UpdatePatientForm(request.POST, instance = user)
+        p_updateform = UpdatePatientForm(request.POST, instance = user.patient)
         if updateform.is_valid() and p_updateform.is_valid():
             p_updateform.save()
             updateform.save()
@@ -152,18 +152,17 @@ OPTIONS = """{  timeFormat: "H:mm",
                     center: 'title',
                     right: 'month,agendaWeek,agendaDay',
                 },
-                allDaySlot: false,
+                allDaySlot: true,
                 firstDay: 0,
                 weekMode: 'liquid',
                 slotMinutes: 15,
                 defaultEventMinutes: 30,
-                minTime: 8,
-                maxTime: 20,
+                minTime: 0,
+                maxTime: 24,
                 editable: true,
 
                 eventClick: function(event, jsEvent, view) {
-
-                    var title = prompt('Event Title:', event.title, { buttons: { Ok: true, Cancel: false} });
+                    var title = prompt('Appointment Title:', event.title,  { buttons: { Ok: true, Cancel: false} });
                     if (title){
                         event.title = title;
                         $('#calendar').fullCalendar('updateEvent',event);
@@ -193,7 +192,7 @@ OPTIONS = """{  timeFormat: "H:mm",
                         });
 
                         $.post('appointments/update/', event, function(response){
-                            if(response === 'success'){ alert('Appointment updated!'); }
+                            if(response === 'success'){ Materialize.toast('Appointment updated!', 4000); }
                             else{ alert(response); }
                         });
                     }

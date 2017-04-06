@@ -2,7 +2,7 @@
 {% load fullcalendar_tags %}
 {% block header %}
 
-        {% fullcalendar_css %}        
+        {% fullcalendar_css %}      
         {% fullcalendar_print_css %}        
         {% fullcalendar_jquery %}
         {% fullcalendar_jquery_ui %}
@@ -16,10 +16,25 @@
     <br>
     {% csrf_token %}
     <div class="container">
+          <div id="modal1" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                <h4>Modal Header</h4>
+                <p>A bunch of text</p>
+                </div>
+                <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Agree</a>
+                </div>
+        </div>
         {% calendar %}
     </div>
     {% else %}
     <p>YOU NEED TO LOG IN, MY BOY!</p>
     {% endif %}
 {% endblock %}
-{% block footer %}{%endblock%}
+{% block footer %}
+
+<script type="text/javascript"> $(document).ready(function(){
+    $('.modal').modal();
+  });
+</script>
+  {%endblock%}
