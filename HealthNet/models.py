@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
+from django.core.files.storage import FileSystemStorage
 
 # Create your models here.
 
@@ -40,17 +41,21 @@ class Doctor(models.Model):
     doctor_id = models.AutoField(primary_key=True)
     def __str__(self):
         return str(self.user.first_name + " " + self.user.last_name)
+    def card(self):
+        variables = {'user':self.user}
+        return(render_to_string('card/doctor.html',variables))
     current_hospital_assignment = models.ForeignKey(
         Hospital,
         on_delete=models.CASCADE
     )
 
+
 class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    date_of_birth = models.DateTimeField(default=timezone.now, blank=True)
+    date_of_birth = models.DateTimeField(default=timezone.now)
     patients = models.Manager()
     patient_id = models.AutoField(primary_key=True)
-    #doctor = models.ForeignKey(Doctor, blank=True)
+
     def __str__(self):
         return str(self.user.first_name + ' ' + self.user.last_name)
 
@@ -74,6 +79,8 @@ class Patient(models.Model):
         on_delete=models.CASCADE,
         null = True,
     )
+
+    profile_picture = models.ImageField(upload_to='patients',blank=True)
 
 
 #@receiver(post_save, sender=User)

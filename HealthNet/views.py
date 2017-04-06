@@ -30,13 +30,15 @@ def register_page(request):
 
     if request.method=='POST':
         userform=UserForm(data=request.POST)
-        patientform=PatientForm(data=request.POST)
+        patientform=PatientForm(request.POST, request.FILES)
+        print(request.FILES)
         if userform.is_valid() and patientform.is_valid():
             user = userform.save(commit=False)
             user.set_password(user.password)
             user.save()
 
             patient = patientform.save(commit=False)
+            
             patient.user = user
             patient.save()
 
@@ -48,12 +50,13 @@ def register_page(request):
             response.write("<h2>Please <a href='../login/'>log in</a>.</h2>")
             return response
         else:
+        
             print(userform.errors, patientform.errors)
     else:
         userform=UserForm()
         patientform=PatientForm()
-        variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
-        return render_to_response("registration/register.html",variables)
+    variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
+    return render_to_response("registration/register.html",variables)
 
 @csrf_exempt
 def update_profile(request):
