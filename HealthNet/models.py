@@ -37,17 +37,20 @@ class Nurse(models.Model):
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     doctor = models.Manager()
-    #employment_date = models.DateTimeField('Employment Date')
+    employment_date = models.DateTimeField(default=timezone.now)
+    doctors = models.Manager()
     doctor_id = models.AutoField(primary_key=True)
-    def __str__(self):
-        return str(self.user.first_name + " " + self.user.last_name)
-    def card(self):
-        variables = {'user':self.user}
-        return(render_to_string('card/doctor.html',variables))
+    
     current_hospital_assignment = models.ForeignKey(
         Hospital,
         on_delete=models.CASCADE
     )
+
+    def __str__(self):
+        return str("Dr. " + self.user.first_name + " " + self.user.last_name)
+    def card(self):
+        variables = {'user':self.user}
+        return(render_to_string('card/doctor.html',variables))
 
 
 class Patient(models.Model):

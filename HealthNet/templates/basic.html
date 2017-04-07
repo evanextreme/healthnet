@@ -14,10 +14,14 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Fullcalendar stuff, oh fun-->
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-
+      <style>    .waves-effect.waves-blue .waves-ripple {
+     /* The alpha value allows the text and background color
+     of the button to still show through. */
+      background-color: rgba(0, 176, 255, 0.65);
+      }</style>
     {% block header %} {%endblock%}
+    {% block nav %}
   <nav>
-
     <div class="nav-wrapper light-blue accent-3">
       <a href="/" class="brand-logo">HealthNet</a>
       <a href="#" data-activates="mobile-menu" class="button-collapse"><i class="material-icons">menu</i></a>
@@ -43,6 +47,8 @@
       </ul>
     </div>
   </nav>
+  {% endblock %}
+
   </head>
   <body>
     {% block body %}
@@ -55,9 +61,11 @@
               <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
               <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
               <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
+              
 
       {% endblock %}
       <script type="text/javascript">$(".button-collapse").sideNav();</script>
+      
       {% include 'material/includes/material_css.html' %}
       {% include 'material/includes/material_js.html' %}
 
