@@ -2,7 +2,7 @@ import re
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from HealthNet.models import Patient
+from HealthNet.models import *
 
 
 
@@ -33,6 +33,12 @@ class PatientForm(forms.ModelForm):
     class Meta:
         model = Patient
         fields = ['date_of_birth', 'height', 'weight', 'assigned_doctor', 'current_hospital_assignment', 'profile_picture']
+
+
+class DoctorForm(forms.ModelForm):
+    class Meta:
+        model = Doctor
+        fields = ['current_hospital_assignment']
 
 
 class UpdateUserForm(forms.ModelForm):

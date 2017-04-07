@@ -41,13 +41,40 @@ def logout_page(request):
     logout(request)
     return HttpResponseRedirect('/')
 
+
+def doc_register_page(request):
+    if request_method == 'POST':
+        userform = UserForm(data=request.POST)
+        docform = DoctorForm(data=reuqest.POST)
+        if userform.is_valid() and docform.is_valid():
+            user = userform.save(commit=False)
+            user.set_password(user.password)
+            user.save()
+
+            doctor = docform.save(commit=False)
+            doctor.user = user
+            doctor.save()
+
+            event = log(user=patient.user, action="user_registered")
+            event.save()
+
+            response = HttpResponse()
+            #TODO fix response
+            response.write("<h1>Congratulation! You are registered!</h1>")
+            response.write("<h2>Please <a href='../login/'>log in</a>.</h2>")
+
+    userform=UserForm()
+    docform=DoctorForm()
+    variables=RequestContext(request,{'userform':userform, 'docform':docform})
+    return render_to_response("registration/register.html",variables)
+
+
 @csrf_exempt
 def register_page(request):
 
-    if request.method=='POST':
-        userform=UserForm(data=request.POST)
-        patientform=PatientForm(request.POST, request.FILES)
-        print(request.FILES)
+    if request.method == 'POST':
+        userform = UserForm(data=request.POST)
+        patientform = PatientForm(data=request.POST)
         if userform.is_valid() and patientform.is_valid():
             user = userform.save(commit=False)
             user.set_password(user.password)
@@ -60,17 +87,14 @@ def register_page(request):
 
             event = log(user=patient.user, action="user_registered")
             event.save()
-            response=HttpResponse()
+            response = HttpResponse()
             #TODO fix response
             response.write("<h1>Congratulation! You are registered!</h1>")
             response.write("<h2>Please <a href='../login/'>log in</a>.</h2>")
             return response
-        else:
-        
-            print(userform.errors, patientform.errors)
-    else:
-        userform=UserForm()
-        patientform=PatientForm()
+
+    userform=UserForm()
+    patientform=PatientForm()
     variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
     return render_to_response("registration/register.html",variables)
 

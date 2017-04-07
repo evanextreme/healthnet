@@ -36,7 +36,7 @@ class Nurse(models.Model):
 
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    doctor = models.Manager()
+    doctors = models.Manager()
     employment_date = models.DateTimeField(default=timezone.now)
     doctors = models.Manager()
     doctor_id = models.AutoField(primary_key=True)
@@ -66,7 +66,7 @@ class Patient(models.Model):
         variables = {'user':self.user}
         return(render_to_string('card/patient.html',variables))
 
-    doctor_notes = models.TextField(null=True) 
+    doctor_notes = models.TextField(null=True)
     height = models.IntegerField()
     weight = models.IntegerField()
 
