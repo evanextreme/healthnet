@@ -16,10 +16,26 @@ from Calendar.util import events_to_json, calendar_options
 from Calendar.forms import CalendarEventForm
 from django.contrib.auth.forms import PasswordChangeForm
 
+@csrf_protect
 def home(request):
+    user = request.user
     event_url = 'all_events/'
-    variables = Context({'user':request.user,'calendar_config_options':calendar_options(event_url, OPTIONS)})
-    return render_to_response('index.html',variables)
+
+    if request.method == 'POST':
+        post_id = request.POST['appointmentid']
+        appointment = CalendarEvent.appointments.get(appointment_id=post_id)
+        cal_form = CalendarEventForm(request.POST, instance=appointment)
+        if cal_form.is_valid():
+            cal_form.save()
+            event=log(user=user,action="updated_apt")
+            event.save()
+            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+            return render_to_response('index.html', variables)
+
+    else:
+        cal_form = CalendarEventForm()
+        variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+        return render_to_response('index.html',variables)
 
 def logout_page(request):
     logout(request)
@@ -124,21 +140,13 @@ def new_appt(request):
 
 @csrf_protect
 def update_appointment(request):
+    user = request.user
     if request.method == 'POST':
-        print(request.POST)
-        if 'appointmentid' in request.POST:
-
-            post_id = request.POST['appointmentid']
-            appointment = CalendarEvent.appointments.get(appointment_id=post_id)
-
-            appointment.title = request.POST['title']
-
-            appointment.save()
-
-            # doSomething with pieFact here...
-            return HttpResponse('success') # if everything is OK
-
-    return HttpResponse('error')
+        post_id = request.POST['appointmentid']
+        appointment = CalendarEvent.appointments.get(appointment_id=post_id)
+        cal_form = CalendarEventForm(request.POST, instance=appointment)
+        variables = RequestContext(request, {'user':user,'cal_form':cal_form})
+        return render_to_response('appointments/update.html', variables)
 
 def all_events(request):
     user = request.user
@@ -165,10 +173,6 @@ OPTIONS = """{  timeFormat: "H:mm",
                 editable: true,
 
                 eventClick: function(event, jsEvent, view) {
-                    var title = prompt('Appointment Title:', event.title,  { buttons: { Ok: true, Cancel: false} });
-                    if (title){
-                        event.title = title;
-                        $('#calendar').fullCalendar('updateEvent',event);
 
                         $.ajaxSetup({
                             beforeSend: function(xhr, settings) {
@@ -193,11 +197,12 @@ OPTIONS = """{  timeFormat: "H:mm",
                                 }
                             }
                         });
-
+                        
                         $.post('appointments/update/', event, function(response){
-                            if(response === 'success'){ Materialize.toast('Appointment updated!', 4000); }
-                            else{ alert(response); }
+                            alert(response)
+                            $('#update-apt-modal').html(response);
                         });
-                    }
+                        $('#update-apt-modal').modal('open');
+                
                 },
             }"""
