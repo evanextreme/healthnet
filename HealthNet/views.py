@@ -81,7 +81,7 @@ def register_page(request):
             user.save()
 
             patient = patientform.save(commit=False)
-            
+
             patient.user = user
             patient.save()
 
@@ -122,6 +122,21 @@ def update_profile(request):
             'current_hospital_assignment':user.patient.current_hospital_assignment,})
         variables = RequestContext(request, {'user':user,'update_form':updateform, 'p_updateform':p_updateform})
         return render_to_response('account/profile.html', variables)
+
+@csrf_exempt
+def change_hospital(request):
+    user = request.user
+    if request.method == 'POST':
+        hospital_change_form = DoctorForm(request.POST, instance = user)
+        if hospital_change_form.is_valid():
+            hospital_change_form.save()
+            event=log(user=user,action="doctor_changehosptial")
+            event.save()
+            return HttpResponseRedirect('/')
+    hospital_change_form = DoctorForm(initial={'current_hospital_assignment':user.doctor.current_hospital_assignment})
+    variables = RequestContext(request, {'user':user,'hospital_change_form':hospital_change_form})
+    return render_to_response('account/change_hospital.html', variables)
+
 
 @csrf_exempt
 def change_password(request):
@@ -221,12 +236,12 @@ OPTIONS = """{  timeFormat: "H:mm",
                                 }
                             }
                         });
-                        
+
                         $.post('appointments/update/', event, function(response){
                             alert(response)
                             $('#update-apt-modal').html(response);
                         });
                         $('#update-apt-modal').modal('open');
-                
+
                 },
             }"""

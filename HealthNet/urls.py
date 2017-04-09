@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^register/$', views.register_page,name='register'),
 	url(r'^account/$', views.account, name='account'),
 	url(r'^account/profile/$', views.update_profile, name='profile'),
+    url(r'^account/change_hospital/$', views.change_hospital, name='change_hospital'),
 	url(r'^account/password/$', views.change_password, name='password'),
 	url(r'^all_events/', views.all_events, name='all_events'),
     url(r'^', include('django.contrib.auth.urls')),
