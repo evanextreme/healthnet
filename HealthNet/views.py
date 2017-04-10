@@ -30,7 +30,7 @@ def home(request):
             cal_form.fields['patient'].widget = forms.HiddenInput()
             variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS)})
             return render_to_response('appointments/update.html', variables)
-        else:
+        elif 'Update' in request.POST:
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             cal_form = CalendarEventForm(request.POST, instance=appointment)
@@ -42,6 +42,18 @@ def home(request):
                 return render_to_response('index.html', variables)
             else:
                 print(str(cal_form.errors))
+
+        elif 'Delete' in request.POST:
+            post_id = request.POST['appointment_id']
+            appointment = CalendarEvent.appointments.get(appointment_id=post_id)
+            appointment.delete()
+            event=log(user=user,action="updated_apt")
+            event.save()
+            variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+            return render_to_response('index.html', variables)
+
+        else:
+            print(str(cal_form.errors))
 
     else:
         cal_form = CalendarEventForm()
@@ -198,6 +210,7 @@ def update_appointment(request):
         variables = RequestContext(request, {'user':user,'cal_form':cal_form})
         return render_to_response('appointments/update.html', variables)
 
+
 def all_events(request):
     user = request.user
     if hasattr(user, 'patient'):
@@ -249,7 +262,6 @@ OPTIONS = """{  timeFormat: "H:mm",
                         });
 
                         $.post('/', event, function(response){
-                            alert(response)
                             $('#update-apt-div').html(response);
                         });
                         $('#update-apt-modal').modal('open');
