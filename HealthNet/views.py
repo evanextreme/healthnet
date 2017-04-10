@@ -16,21 +16,32 @@ from Calendar.util import events_to_json, calendar_options
 from Calendar.forms import CalendarEventForm
 from django.contrib.auth.forms import PasswordChangeForm
 
-@csrf_protect
+@csrf_exempt
 def home(request):
     user = request.user
     event_url = 'all_events/'
-
     if request.method == 'POST':
-        post_id = request.POST['appointmentid']
-        appointment = CalendarEvent.appointments.get(appointment_id=post_id)
-        cal_form = CalendarEventForm(request.POST, instance=appointment)
-        if cal_form.is_valid():
-            cal_form.save()
-            event=log(user=user,action="updated_apt")
-            event.save()
+        appointment = CalendarEvent()
+        if 'appointmentid' in request.POST:
+            post_id = request.POST['appointmentid']
+            appointment = CalendarEvent.appointments.get(appointment_id=post_id)
+            cal_form = CalendarEventForm(instance=appointment)
+            cal_form.fields['appointment_id'].widget = forms.HiddenInput()
+            cal_form.fields['patient'].widget = forms.HiddenInput()
             variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS)})
-            return render_to_response('index.html', variables)
+            return render_to_response('appointments/update.html', variables)
+        else:
+            post_id = request.POST['appointment_id']
+            appointment = CalendarEvent.appointments.get(appointment_id=post_id)
+            cal_form = CalendarEventForm(request.POST, instance=appointment)
+            if cal_form.is_valid():
+                cal_form.save()
+                event=log(user=user,action="updated_apt")
+                event.save()
+                variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+                return render_to_response('index.html', variables)
+            else:
+                print(str(cal_form.errors))
 
     else:
         cal_form = CalendarEventForm()
@@ -74,7 +85,7 @@ def register_page(request):
 
     if request.method == 'POST':
         userform = UserForm(data=request.POST)
-        patientform = PatientForm(data=request.POST)
+        patientform = PatientForm(request.POST, request.FILES)
         if userform.is_valid() and patientform.is_valid():
             user = userform.save(commit=False)
             user.set_password(user.password)
@@ -237,9 +248,9 @@ OPTIONS = """{  timeFormat: "H:mm",
                             }
                         });
 
-                        $.post('appointments/update/', event, function(response){
+                        $.post('/', event, function(response){
                             alert(response)
-                            $('#update-apt-modal').html(response);
+                            $('#update-apt-div').html(response);
                         });
                         $('#update-apt-modal').modal('open');
 

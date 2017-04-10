@@ -10,9 +10,10 @@ from HealthNet.models import Doctor
 
 class CalendarEventForm(forms.ModelForm):
     #doctor = forms.ModelChoiceField(queryset=Doctor.doctor.all(), empty_label=None)
+    appointment_id = forms.IntegerField()
     class Meta:
         model = CalendarEvent
-        fields = ['title','start','end','all_day','doctor']
+        fields = ['title','start','end','all_day','doctor','patient','appointment_id']
         widgets = {
             #Use localization
             'start': DateTimeWidget(attrs={'class':"yourdatetime"}, usel10n = True),

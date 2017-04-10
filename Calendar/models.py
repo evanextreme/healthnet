@@ -5,22 +5,22 @@ from django.utils.translation import ugettext_lazy as _
 from HealthNet.models import Doctor, Patient
 
 class CalendarEvent(models.Model):
-    """The event set a record for an 
-    activity that will be scheduled at a 
-    specified date and time. 
-    
-    It could be on a date and time 
+    """The event set a record for an
+    activity that will be scheduled at a
+    specified date and time.
+
+    It could be on a date and time
     to start and end, but can also be all day.
-    
+
     :param title: Title of event
     :type title: str.
-    
+
     :param start: Start date of event
     :type start: datetime.
-    
+
     :param end: End date of event
     :type end: datetime.
-    
+
     :param all_day: Define event for all day
     :type all_day: bool.
     """
@@ -31,8 +31,8 @@ class CalendarEvent(models.Model):
     end = models.DateTimeField(_('End'))
     all_day = models.BooleanField(_('All day'), default=False)
     appointments = models.Manager()
-    doctor = models.ForeignKey(Doctor, default=None, blank=True)
-    patient = models.ForeignKey(Patient, default=None, blank=True)
+    doctor = models.ForeignKey(Doctor)
+    patient = models.ForeignKey(Patient)
     class Meta:
         verbose_name = _('Event')
         verbose_name_plural = _('Events')
