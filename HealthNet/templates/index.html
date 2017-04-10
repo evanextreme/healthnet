@@ -1,14 +1,14 @@
 {% extends "basic.html" %}
 {% load fullcalendar_tags %}
-{% load material_form %} 
+{% load material_form %}
 {% block header %}
 
-        {% fullcalendar_css %}      
-        {% fullcalendar_print_css %}        
+        {% fullcalendar_css %}
+        {% fullcalendar_print_css %}
         {% fullcalendar_jquery %}
         {% fullcalendar_jquery_ui %}
         {% fullcalendar_javascript %}
-        
+
         {% calendar_init calendar_config_options %}
 
 {% endblock %}
@@ -25,8 +25,11 @@
                     </div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="modal-action modal-close waves-effect waves-blue btn-flat">Cancel</a>
-                <button class="modal-action modal-close waves-effect waves-light btn light-blue accent-3" type="submit" value="Submit">Update</button>
+              <button class="left waves-effect waves-red btn-flat" type="submit" name="Delete">
+                <i class="material-icons left">delete</i>Delete
+              </button>
+              <a href="#" class="modal-action modal-close waves-effect waves-blue btn-flat">Cancel</a>
+              <button class="modal-action modal-close waves-effect waves-light btn light-blue accent-3" type="submit" name="Update">Update</button>
             </div>
 
         </div>
