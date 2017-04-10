@@ -15,19 +15,20 @@
 {% block body %}
     {% if user.is_authenticated %}
     <br>
-    {% csrf_token %}
     <div class="container">
           <div id="update-apt-modal" class="modal modal-fixed-footer">
-              <div class="modal-content">
-                  <h4>Update Appointment</h4>
-                      <form action='.' method='post' enctype="multipart/form-data">
-                          {% csrf_token %}
-                          {% form form=cal_form %}{% endform %}
-              </div>
-              <div class="modal-footer">
-                  <a href="#" class="modal-action modal-close waves-effect waves-blue btn-flat">Cancel</a>
-                  <button class="modal-action modal-close waves-effect waves-light btn light-blue accent-3" type="submit" value="Submit">Update</button>
-              </div>
+            <div class="modal-content">
+                <h4>Update Appointment</h4>
+                <form action='.' method='post' enctype="multipart/form-data">
+
+                    <div id='update-apt-div'>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="modal-action modal-close waves-effect waves-blue btn-flat">Cancel</a>
+                <button class="modal-action modal-close waves-effect waves-light btn light-blue accent-3" type="submit" value="Submit">Update</button>
+            </div>
+
         </div>
         {% calendar %}
     </div>
