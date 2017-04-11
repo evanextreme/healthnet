@@ -1,0 +1,12 @@
+{% load staticfiles %}
+{% load material_form %}
+
+{% csrf_token %}
+{% form form=cal_form %}{% endform %}
+{% include 'material/includes/material_css.html' %}
+<script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
+{% include 'material/includes/material_js.html' %}
+<script type="text/javascript"> $(document).ready(function(){
+    $('.modal').modal();
+    })
+</script>
