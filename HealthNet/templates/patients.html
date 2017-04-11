@@ -1,0 +1,12 @@
+{% extends "basic.html" %}
+{% block active_patients %}class="active"{% endblock %}
+{% block body %}
+<div class="container row">
+  <div class="col s6">
+{% for patient in patients %}
+    {{patient.card}}
+    <br>
+{% endfor %}
+</div>
+</div>
+{% endblock %}

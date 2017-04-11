@@ -105,6 +105,9 @@ def register_page(request):
         if userform.is_valid() and patientform.is_valid():
             user = userform.save(commit=False)
             user.set_password(user.password)
+            user.username = user.username.lower()
+            user.first_name = user.first_name.title()
+            user.last_name = user.last_name.title()
             user.save()
 
             patient = patientform.save(commit=False)
@@ -137,6 +140,9 @@ def update_profile(request):
         if updateform.is_valid() and p_updateform.is_valid():
             p_updateform.save()
             updateform.save()
+            user.first_name = user.first_name.title()
+            user.last_name = user.last_name.title()
+            user.save()
             event=log(user=user,action="user_updateprofile")
             event.save()
             return HttpResponseRedirect('/')
