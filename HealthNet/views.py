@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from eventlog.models import log
 from HealthNet.models import *
 from django.contrib.auth.models import User
-from Calendar.models import CalendarEvent
+from Calendar.models import CalendarEvent, Attachment
 from Calendar.util import events_to_json, calendar_options
 from Calendar.forms import CalendarEventForm, UpdateCalendarEventForm
 from django.contrib.auth.forms import PasswordChangeForm
@@ -22,25 +22,35 @@ def home(request):
     user = request.user
     permissions = get_permissions(user)
     event_url = 'all_events/'
+
+    #If user is admin, redirect to admin dashboard
+    if permissions == 'admin':
+        return HttpResponseRedirect('/admin')
+
     if request.method == 'POST':
         appointment = CalendarEvent()
         if 'appointmentid' in request.POST:
             post_id = request.POST['appointmentid']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
+            attachments = appointment.attachment_set.all()
+            print("Test" + str(attachments))
             cal_form = UpdateCalendarEventForm(instance=appointment)
             if get_permissions(user) == 'doctor':
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
             elif get_permissions(user) == 'patient':
                 cal_form.fields['patient'].widget = forms.HiddenInput()
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
-            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'attachments':attachments,'calendar_config_options':calendar_options(event_url, OPTIONS)})
             return render_to_response('appointments/update.html', variables)
         elif 'Update' in request.POST:
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
-            cal_form = UpdateCalendarEventForm(request.POST, instance=appointment)
+            cal_form = UpdateCalendarEventForm(request.POST, request.FILES, instance=appointment)
             if cal_form.is_valid():
-                cal_form.save()
+                appt = cal_form.save()
+                for each in cal_form.cleaned_data['attachments']:
+                    attachment = Attachment.objects.create(file=each,appointment=appt)
+                    attachment.save()
                 event=log(user=user,action="updated_apt")
                 event.save()
                 variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
@@ -56,9 +66,6 @@ def home(request):
             event.save()
             variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
             return render_to_response('index.html', variables)
-
-        else:
-            print(str(cal_form.errors))
 
     else:
         cal_form = CalendarEventForm()
@@ -134,7 +141,8 @@ def register_page(request):
 def update_profile(request):
     user = request.user
     permissions = get_permissions(user)
-    if request.method == 'POST':
+    if request.method == 'POST' and 'update_patient' not in request.POST:
+        print(str(request.POST))
         updateform = UpdateUserForm(request.POST, instance = user)
         p_updateform = UpdatePatientForm(request.POST, instance = user.patient)
         if updateform.is_valid() and p_updateform.is_valid():
@@ -147,15 +155,22 @@ def update_profile(request):
             event.save()
             return HttpResponseRedirect('/')
     else:
-        updateform = UpdateUserForm(initial={
-            'email':user.email,
-            'first_name':user.first_name,
-            'last_name':user.last_name,})
-        p_updateform = UpdatePatientForm(initial={
-            'height':user.patient.height,
-            'weight':user.patient.weight,
-            'assigned_doctor':user.patient.doctor,
-            'current_hospital_assignment':user.patient.hospital,})
+        #TODO refactor into new "update_patient" view. Doesn't make sense to keep it all the same
+        if 'update_patient' in request.POST:
+            post_id = request.POST['update_patient']
+            patient = Patient.patients.get(patient_id=post_id)
+            updateform = UpdateUserForm(instance=patient.user)
+            p_updateform = UpdatePatientForm(instance=patient)
+        else:
+            updateform = UpdateUserForm(initial={
+                'email':user.email,
+                'first_name':user.first_name,
+                'last_name':user.last_name,})
+            p_updateform = UpdatePatientForm(initial={
+                'height':user.patient.height,
+                'weight':user.patient.weight,
+                'assigned_doctor':user.patient.doctor,
+                'current_hospital_assignment':user.patient.hospital})
         variables = RequestContext(request, {'user':user,'update_form':updateform, 'p_updateform':p_updateform,'permissions':permissions})
         return render_to_response('account/profile.html', variables)
 
@@ -212,28 +227,34 @@ def new_appt(request):
     user = request.user
     permissions = get_permissions(user)
     if request.method == 'POST':
-        cal_form = CalendarEventForm(request.POST)
+        cal_form = CalendarEventForm(request.POST, request.FILES)
+        print(str(request.FILES))
         if cal_form.is_valid():
             appt = cal_form.save(commit=False)
             if get_permissions(user) == 'doctor':
-                cal_form.doctor = user.doctor
-            if get_permissions(user) == 'patient':
-                cal_form.patient = user.patient
-            appt.patient = user.patient
+                appt.doctor = user.doctor
+            elif get_permissions(user) == 'patient':
+                appt.patient = user.patient
             appt.save()
+            for each in cal_form.cleaned_data['attachments']:
+                attachment = Attachment.objects.create(file=each,appointment=appt)
+
+                attachment.save()
+
             event=log(user=user,action="new_appt")
             event.save()
             return HttpResponseRedirect('/')
         else:
             print(str(cal_form.errors))
     else:
-
-        if get_permissions(user) == 'doctor':
+        if permissions == 'doctor':
             cal_form = CalendarEventForm(initial={'doctor': user.doctor})
             cal_form.fields['doctor'].widget = forms.HiddenInput()
-        elif get_permissions(user) == 'patient':
+        elif permissions == 'patient':
             cal_form = CalendarEventForm(initial={'patient': user.patient})
             cal_form.fields['patient'].widget = forms.HiddenInput()
+            cal_form.fields['type'].widget = forms.HiddenInput()
+            cal_form.fields['attachments'].widget = forms.HiddenInput()
         else:
             cal_form = CalendarEventForm()
         variables=RequestContext(request,{'user':user,'cal_form':cal_form,'permissions':permissions})
@@ -248,6 +269,14 @@ def update_appointment(request):
         cal_form = CalendarEventForm(request.POST, instance=appointment)
         variables = RequestContext(request, {'user':user,'cal_form':cal_form})
         return render_to_response('appointments/update.html', variables)
+
+def new_test(request):
+    user = request.user
+    if request.method == 'POST':
+        test_form = TestForm(request.POST)
+        if test_form.is_valid():
+            for each in form.cleaned_data['attachments']:
+                Attachment.objects.create(file=each)
 
 def get_permissions(user):
     if hasattr(user, 'patient'):

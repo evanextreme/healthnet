@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from django.core.files.storage import FileSystemStorage
 from phonenumber_field.modelfields import PhoneNumberField
 
+
 # Create your models here.
 
 
@@ -25,14 +26,22 @@ class Hospital(models.Model):
 
 
 class Nurse(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    doctors = models.Manager()
+    employment_date = models.DateTimeField(default=timezone.now)
     nurses = models.Manager()
-    #employment_date = models.DateTimeField('Employment Date')
-    #employee_id = models.IntegerField()
+    nurse_id = models.AutoField(primary_key=True)
 
-    current_hospital_assignment = models.ForeignKey(
-        Hospital,
-        on_delete=models.CASCADE
-    )
+    phone_number = PhoneNumberField()
+
+    hospital = models.ForeignKey(Hospital)
+
+    def __str__(self):
+        return str(self.user.first_name + " " + self.user.last_name)
+
+    def card(self):
+        variables = {'user':self.user}
+        return(render_to_string('card/doctor.html',variables))
 
 
 class Doctor(models.Model):
@@ -48,6 +57,7 @@ class Doctor(models.Model):
 
     def __str__(self):
         return str("Dr. " + self.user.first_name + " " + self.user.last_name)
+
     def card(self):
         variables = {'user':self.user}
         return(render_to_string('card/doctor.html',variables))
@@ -76,13 +86,3 @@ class Patient(models.Model):
     hospital = models.ForeignKey(Hospital)
 
     profile_picture = models.ImageField(upload_to='patients',blank=True)
-
-
-#@receiver(post_save, sender=User)
-def create_patient(sender, instance, created, **kwargs):
-    if created:
-        Patient.patients.create(user=instance)
-
-#@receiver(post_save, sender=User)
-def save_patient(sender, instance, **kwargs):
-    instance.patient.save()
