@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'materialize',
     'material',
+    'multiupload',
 ]
 
 

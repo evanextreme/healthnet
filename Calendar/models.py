@@ -27,12 +27,21 @@ class CalendarEvent(models.Model):
 
     appointment_id = models.AutoField(primary_key=True, default=None)
     title = models.CharField(_('Title'), blank=True, max_length=200)
+
+    type = models.CharField(choices=(
+    ('1', 'General'),
+    ('2', 'Blood Report'),
+    ('3', 'X-Ray'),
+    ('4', 'MRI')
+    ),max_length=4,default=1)
+
     start = models.DateTimeField(_('Start'))
     end = models.DateTimeField(_('End'))
     all_day = models.BooleanField(_('All day'), default=False)
     appointments = models.Manager()
     doctor = models.ForeignKey(Doctor)
     patient = models.ForeignKey(Patient)
+
     class Meta:
         verbose_name = _('Event')
         verbose_name_plural = _('Events')
@@ -40,3 +49,8 @@ class CalendarEvent(models.Model):
         return self.title
     def __unicode__(self):
         return self.title
+
+
+class Attachment(models.Model):
+    file = models.FileField(upload_to='attachments')
+    appointment = models.ForeignKey(CalendarEvent)

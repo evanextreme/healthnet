@@ -3,6 +3,15 @@
 
 {% csrf_token %}
 {% form form=cal_form %}{% endform %}
+<a class='dropdown-button btn' href='#' data-activates='attachment-dropdown'>Attachments</a>
+
+  <!-- Dropdown Structure -->
+  <ul id='attachment-dropdown' class='dropdown-content'>
+    {% for attachment in attachments %}
+        <li><a href="{{attachment.file.url}}">{{attachment.file.name}}</a></li>
+    {% endfor %}
+  </ul>
+
 {% include 'material/includes/material_css.html' %}
 <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
 {% include 'material/includes/material_js.html' %}
