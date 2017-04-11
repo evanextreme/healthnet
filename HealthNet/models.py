@@ -8,6 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.core.files.storage import FileSystemStorage
+from phonenumber_field.modelfields import PhoneNumberField
 
 # Create your models here.
 
@@ -40,11 +41,10 @@ class Doctor(models.Model):
     employment_date = models.DateTimeField(default=timezone.now)
     doctors = models.Manager()
     doctor_id = models.AutoField(primary_key=True)
-    
-    current_hospital_assignment = models.ForeignKey(
-        Hospital,
-        on_delete=models.CASCADE
-    )
+
+    phone_number = PhoneNumberField()
+
+    hospital = models.ForeignKey(Hospital)
 
     def __str__(self):
         return str("Dr. " + self.user.first_name + " " + self.user.last_name)
@@ -66,22 +66,14 @@ class Patient(models.Model):
         variables = {'user':self.user}
         return(render_to_string('card/patient.html',variables))
 
+    phone_number = PhoneNumberField()
+
     doctor_notes = models.TextField(null=True)
     height = models.IntegerField()
     weight = models.IntegerField()
 
-    assigned_doctor = models.ForeignKey(
-        Doctor,
-        on_delete=models.CASCADE,
-        related_name ="doctor",
-        null=True,
-    )
-
-    current_hospital_assignment = models.ForeignKey(
-        Hospital,
-        on_delete=models.CASCADE,
-        null = True,
-    )
+    doctor = models.ForeignKey(Doctor)
+    hospital = models.ForeignKey(Hospital)
 
     profile_picture = models.ImageField(upload_to='patients',blank=True)
 

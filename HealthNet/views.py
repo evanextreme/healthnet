@@ -119,15 +119,18 @@ def register_page(request):
             response.write("<h1>Congratulation! You are registered!</h1>")
             response.write("<h2>Please <a href='../login/'>log in</a>.</h2>")
             return response
-
-    userform=UserForm()
-    patientform=PatientForm()
-    variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
-    return render_to_response("registration/register.html",variables)
+        else:
+            print(str(patientform.errors))
+    else:
+        userform=UserForm()
+        patientform=PatientForm()
+        variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
+        return render_to_response("registration/register.html",variables)
 
 @csrf_exempt
 def update_profile(request):
     user = request.user
+    permissions = get_permissions(user)
     if request.method == 'POST':
         updateform = UpdateUserForm(request.POST, instance = user)
         p_updateform = UpdatePatientForm(request.POST, instance = user.patient)
@@ -145,8 +148,8 @@ def update_profile(request):
         p_updateform = UpdatePatientForm(initial={
             'height':user.patient.height,
             'weight':user.patient.weight,
-            'assigned_doctor':user.patient.assigned_doctor,
-            'current_hospital_assignment':user.patient.current_hospital_assignment,})
+            'assigned_doctor':user.patient.doctor,
+            'current_hospital_assignment':user.patient.hospital,})
         variables = RequestContext(request, {'user':user,'update_form':updateform, 'p_updateform':p_updateform,'permissions':permissions})
         return render_to_response('account/profile.html', variables)
 
@@ -160,7 +163,7 @@ def change_hospital(request):
             event=log(user=user,action="doctor_changehosptial")
             event.save()
             return HttpResponseRedirect('/')
-    hospital_change_form = DoctorForm(initial={'current_hospital_assignment':user.doctor.current_hospital_assignment})
+    hospital_change_form = DoctorForm(initial={'hospital':user.doctor.hospital})
     variables = RequestContext(request, {'user':user,'hospital_change_form':hospital_change_form})
     return render_to_response('account/change_hospital.html', variables)
 
@@ -184,8 +187,19 @@ def change_password(request):
 
 def account(request):
     user = request.user
-    variables = RequestContext(request, {'user':user})
+    permissions = get_permissions(user)
+    variables = RequestContext(request, {'user':user,'permissions':permissions})
     return render_to_response('account/index.html', variables)
+
+def patients(request):
+    user = request.user
+    permissions = get_permissions(user)
+    if permissions == 'doctor':
+        print(str(user.doctor))
+        patients = user.doctor.patient_set.all()
+        variables = RequestContext(request, {'user':user,'patients':patients,'permissions':permissions})
+        return render_to_response('patients.html',variables)
+
 
 @csrf_exempt
 def new_appt(request):
