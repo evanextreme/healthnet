@@ -24,19 +24,10 @@
   <nav>
     <div class="nav-wrapper light-blue accent-3">
       <a href="/" class="brand-logo">HealthNet</a>
-      <a href="#" data-activates="mobile-menu" class="button-collapse"><i class="material-icons">menu</i></a>
       <ul class="right">
-        {% if user.is_authenticated %}
-        <li><a class="waves-effect waves-light" href="/appointments/new">New Appointment</a></li>
-        <li><a class="waves-effect waves-light" href="/account">{{user.first_name}}'s Account</a></li>
-        <li><a class="waves-effect waves-light" href="/logout">Logout</a></li>
-        {% else %}
-        <li><a class="waves-effect waves-light" href="/register">Register</a></li>
-        <li><a class="waves-effect waves-light" href="/login">Login</a></li>
-        {% endif %}
-      </ul>
-      <ul class="side-nav" id="mobile-menu">
-        {% if user.is_authenticated %}
+        {% if permissions == 'admin' %}
+        <li><a class="waves-effect waves-light" href="/admin/">Admin Dashboard</a></li>
+        {% elif user.is_authenticated %}
         <li><a class="waves-effect waves-light" href="/appointments/new">New Appointment</a></li>
         <li><a class="waves-effect waves-light" href="/account">{{user.first_name}}'s Account</a></li>
         <li><a class="waves-effect waves-light" href="/logout">Logout</a></li>
@@ -61,11 +52,11 @@
               <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
               <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
               <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
-              
+
 
       {% endblock %}
       <script type="text/javascript">$(".button-collapse").sideNav();</script>
-      
+
       {% include 'material/includes/material_css.html' %}
       {% include 'material/includes/material_js.html' %}
 
