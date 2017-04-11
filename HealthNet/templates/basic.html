@@ -20,21 +20,28 @@
       background-color: rgba(0, 176, 255, 0.65);
       }</style>
     {% block header %} {%endblock%}
+    <ul id="dropdown1" class="dropdown-content">
+
+      <li><a class="waves-effect waves-light blue-text" href="/account">Account</a></li>
+      <li class="divider"></li>
+      <li><a class="waves-effect waves-light blue-text" href="/logout">Logout</a></li>
+    </ul>
     {% block nav %}
   <nav>
     <div class="nav-wrapper light-blue accent-3">
-      <a href="/" class="brand-logo">HealthNet</a>
-      <ul class="right">
+      <a href="/" class="brand-logo">myHealth</a>
+        <ul class="right hide-on-med-and-down">
+
         {% if permissions == 'admin' %}
         <li><a class="waves-effect waves-light" href="/admin/">Admin Dashboard</a></li>
+
         {% elif user.is_authenticated %}
-        <li><a class="waves-effect waves-light" href="/appointments/new">New Appointment</a></li>
-        <li><a class="waves-effect waves-light" href="/account">{{user.first_name}}'s Account</a></li>
-        <li><a class="waves-effect waves-light" href="/logout">Logout</a></li>
+        <li><a class="dropdown-button" href="#!" data-activates="dropdown1">{{user.first_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
         {% else %}
         <li><a class="waves-effect waves-light" href="/register">Register</a></li>
         <li><a class="waves-effect waves-light" href="/login">Login</a></li>
         {% endif %}
+        <!-- Dropdown Trigger -->
       </ul>
     </div>
   </nav>
@@ -52,11 +59,7 @@
               <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
               <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
               <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
-
-
       {% endblock %}
-      <script type="text/javascript">$(".button-collapse").sideNav();</script>
-
       {% include 'material/includes/material_css.html' %}
       {% include 'material/includes/material_js.html' %}
 

@@ -32,16 +32,76 @@
               <button class="modal-action modal-close waves-effect waves-light btn light-blue accent-3" type="submit" name="Update">Update</button>
             </div>
 
+
         </div>
         {% calendar %}
+        <div class="fixed-action-btn horizontal">
+         <a class="btn-floating btn-large red">
+           <i class="large material-icons">mode_edit</i>
+         </a>
+         <ul>
+           <li><a class="btn-floating red" href="/appointments/new" ><i class="material-icons">add</i></a></li>
+           <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li>
+           <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+           <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
+         </ul>
+        </div>
     </div>
     {% else %}
-    <p>YOU NEED TO LOG IN, MY BOY!</p>
+    <div id="index-banner" class="parallax-container">
+  				<br><br>
+  				<h1 class="header center">Your Lifeline</h1>
+  				<div class="row center">
+  					<h5 class="header col s12 light">We take the middleman out of medicine.</h5>
+  				</div>
+  		<div class="parallax img"><img src="/media/img/main.jpg"></div>
+  	</div>
+
+  	<div class="container">
+  		<div class="section">
+  			<div class="row">
+  				<div class="col s12 m4">
+  					<div class="icon-block">
+  						<h2 class="center blue-text"><i class="mdi-hardware-desktop-windows"></i></h2>
+  						<h5 class="center">Fast and light</h5>
+
+  						<p class="light">Tomorrow is built using the latest in web and mobile technology. Tomorrow looks and works the same on every device you own, from your phone to your desktop. Tomorrow is available wherever you are, to help you get whatever you need done.</p>
+  					</div>
+  				</div>
+
+  				<div class="col s12 m4">
+  					<div class="icon-block">
+  						<h2 class="center blue-text"><i class="mdi-social-people"></i></h2>
+  						<h5 class="center">Built for humans</h5>
+
+  						<p class="light">No one wants to use a planer that is deigned for robots. So why do we insist on doing so? Tomorrow elminates stress by only letting you plan tasks for Tomorrow. Soon Tomorrow will include automatic reminders throughout the day so that you don't need to plan your life around tasks, but so that you can plan tasks around your life.</p>
+  					</div>
+  				</div>
+
+  				<div class="col s12 m4">
+  					<div class="icon-block">
+  						<h2 class="center blue-text"><i class="mdi-action-settings"></i></h2>
+  						<h5 class="center">Productivity focused</h5>
+
+  						<p class="light">Tomorrow is designed to make sure you get everything that you need to do out of the way, so you can live your life. We have built the app to place your productivity first and foremost, and signifigantly increases productivity when used versus similar applications.</p>
+  					</div>
+  				</div>
+  			</div>
+  		</div>
+  	</div>
     {% endif %}
 {% endblock %}
 {% block footer %}
-
-<script type="text/javascript"> $(document).ready(function(){
+<style>
+.parallax-container {
+      width: 100%;
+    }
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+     $('.parallax').parallax();
+   });
+$(document).ready(function(){
     $('.modal').modal();
   });
 </script>
