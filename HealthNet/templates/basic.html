@@ -27,24 +27,29 @@
       <li><a class="waves-effect waves-light blue-text" href="/logout">Logout</a></li>
     </ul>
     {% block nav %}
-  <nav>
-    <div class="nav-wrapper light-blue accent-3">
-      <a href="/" class="brand-logo">myHealth</a>
-        <ul class="right hide-on-med-and-down">
+    <div class="navbar-fixed">
+      <nav>
+        <div class="nav-wrapper light-blue accent-3">
+          <a href="/" class="brand-logo">myHealth</a>
+            <ul class="right hide-on-med-and-down">
 
-        {% if permissions == 'admin' %}
-        <li><a class="waves-effect waves-light" href="/admin/">Admin Dashboard</a></li>
+            {% if permissions == 'admin' %}
+            <li><a class="waves-effect waves-light" href="/admin/">Admin Dashboard</a></li>
 
-        {% elif user.is_authenticated %}
-        <li><a class="dropdown-button" href="#!" data-activates="dropdown1">{{user.first_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
-        {% else %}
-        <li><a class="waves-effect waves-light" href="/register">Register</a></li>
-        <li><a class="waves-effect waves-light" href="/login">Login</a></li>
-        {% endif %}
-        <!-- Dropdown Trigger -->
-      </ul>
+            {% elif permissions == 'doctor' %}
+            <li {% block active_patients %} {% endblock %}><a class="waves-effect waves-light" href="/patients">Patients</a></li>
+            <li {% block active_account %} {% endblock %}><a class="dropdown-button" href="#!" data-activates="dropdown1">Dr. {{user.last_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
+            {% elif user.is_authenticated %}
+            <li><a class="dropdown-button" href="#!" data-activates="dropdown1">{{user.first_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
+            {% else %}
+            <li><a class="waves-effect waves-light" href="/register">Register</a></li>
+            <li><a class="waves-effect waves-light" href="/login">Login</a></li>
+            {% endif %}
+            <!-- Dropdown Trigger -->
+          </ul>
+        </div>
+      </nav>
     </div>
-  </nav>
   {% endblock %}
 
   </head>

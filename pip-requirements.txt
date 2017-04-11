@@ -3,4 +3,5 @@ django-registration
 django-datetime-widget
 django-materialize-css
 django-material
+django-phonenumber-field
 git+https://github.com/rodrigoamaral/django-fullcalendar.git#egg=django-fullcalendar

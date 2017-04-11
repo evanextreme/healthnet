@@ -24,6 +24,7 @@ from . import signals, views
 
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
+    url(r'^patients/$', views.patients, name='patients'),
 	url(r'^appointments/new/$', views.new_appt, name='new_appt'),
     url(r'^appointments/update/$', views.update_appointment, name='update_appointment'),
 	url(r'^login/$', auth_views.login, name='login'),

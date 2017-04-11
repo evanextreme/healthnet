@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'Calendar',
     'eventlog',
     'datetimewidget',
+    'phonenumber_field',
     'materialize',
     'material',
 ]
