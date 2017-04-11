@@ -36,5 +36,6 @@ urlpatterns = [
 	url(r'^all_events/', views.all_events, name='all_events'),
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^admin/doctor', views.doc_register_page,name='doc_register_page'),
     url(r'^accounts/', include('registration.backends.hmac.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
