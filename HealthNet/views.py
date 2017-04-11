@@ -122,7 +122,7 @@ def register_page(request):
 
     userform=UserForm()
     patientform=PatientForm()
-    variables=RequestContext(request,{'userform':userform, 'patientform':patientform,'permissions':permissions})
+    variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
     return render_to_response("registration/register.html",variables)
 
 @csrf_exempt
