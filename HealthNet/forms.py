@@ -35,12 +35,15 @@ class PatientForm(forms.ModelForm):
         model = Patient
         fields = ['date_of_birth', 'phone_number', 'height', 'weight', 'doctor', 'hospital', 'profile_picture']
 
-
 class DoctorForm(forms.ModelForm):
     class Meta:
         model = Doctor
         fields = ['phone_number','hospital']
 
+class PrescriptionForm(forms.ModelForm):
+    class Meta:
+        model = Prescription
+        fields = ['patient', 'drug_name', 'dosage', 'side_effects', 'refills_remaining']
 
 class UpdateUserForm(forms.ModelForm):
     email = forms.EmailField(required=True)

@@ -278,6 +278,14 @@ def new_test(request):
             for each in form.cleaned_data['attachments']:
                 Attachment.objects.create(file=each)
 
+def refill_prescription(request):
+    user = request.user
+    patient = request.user.patient
+    if request.method == 'POST':
+        post_id = ['prescription_id']
+        prescription = Prescription.prescriptions.get(prescription_id=post_id)
+        prescription.refill()
+
 def get_permissions(user):
     if hasattr(user, 'patient'):
         return 'patient'
