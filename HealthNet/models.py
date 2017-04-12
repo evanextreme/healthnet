@@ -51,7 +51,7 @@ class Doctor(models.Model):
     doctors = models.Manager()
     doctor_id = models.AutoField(primary_key=True)
 
-    phone_number = PhoneNumberField()
+    phone_number = PhoneNumberField(default=None)
 
     hospital = models.ForeignKey(Hospital)
 
@@ -86,3 +86,31 @@ class Patient(models.Model):
     hospital = models.ForeignKey(Hospital)
 
     profile_picture = models.ImageField(upload_to='patients',blank=True)
+
+
+
+
+
+class Prescription(models.Model):
+    prescriptions = models.Manager()
+    #every Prescription gets assigned an auto ID
+    prescription_id = models.AutoField(primary_key=True)
+    #every Prescription needs a patient to take it
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=False)
+    #i.e. "Ibuprofen", "Vicodin"
+    drug_name = models.CharField(max_length=50)
+    #i.e. 10mg 3x/day, 100mg 1x/day
+    dosage = models.CharField(max_length=10)
+    #i.e. "Take with food", ""
+    instructions = models.TextField()
+    #i.e. "May cauase drowsieness"
+    side_effects = models.TextField()
+    #decremented when a patient refills
+    refills_remaining = models.IntegerField()
+    def __str__(self):
+        drug_desc = str(self.drug_name + ' ' + self.dosage)
+        return drug_desc
+
+    def refill(self):
+        #decrement refills
+        refills_remaining -= 1

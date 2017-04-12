@@ -39,8 +39,8 @@ class CalendarEvent(models.Model):
     end = models.DateTimeField(_('End'))
     all_day = models.BooleanField(_('All day'), default=False)
     appointments = models.Manager()
-    doctor = models.ForeignKey(Doctor)
-    patient = models.ForeignKey(Patient)
+    doctor = models.ForeignKey(Doctor, default=None)
+    patient = models.ForeignKey(Patient, default=None)
 
     class Meta:
         verbose_name = _('Event')
