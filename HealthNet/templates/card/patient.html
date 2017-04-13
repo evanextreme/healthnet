@@ -1,7 +1,11 @@
 <div class="card-panel grey lighten-5 z-depth-1">
   <div class="row valign-wrapper">
     <div class="col s4">
-      <img src={{user.patient.profile_picture.url}} alt="Profile Picture" class="circle responsive-img">
+        {% if user.patient.profile_picture %}
+            <img src={{user.patient.profile_picture.url}} alt="Profile Picture" class="circle responsive-img">
+        {% else %}
+            <img src="../../static/blank_picture.png" alt="Profile Picture" class="circle responsive-img">
+        {% endif %}
     </div>
     <div class="col s9 card-stacked">
       <div class="card-content">
