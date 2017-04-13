@@ -130,7 +130,9 @@ def register_page(request):
             response.write("<h2>Please <a href='../login/'>log in</a>.</h2>")
             return response
         else:
-            print(str(patientform.errors))
+            variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
+            return render_to_response("registration/register.html",variables)
+
     else:
         userform=UserForm()
         patientform=PatientForm()

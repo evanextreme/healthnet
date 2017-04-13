@@ -10,11 +10,13 @@
     <div class="input-field">
     <p><label for="id_username">Username:</label>
         {{ form.username }}</p>
+        {{ form.username.errors }}
     </div>
 
     <div class="input-field">
     <p><label for="id_password">Password:</label>
         {{ form.password }}</p>
+        {{ form.password.errors }}
     </div>
     <input type="hidden" name="next" value="/" />
     <button class="waves-effect waves-light btn light-blue accent-3" type="submit" value="login">Login<i class="material-icons right">vpn_key</i></button>
