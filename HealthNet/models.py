@@ -84,8 +84,7 @@ class Patient(models.Model):
 
     doctor = models.ForeignKey(Doctor)
     hospital = models.ForeignKey(Hospital)
-
-    profile_picture = models.ImageField(upload_to='patients',blank=True)
+    profile_picture = models.FileField(upload_to='patients',blank=True)
 
 
 
