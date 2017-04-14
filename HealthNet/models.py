@@ -36,6 +36,8 @@ class Nurse(models.Model):
 
     hospital = models.ForeignKey(Hospital)
 
+    new_user = models.BooleanField(default=True)
+
     def __str__(self):
         return str(self.user.first_name + " " + self.user.last_name)
 
@@ -55,12 +57,15 @@ class Doctor(models.Model):
 
     hospital = models.ManyToManyField(Hospital)
 
+    new_user = models.BooleanField(default=True)
+
     def __str__(self):
         return str("Dr. " + self.user.first_name + " " + self.user.last_name)
 
     def card(self):
         variables = {'user':self.user}
         return(render_to_string('card/doctor.html',variables))
+
 
 
 class Patient(models.Model):
@@ -90,8 +95,7 @@ class Patient(models.Model):
 
     profile_picture = models.FileField(upload_to='patients',blank=True)
 
-
-
+    new_user = models.BooleanField(default=True)
 
 
 class Prescription(models.Model):
