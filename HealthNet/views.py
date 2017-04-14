@@ -23,7 +23,9 @@ def home(request):
     user = request.user
     permissions = get_permissions(user)
     event_url = 'all_events/'
-
+    opentap = ''
+    if (permissions == 'patient' and user.patient.new_user) or (permissions == 'nurse' and user.nurse.new_user) or (permissions == 'doctor' and user.doctor.new_user):
+        opentap = 'True'
     #If user is admin, redirect to admin dashboard
     if permissions == 'admin':
         return HttpResponseRedirect('/admin')
@@ -54,7 +56,7 @@ def home(request):
             cal_form = CalendarEventForm(request.POST, request.FILES)
             if cal_form.is_valid():
                 appointment = cal_form.save(commit=False)
-                if permissions == 'doctor' and permissions == 'nurse':
+                if permissions == 'doctor' or permissions == 'nurse':
                     appointment.confirmed = True
                     appointment.color = '#00b0ff'
                     #TODO change from confirmation email to creation email
@@ -98,14 +100,14 @@ def home(request):
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             appointment.delete()
-            event=log(user=user,action="updated_apt")
+            event=log(user=user,action="deleted_apt")
             event.save()
             variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
             return render_to_response('index.html', variables)
 
     else:
         cal_form = CalendarEventForm()
-        variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
+        variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
         return render_to_response('index.html',variables)
 
 def logout_page(request):
@@ -333,19 +335,21 @@ def all_events(request):
 
 
 OPTIONS = """{  timeFormat: "H:mm",
+
+                editable: false,
+                handleWindowResize: true,
+                defaultView: 'agendaWeek', // Only show week view
                 header: {
                     left: 'prev,next today',
-                    center: 'title',
                     right: 'month,agendaWeek,agendaDay',
                 },
-                allDaySlot: true,
-                firstDay: 0,
-                weekMode: 'liquid',
-                slotMinutes: 15,
-                defaultEventMinutes: 30,
-                minTime: 0,
-                maxTime: 24,
-                editable: false,
+                minTime: '07:30:00', // Start time for the calendar
+                maxTime: '22:00:00', // End time for the calendar
+                columnFormat: {
+                    week: 'ddd' // Only show day of the week names
+                },
+                displayEventTime: true,
+                allDayText: 'Unscheduled',
 
                 eventClick: function(event, jsEvent, view) {
                         $.ajaxSetup({

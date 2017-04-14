@@ -24,29 +24,17 @@ def snake_to_camel_case(s):
     Converts strings from 'snake_case' (Python code convention)
     to CamelCase
     """
-    new_string = s
-
-    leading_count = 0
-    while new_string.find('_') == 0:
-        new_string = new_string[1:]
-        leading_count +=1
-
-    trailing_count = 0
-    while new_string.rfind('_') == len(new_string) - 1:
-        new_string = new_string[:-1]
-        trailing_count +=1
-
-    new_string = ''.join([word.title() for word in new_string.split('_')])
-    leading_underscores = '_' * leading_count
-    trailing_underscores = '_' * trailing_count
-    return leading_underscores + new_string[0].lower() + new_string[1:] + trailing_underscores
+    components = s.split('_')
+    # We capitalize the first letter of each component except the first one
+    # with the 'title' method and join them together.
+    return components[0] + "".join(x.title() for x in components[1:])
 
 
 def events_to_json(events_queryset):
     """
     Dumps a CalendarEvent queryset to the JSON expected by FullCalendar
     """
-    events_values = list(events_queryset.values('appointment_id', 'title', 'start', 'end', 'all_day', 'color'))
+    events_values = list(events_queryset.values('appointment_id', 'title', 'start', 'end', 'all_day','color'))
     events_values = convert_field_names(events_values)
     return json.dumps(events_values, default=date_handler)
 

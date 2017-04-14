@@ -25,8 +25,8 @@ class CalendarEvent(models.Model):
     :type all_day: bool.
     """
 
-    appointment_id = models.AutoField(primary_key=True, default=None)
-    title = models.CharField(_('Title'), blank=True, max_length=200)
+    appointment_id = models.AutoField(_('appointment_id'), primary_key=True, default=None)
+    title = models.CharField(_('title'), blank=True, max_length=200)
 
     type = models.CharField(choices=(
     ('1', 'General'),
@@ -35,16 +35,16 @@ class CalendarEvent(models.Model):
     ('4', 'MRI')
     ),max_length=4,default=1)
 
-    start = models.DateTimeField(_('Start'))
-    end = models.DateTimeField(_('End'))
-    all_day = models.BooleanField(_('All day'), default=False)
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    all_day = models.BooleanField(('Unscheduled'), default=False)
     appointments = models.Manager()
     doctor = models.ForeignKey(Doctor, default=None)
     patient = models.ForeignKey(Patient, default=None)
 
     confirmed = models.BooleanField(default=False)
 
-    color = models.CharField(_('Color'), default='#b0bec5',max_length=7)
+    color = models.CharField(_('color'), default='#b0bec5',max_length=7)
 
     class Meta:
         verbose_name = _('Event')
