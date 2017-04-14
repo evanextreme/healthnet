@@ -1,16 +1,35 @@
 {% load staticfiles %}
 {% load material_form %}
 
-{% csrf_token %}
-{% form form=cal_form %}{% endform %}
-<a class='dropdown-button btn' href='#' data-activates='attachment-dropdown'>Attachments</a>
+
 
   <!-- Dropdown Structure -->
-  <ul id='attachment-dropdown' class='dropdown-content'>
+<div class="modal-content">
+    <h4>Update Appointment{% if permissions == 'doctor'%}/Test{% endif %}</h4>
+    {% csrf_token %}
+    {% form form=cal_form %}{% endform %}
+    {% if permissions != 'patient' %}
+    <a class='dropdown-button btn' href='#' data-activates='attachment-dropdown'>Attachments</a>
+    <ul id='attachment-dropdown' class='dropdown-content'>
     {% for attachment in attachments %}
         <li><a href="{{attachment.file.url}}">{{attachment.file.name}}</a></li>
     {% endfor %}
-  </ul>
+    {% endif %}
+    </ul>
+</div>
+<div class="modal-footer">
+    <button class="left waves-effect waves-red btn-flat" type="submit" name="Delete">
+      <i class="material-icons left">delete</i>Delete
+    </button>
+    <a href="/" class="modal-action modal-close waves-effect waves-blue btn-flat">Cancel</a>
+    {% if confirm == 'True'%}
+    <button class="modal-action modal-close waves-effect waves-light btn red" type="submit" name="Update">Confirm Appointment</button>
+    {% else %}
+    <button class="modal-action modal-close waves-blue btn-flat" type="submit" name="Update">Update</button>
+    {% endif %}
+</div>
+
+
 
 {% include 'material/includes/material_css.html' %}
 <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>

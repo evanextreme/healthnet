@@ -36,9 +36,9 @@
             {% if permissions == 'admin' %}
             <li><a class="waves-effect waves-light" href="/admin/">Admin Dashboard</a></li>
 
-            {% elif permissions == 'doctor' %}
+            {% elif permissions == 'doctor' or permissions == 'nurse'%}
             <li {% block active_patients %} {% endblock %}><a class="waves-effect waves-light" href="/patients">Patients</a></li>
-            <li {% block active_account %} {% endblock %}><a class="dropdown-button" href="#!" data-activates="dropdown1">Dr. {{user.last_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
+            <li {% block active_account %} {% endblock %}><a class="dropdown-button" href="#!" data-activates="dropdown1">{% if permissions == 'doctor' %}Dr. {% elif permissions == 'nurse'%}Nurse {%endif%}{{user.last_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
             {% elif user.is_authenticated %}
             <li><a class="dropdown-button" href="#!" data-activates="dropdown1">{{user.first_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
             {% else %}
