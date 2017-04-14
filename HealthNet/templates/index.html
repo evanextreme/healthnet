@@ -15,7 +15,7 @@
 {% block body %}
     {% if user.is_authenticated %}
     <br>
-    <div class="container">
+    <div id="main-container" class="container">
         <div id="apt-modal" class="modal modal-fixed-footer">
 
           <form action='.' method='post' enctype="multipart/form-data">
@@ -82,10 +82,8 @@
 </style>
 <script type="text/javascript">
 $(document).ready(function(){
-     $('.parallax').parallax();
-   });
-$(document).ready(function(){
-    $('.modal').modal();
+      $('.modal').modal();
+      $('.parallax').parallax();
   });
 function newAppointment(){
   $.ajaxSetup({
@@ -112,11 +110,19 @@ function newAppointment(){
     }
   });
   $.get("/appointments/new/",function(response){
-      alert(response);
       $('#apt-div').html(response);
   });
   $('#apt-modal').modal('open');
 }
+
+(function( $ ){
+   $.fn.healthToast = function(text) {
+      alert('TEST BOY')
+      Materialize.toast('I am a toast!', 3000, 'rounded')
+      alert('hello world');
+      return this;
+   };
+})( jQuery );
 
 function closeModal(){
   $('#apt-modal').modal('close');

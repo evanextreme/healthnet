@@ -30,15 +30,17 @@ def home(request):
 
     if request.method == 'POST':
         appointment = CalendarEvent()
-        if 'appointmentid' in request.POST:
-            post_id = request.POST['appointmentid']
+        if 'appointmentId' in request.POST:
+            post_id = request.POST['appointmentId']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             attachments = appointment.attachment_set.all()
             cal_form = UpdateCalendarEventForm(instance=appointment)
             print(str(appointment.confirmed))
-            confirm = 'False'
-            if permissions == 'doctor' and appointment.confirmed == False:
-                confirm = 'True'
+            confirmed = 'False'
+            if appointment.confirmed == False:
+                confirmed = 'False'
+            else:
+                confirmed = 'True'
             if permissions == 'doctor':
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
             elif permissions == 'patient':
@@ -46,12 +48,17 @@ def home(request):
                 cal_form.fields['type'].widget = forms.HiddenInput()
                 cal_form.fields['attachments'].widget = forms.HiddenInput()
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
-            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'attachments':attachments,'confirm':confirm,'permissions':permissions,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'attachments':attachments,'confirmed':confirmed,'permissions':permissions,'calendar_config_options':calendar_options(event_url, OPTIONS)})
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
             cal_form = CalendarEventForm(request.POST, request.FILES)
             if cal_form.is_valid():
                 appointment = cal_form.save(commit=False)
+                if permissions == 'doctor' and permissions == 'nurse':
+                    appointment.confirmed = True
+                    appointment.color = '#00b0ff'
+                    #TODO change from confirmation email to creation email
+                    appointment_confirmation_email(appointment.patient,appointment.doctor,appointment)
                 if get_permissions(user) == 'doctor':
                     appointment.doctor = user.doctor
                 elif get_permissions(user) == 'patient':
@@ -74,6 +81,7 @@ def home(request):
                 appointment = cal_form.save()
                 if permissions == 'doctor' and appointment.confirmed == False:
                     appointment.confirmed = True
+                    appointment.color = '#00b0ff'
                     appointment_confirmation_email(appointment.patient,appointment.doctor,appointment)
                 for each in cal_form.cleaned_data['attachments']:
                     attachment = Attachment.objects.create(file=each,appointment=appointment)
@@ -337,10 +345,9 @@ OPTIONS = """{  timeFormat: "H:mm",
                 defaultEventMinutes: 30,
                 minTime: 0,
                 maxTime: 24,
-                editable: true,
+                editable: false,
 
                 eventClick: function(event, jsEvent, view) {
-
                         $.ajaxSetup({
                             beforeSend: function(xhr, settings) {
                                 function getCookie(name) {

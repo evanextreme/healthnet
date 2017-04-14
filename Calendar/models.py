@@ -42,6 +42,10 @@ class CalendarEvent(models.Model):
     doctor = models.ForeignKey(Doctor, default=None)
     patient = models.ForeignKey(Patient, default=None)
 
+    confirmed = models.BooleanField(default=False)
+
+    color = models.CharField(_('Color'), default='#b0bec5',max_length=7)
+
     class Meta:
         verbose_name = _('Event')
         verbose_name_plural = _('Events')
@@ -52,5 +56,5 @@ class CalendarEvent(models.Model):
 
 
 class Attachment(models.Model):
-    file = models.FileField(upload_to='attachments')
+    file = models.FileField(upload_to='attachments', null=True)
     appointment = models.ForeignKey(CalendarEvent)
