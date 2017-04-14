@@ -53,7 +53,7 @@ class Doctor(models.Model):
 
     phone_number = PhoneNumberField(default=None)
 
-    hospital = models.ForeignKey(Hospital)
+    hospital = models.ManyToManyField(Hospital)
 
     def __str__(self):
         return str("Dr. " + self.user.first_name + " " + self.user.last_name)
@@ -84,6 +84,10 @@ class Patient(models.Model):
 
     doctor = models.ForeignKey(Doctor)
     hospital = models.ForeignKey(Hospital)
+
+    admitted = models.BooleanField(default=False)
+    discharge_date = models.DateTimeField(default=None, null=True)
+
     profile_picture = models.FileField(upload_to='patients',blank=True)
 
 

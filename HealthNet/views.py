@@ -16,6 +16,7 @@ from Calendar.util import events_to_json, calendar_options
 from Calendar.forms import CalendarEventForm, UpdateCalendarEventForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
+from HealthNet.email import appointment_confirmation_email
 
 @csrf_exempt
 def home(request):
@@ -33,25 +34,52 @@ def home(request):
             post_id = request.POST['appointmentid']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             attachments = appointment.attachment_set.all()
-            print("Test" + str(attachments))
             cal_form = UpdateCalendarEventForm(instance=appointment)
-            if get_permissions(user) == 'doctor':
+            print(str(appointment.confirmed))
+            confirm = 'False'
+            if permissions == 'doctor' and appointment.confirmed == False:
+                confirm = 'True'
+            if permissions == 'doctor':
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
-            elif get_permissions(user) == 'patient':
+            elif permissions == 'patient':
                 cal_form.fields['patient'].widget = forms.HiddenInput()
+                cal_form.fields['type'].widget = forms.HiddenInput()
+                cal_form.fields['attachments'].widget = forms.HiddenInput()
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
-            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'attachments':attachments,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'attachments':attachments,'confirm':confirm,'permissions':permissions,'calendar_config_options':calendar_options(event_url, OPTIONS)})
             return render_to_response('appointments/update.html', variables)
+        elif 'Create' in request.POST:
+            cal_form = CalendarEventForm(request.POST, request.FILES)
+            if cal_form.is_valid():
+                appointment = cal_form.save(commit=False)
+                if get_permissions(user) == 'doctor':
+                    appointment.doctor = user.doctor
+                elif get_permissions(user) == 'patient':
+                    appointment.patient = user.patient
+                appointment.save()
+                for each in cal_form.cleaned_data['attachments']:
+                    attachment = Attachment.objects.create(file=each,appointment=appointment)
+                    attachment.save()
+                event=log(user=user,action="new_appt")
+                event.save()
+                return HttpResponseRedirect('/')
+            else:
+                variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
+                return render_to_response("appointments/new.html",variables)
         elif 'Update' in request.POST:
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             cal_form = UpdateCalendarEventForm(request.POST, request.FILES, instance=appointment)
             if cal_form.is_valid():
-                appt = cal_form.save()
+                appointment = cal_form.save()
+                if permissions == 'doctor' and appointment.confirmed == False:
+                    appointment.confirmed = True
+                    appointment_confirmation_email(appointment.patient,appointment.doctor,appointment)
                 for each in cal_form.cleaned_data['attachments']:
-                    attachment = Attachment.objects.create(file=each,appointment=appt)
+                    attachment = Attachment.objects.create(file=each,appointment=appointment)
                     attachment.save()
-                event=log(user=user,action="updated_apt")
+                appointment.save()
+                event=log(user=user,action="update_apt")
                 event.save()
                 variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
                 return render_to_response('index.html', variables)
@@ -143,7 +171,7 @@ def register_page(request):
 def update_profile(request):
     user = request.user
     permissions = get_permissions(user)
-    if request.method == 'POST' and 'update_patient' not in request.POST:
+    if request.method == 'POST':
         print(str(request.POST))
         updateform = UpdateUserForm(request.POST, instance = user)
         p_updateform = UpdatePatientForm(request.POST, instance = user.patient)
@@ -157,24 +185,38 @@ def update_profile(request):
             event.save()
             return HttpResponseRedirect('/')
     else:
-        #TODO refactor into new "update_patient" view. Doesn't make sense to keep it all the same
-        if 'update_patient' in request.POST:
-            post_id = request.POST['update_patient']
-            patient = Patient.patients.get(patient_id=post_id)
-            updateform = UpdateUserForm(instance=patient.user)
-            p_updateform = UpdatePatientForm(instance=patient)
-        else:
-            updateform = UpdateUserForm(initial={
-                'email':user.email,
-                'first_name':user.first_name,
-                'last_name':user.last_name,})
-            p_updateform = UpdatePatientForm(initial={
-                'height':user.patient.height,
-                'weight':user.patient.weight,
-                'assigned_doctor':user.patient.doctor,
-                'current_hospital_assignment':user.patient.hospital})
-        variables = RequestContext(request, {'user':user,'update_form':updateform, 'p_updateform':p_updateform,'permissions':permissions})
-        return render_to_response('account/profile.html', variables)
+        updateform = UpdateUserForm(initial={
+            'email':user.email,
+            'first_name':user.first_name,
+            'last_name':user.last_name,})
+        p_updateform = UpdatePatientForm(initial={
+            'height':user.patient.height,
+            'weight':user.patient.weight,
+            'assigned_doctor':user.patient.doctor,
+            'current_hospital_assignment':user.patient.hospital})
+    variables = RequestContext(request, {'user':user,'update_form':updateform, 'p_updateform':p_updateform,'permissions':permissions})
+    return render_to_response('account/profile.html', variables)
+
+@csrf_exempt
+def employee_update_patient(request):
+    user = request.user
+    permissions = get_permissions(user)
+    if request.method == 'POST' and 'get_patient_id' in request.POST:
+        post_id = request.POST['get_patient_id']
+        patient = Patient.patients.get(patient_id=post_id)
+        patientform = EmployeeUpdatePatientForm(instance = patient)
+        if permissions == 'nurse':
+            patientform.fields['hospital'].widget = forms.HiddenInput()
+    elif request.method == 'POST':
+        post_id = request.POST['patient_id']
+        patient = Patient.patients.get(patient_id=post_id)
+        patientform = EmployeeUpdatePatientForm(request.POST, instance = patient)
+        if patientform.is_valid():
+            patientform.save()
+            event=log(user=user,action="employee_updateprofile")
+            event.save()
+    return render_to_response('patients/update.html', {'user':user,'patientform':patientform,'permissions':permissions},RequestContext(request))
+
 
 @csrf_exempt
 def change_hospital(request):
@@ -218,37 +260,20 @@ def patients(request):
     user = request.user
     permissions = get_permissions(user)
     if permissions == 'doctor':
-        print(str(user.doctor))
         patients = user.doctor.patient_set.all()
         variables = RequestContext(request, {'user':user,'patients':patients,'permissions':permissions})
-        return render_to_response('patients.html',variables)
+        return render_to_response('patients/index.html',variables)
+    elif permissions == 'nurse':
+        patients = user.nurse.hospital.patient_set.all()
+        variables = RequestContext(request, {'user':user,'patients':patients,'permissions':permissions})
+        return render_to_response('patients/index.html',variables)
 
 
 @csrf_exempt
 def new_appt(request):
     user = request.user
     permissions = get_permissions(user)
-    if request.method == 'POST':
-        cal_form = CalendarEventForm(request.POST, request.FILES)
-        print(str(request.FILES))
-        if cal_form.is_valid():
-            appt = cal_form.save(commit=False)
-            if get_permissions(user) == 'doctor':
-                appt.doctor = user.doctor
-            elif get_permissions(user) == 'patient':
-                appt.patient = user.patient
-            appt.save()
-            for each in cal_form.cleaned_data['attachments']:
-                attachment = Attachment.objects.create(file=each,appointment=appt)
-
-                attachment.save()
-
-            event=log(user=user,action="new_appt")
-            event.save()
-            return HttpResponseRedirect('/')
-        else:
-            print(str(cal_form.errors))
-    else:
+    if request.method != 'POST':
         if permissions == 'doctor':
             cal_form = CalendarEventForm(initial={'doctor': user.doctor})
             cal_form.fields['doctor'].widget = forms.HiddenInput()
@@ -261,16 +286,6 @@ def new_appt(request):
             cal_form = CalendarEventForm()
         variables=RequestContext(request,{'user':user,'cal_form':cal_form,'permissions':permissions})
         return render_to_response("appointments/new.html",variables)
-
-@csrf_protect
-def update_appointment(request):
-    user = request.user
-    if request.method == 'POST':
-        post_id = request.POST['appointmentid']
-        appointment = CalendarEvent.appointments.get(appointment_id=post_id)
-        cal_form = CalendarEventForm(request.POST, instance=appointment)
-        variables = RequestContext(request, {'user':user,'cal_form':cal_form})
-        return render_to_response('appointments/update.html', variables)
 
 def new_test(request):
     user = request.user
@@ -351,9 +366,9 @@ OPTIONS = """{  timeFormat: "H:mm",
                         });
 
                         $.post('/', event, function(response){
-                            $('#update-apt-div').html(response);
+                            $('#apt-div').html(response);
                         });
-                        $('#update-apt-modal').modal('open');
+                        $('#apt-modal').modal('open');
 
                 },
             }"""
