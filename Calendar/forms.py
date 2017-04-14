@@ -9,7 +9,7 @@ from multiupload.fields import MultiFileField
 
 class CalendarEventForm(forms.ModelForm):
     #doctor = forms.ModelChoiceField(queryset=Doctor.doctor.all(), empty_label=None)
-    attachments = MultiFileField(min_num=1, max_num=3, max_file_size=1024*1024*5)
+    attachments = MultiFileField(min_num=1, max_num=3, max_file_size=1024*1024*5,required=False)
     class Meta:
         model = CalendarEvent
         fields = ['title','type','start','end','all_day','doctor','patient','attachments']
@@ -22,7 +22,7 @@ class CalendarEventForm(forms.ModelForm):
 class UpdateCalendarEventForm(forms.ModelForm):
     #doctor = forms.ModelChoiceField(queryset=Doctor.doctor.all(), empty_label=None)
     appointment_id = forms.IntegerField()
-    attachments = MultiFileField(min_num=1, max_num=3, max_file_size=1024*1024*5)
+    attachments = MultiFileField(min_num=1, max_num=3, max_file_size=1024*1024*5,required=False)
     class Meta:
         model = CalendarEvent
         fields = ['title','type','start','end','all_day','doctor','patient','appointment_id','attachments']
