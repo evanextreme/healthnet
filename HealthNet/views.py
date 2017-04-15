@@ -227,6 +227,29 @@ def employee_update_patient(request):
             event.save()
     return render_to_response('patients/update.html', {'user':user,'patientform':patientform,'permissions':permissions},RequestContext(request))
 
+@csrf_exempt
+def edit_prescription(request):
+    user = request.user
+    permissions = get_permissions(user)
+    if request.method == 'POST' and 'refill' in request.POST:
+        post_id = request.POST['prescription_id']
+        prescription = Prescription.prescriptions.get(prescription_id = post_id)
+        prescription.refill()
+        prescription.save()
+    if request.method == 'POST':
+        post_id = request.POST['prescription_id']
+        prescription = Prescription.prescriptions.get(prescription_id = post_id)
+        form = PrescriptionForm(instance=prescription)
+        form.fields['patient'].widget = forms.HiddenInput()
+        if permissions != 'doctor' or permissions != 'nurse':
+            fields = ['patient', 'drug_name', 'dosage', 'side_effects', 'refills_remaining']
+            form.fields['drug_name'].widget = forms.HiddenInput()
+            form.fields['dosage'].widget = forms.HiddenInput()
+            form.fields['side_effects'].widget = forms.HiddenInput()
+            form.fields['refills_remaining'].widget.attrs['readonly'] = True
+        return render_to_response('account/edit_prescription.html', {'user':user, 'prescriptionform':form,'prescription':prescription, 'permissions':permissions}, RequestContext(request))
+
+
 
 @csrf_exempt
 def change_hospital(request):
@@ -265,6 +288,14 @@ def account(request):
     permissions = get_permissions(user)
     variables = RequestContext(request, {'user':user,'permissions':permissions})
     return render_to_response('account/index.html', variables)
+
+def prescriptions(request):
+    user = request.user
+    permissions = get_permissions(user)
+    prescriptions = user.patient.prescription_set.all()
+    variables = RequestContext(request, {'user':user,'permissions':permissions, 'prescriptions':prescriptions})
+    return render_to_response('account/prescriptions.html', variables)
+
 
 def patients(request):
     user = request.user
@@ -305,13 +336,7 @@ def new_test(request):
             for each in form.cleaned_data['attachments']:
                 Attachment.objects.create(file=each)
 
-def refill_prescription(request):
-    user = request.user
-    patient = request.user.patient
-    if request.method == 'POST':
-        post_id = ['prescription_id']
-        prescription = Prescription.prescriptions.get(prescription_id=post_id)
-        prescription.refill()
+
 
 def get_permissions(user):
     if hasattr(user, 'patient'):
