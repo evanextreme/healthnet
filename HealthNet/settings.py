@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'materialize',
     'material',
     'multiupload',
+    'PIL',
 ]
 
 
