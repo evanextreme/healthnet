@@ -115,9 +115,11 @@ class Prescription(models.Model):
     #decremented when a patient refills
     refills_remaining = models.IntegerField()
     def __str__(self):
-        drug_desc = str(self.drug_name + ' ' + self.dosage)
+        drug_desc = str(self.drug_name + ' ' + self.dosage + ' ' + 'Refills Remaining: ' + str(self.refills_remaining))
         return drug_desc
 
     def refill(self):
         #decrement refills
-        refills_remaining -= 1
+        self.refills_remaining -= 1
+        if self.refills_remaining < 0:
+            self.delete()
