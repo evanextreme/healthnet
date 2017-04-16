@@ -16,6 +16,7 @@ from Calendar.util import events_to_json, calendar_options
 from Calendar.forms import CalendarEventForm, UpdateCalendarEventForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
+from HealthNet.export import make_pdf
 from HealthNet.email import appointment_confirmation_email
 
 @csrf_exempt
@@ -49,6 +50,11 @@ def home(request):
                 cal_form.fields['patient'].widget = forms.HiddenInput()
                 cal_form.fields['type'].widget = forms.HiddenInput()
                 cal_form.fields['attachments'].widget = forms.HiddenInput()
+            if permissions == 'patient' and appointment.confirmed:
+                cal_form.fields['title'].widget.attrs['disabled'] = True
+                cal_form.fields['start'].widget.attrs['disabled'] = True
+                cal_form.fields['end'].widget.attrs['disabled'] = True
+                cal_form.fields['all_day'].widget.attrs['disabled'] = True
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
             variables = RequestContext(request, {'user':user,'cal_form':cal_form,'attachments':attachments,'confirmed':confirmed,'permissions':permissions,'calendar_config_options':calendar_options(event_url, OPTIONS)})
             return render_to_response('appointments/update.html', variables)
@@ -340,7 +346,10 @@ def new_test(request):
             for each in form.cleaned_data['attachments']:
                 Attachment.objects.create(file=each)
 
-
+def export_file(request):
+    user = request.user
+    pdf = make_pdf(user)
+    return HttpResponseRedirect(pdf.output('I'))
 
 def get_permissions(user):
     if hasattr(user, 'patient'):
