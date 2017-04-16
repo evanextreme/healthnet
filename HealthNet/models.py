@@ -114,9 +114,10 @@ class Prescription(models.Model):
 
     def refill(self):
         #decrement refills
-        self.refills_remaining -= 1
         if self.refills_remaining < 0:
-            self.delete()
+            return
+        self.refills_remaining -=1
+        return
 
 class Export(models.Model):
     user = models.OneToOneField(User)

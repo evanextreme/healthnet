@@ -8,6 +8,8 @@
     <form action='/patients/update' method='post' enctype="multipart/form-data">
       {% csrf_token %}
     <button class="modal-action modal-close waves-effect waves-light btn light-blue accent-3" type="submit" name="get_patient_id" value="{{patient.patient_id}}">Update</button>
+    <button class="modal-action modal-close waves-effect waves-light btn light-blue accent-3" type="submit" name="get_patient_prescriptions" value="{{patient.patient_id}}">View/Edit Medications</button>
+
 {% endfor %}
 </div>
 </div>
