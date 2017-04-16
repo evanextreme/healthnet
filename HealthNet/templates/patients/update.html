@@ -1,0 +1,20 @@
+{% extends "basic.html" %}
+{% load material_form %}
+
+{% block body %}
+<div class="container">
+  <h4>
+<form method="post" action="/patients/update" enctype="multipart/form-data">
+  {% csrf_token %}
+    {% form form=patientform %}
+    {% if form.subject.errors %}
+    <ol>
+        {% for error in form.subject.errors %}
+            <li><strong>{{ error|escape }}</strong></li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+    {% endform %}
+    <button class="waves-effect waves-light btn light-blue accent-3" type="submit" value="update">Register<i class="material-icons right">system_update_alt</i></button>
+</div>
+{% endblock %}

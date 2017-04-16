@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^account/change_hospital/$', views.change_hospital, name='change_hospital'),
 	url(r'^account/password/$', views.change_password, name='password'),
 	url(r'^all_events/', views.all_events, name='all_events'),
+    url(r'^export/', views.export_file, name='export_file'),
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^admin/doctor', views.doc_register_page,name='doc_register_page'),

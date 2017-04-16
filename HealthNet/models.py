@@ -117,3 +117,7 @@ class Prescription(models.Model):
         self.refills_remaining -= 1
         if self.refills_remaining < 0:
             self.delete()
+
+class Export(models.Model):
+    user = models.OneToOneField(User)
+    file = models.FileField(upload_to='exports',blank=True)
