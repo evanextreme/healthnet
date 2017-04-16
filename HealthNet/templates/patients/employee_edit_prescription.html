@@ -1,0 +1,14 @@
+{% extends "basic.html" %}
+{% load material_form %}
+
+{% block body %}
+<div class="container">
+    <form method="post" action=".">
+        <input type="hidden" name="prescription_id" value="{{ prescription.prescription_id }}">
+        <input type="hidden" name="edit_prescription" value="1">
+        {% form form=prescriptionform %}
+        {% endform %}
+        <button class="waves-effect waves-light btn light-blue accent-3" type="submit" value="{{ prescription.prescription_id }}">Update<i class="material-icons right">system_update_alt</i></button>
+    </form>
+</div>
+{% endblock %}

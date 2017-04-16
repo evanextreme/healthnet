@@ -227,6 +227,13 @@ def employee_update_patient(request):
         patientform = EmployeeUpdatePatientForm(instance = patient)
         if permissions == 'nurse':
             patientform.fields['hospital'].widget = forms.HiddenInput()
+
+    if request.method == 'POST' and 'get_patient_prescriptions' in request.POST:
+        post_id = request.POST['get_patient_prescriptions']
+        patient = Patient.patients.get(patient_id=post_id)
+        prescriptions = patient.prescription_set.all()
+        return render_to_response('patients/prescriptions.html', {'user':user,'patient':patient,'prescriptions':prescriptions,'permissions':permissions},RequestContext(request))
+
     elif request.method == 'POST':
         post_id = request.POST['patient_id']
         patient = Patient.patients.get(patient_id=post_id)
@@ -258,6 +265,48 @@ def edit_prescription(request):
             form.fields['side_effects'].widget = forms.HiddenInput()
             form.fields['refills_remaining'].widget.attrs['readonly'] = True
         return render_to_response('account/edit_prescription.html', {'user':user, 'prescriptionform':form,'prescription':prescription, 'permissions':permissions}, RequestContext(request))
+
+@csrf_exempt
+def employee_edit_prescription(request):
+    user = request.user
+    permissions = get_permissions(user)
+    if request.method == 'POST' and 'edit_prescription' in request.POST:
+        post_id = request.POST['prescription_id']
+        prescription = Prescription.prescriptions.get(prescription_id = post_id)
+        form = PrescriptionForm(request.POST, instance = prescription)
+        if form.is_valid():
+            form.save()
+            event=log(user=user,action="employee_edit_prescription")
+            return render_to_response('patients/employee_edit_prescription.html', {'user':user, 'prescriptionform':form, 'prescription':prescription})
+    if request.method == 'POST':
+        post_id = request.POST['prescription_id']
+        prescription = Prescription.prescriptions.get(prescription_id = post_id)
+        form = PrescriptionForm(instance = prescription)
+        form.fields['patient'].widget.attrs['readonly'] = True
+        return render_to_response('patients/employee_edit_prescription.html', {'user':user, 'prescriptionform':form, 'prescription':prescription})
+
+@csrf_exempt
+def new_prescription(request):
+    user = request.user
+    permissions = get_permissions(user)
+    if request.method == 'POST' and 'get_patient_id' in request.POST:
+        post_id = request.POST['get_patient_id']
+        patient = Patient.patients.get(patient_id = post_id)
+        form = PrescriptionForm()
+        form.fields['patient'].initial = patient
+        form.fields['patient'].widget.attrs['readonly'] = True
+        return render_to_response('patients/new_prescription.html', {'user':user, 'prescriptionform':form, 'permissions':permissions}, RequestContext(request))
+
+    if request.method == 'POST':
+        form = PrescriptionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            event=log(user=user,action="new_prescription")
+            if user.doctor:
+                patients = user.doctor.patient_set.all()
+            elif user.nurse:
+                patients = user.nurse.patient_set.all()
+            return render_to_response('patients/index.html', {'user':user,'patients':patients, 'permissions':permissions},RequestContext(request))
 
 
 
