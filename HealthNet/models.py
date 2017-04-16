@@ -10,11 +10,6 @@ from django.template.loader import render_to_string
 from django.core.files.storage import FileSystemStorage
 from phonenumber_field.modelfields import PhoneNumberField
 
-
-# Create your models here.
-
-
-
 class Hospital(models.Model):
     hospitals = models.Manager()
     name = models.CharField(max_length=50)
@@ -22,7 +17,6 @@ class Hospital(models.Model):
     def __str__(self):
         name = self.name
         return name
-
 
 
 class Nurse(models.Model):
