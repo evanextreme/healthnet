@@ -1,10 +1,8 @@
 import re
 from django import forms
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from .models import CalendarEvent
 from datetimewidget.widgets import DateTimeWidget
-from HealthNet.models import Doctor
 from multiupload.fields import MultiFileField
 
 class CalendarEventForm(forms.ModelForm):
@@ -12,7 +10,7 @@ class CalendarEventForm(forms.ModelForm):
     attachments = MultiFileField(min_num=1, max_num=3, max_file_size=1024*1024*5,required=False)
     class Meta:
         model = CalendarEvent
-        fields = ['title','type','start','end','all_day','doctor','patient','attachments']
+        fields = ['title','type','start','end','all_day','doctor','patient','hospital','attachments']
         widgets = {
             #Use localization
             'start': DateTimeWidget(attrs={'class':"yourdatetime"}, usel10n = True),
@@ -25,7 +23,7 @@ class UpdateCalendarEventForm(forms.ModelForm):
     attachments = MultiFileField(min_num=1, max_num=3, max_file_size=1024*1024*5,required=False)
     class Meta:
         model = CalendarEvent
-        fields = ['title','type','start','end','all_day','doctor','patient','appointment_id','attachments']
+        fields = ['title','type','start','end','all_day','doctor','patient','hospital','appointment_id','attachments']
         widgets = {
             #Use localization
             'start': DateTimeWidget(attrs={'class':"yourdatetime"}, usel10n = True),

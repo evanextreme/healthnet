@@ -2,7 +2,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from HealthNet.models import Doctor, Patient
+from HealthNet.models import Doctor, Patient, Hospital
 
 class CalendarEvent(models.Model):
     """The event set a record for an
@@ -41,6 +41,7 @@ class CalendarEvent(models.Model):
     appointments = models.Manager()
     doctor = models.ForeignKey(Doctor, default=None)
     patient = models.ForeignKey(Patient, default=None)
+    hospital = models.ForeignKey(Hospital, default=None)
 
     confirmed = models.BooleanField(default=False)
 

@@ -65,6 +65,8 @@ def home(request):
                     appointment.doctor = user.doctor
                 elif get_permissions(user) == 'patient':
                     appointment.patient = user.patient
+                    appointment.doctor = user.patient.doctor
+                    appointment.hospital= user.patient.hospital
                 appointment.save()
                 for each in cal_form.cleaned_data['attachments']:
                     attachment = Attachment.objects.create(file=each,appointment=appointment)
@@ -320,6 +322,8 @@ def new_appt(request):
             cal_form.fields['doctor'].widget = forms.HiddenInput()
         elif permissions == 'patient':
             cal_form = CalendarEventForm(initial={'patient': user.patient})
+            cal_form.fields['doctor'].widget.attrs['disabled'] = True
+            cal_form.fields['hospital'].widget.attrs['disabled'] = True
             cal_form.fields['patient'].widget = forms.HiddenInput()
             cal_form.fields['type'].widget = forms.HiddenInput()
             cal_form.fields['attachments'].widget = forms.HiddenInput()
@@ -352,10 +356,13 @@ def get_permissions(user):
 
 def all_events(request):
     user = request.user
-    if hasattr(user, 'patient'):
+    permissions = get_permissions(user)
+    if permissions == 'patient':
         appointments = user.patient.calendarevent_set.all()
-    elif hasattr(user, 'doctor'):
+    elif permissions == 'doctor':
         appointments = user.doctor.calendarevent_set.all()
+    elif permissions == 'nurse':
+        appointments = user.nurse.hospital.calendarevent_set.all()
     return HttpResponse(events_to_json(appointments), content_type='application/json')
 
 
