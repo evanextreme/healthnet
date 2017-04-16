@@ -16,8 +16,10 @@ from Calendar.util import events_to_json, calendar_options
 from Calendar.forms import CalendarEventForm, UpdateCalendarEventForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
-from HealthNet.export import make_pdf
 from HealthNet.email import appointment_confirmation_email
+from io import BytesIO
+from reportlab.pdfgen import canvas
+
 
 @csrf_exempt
 def home(request):
@@ -347,9 +349,24 @@ def new_test(request):
                 Attachment.objects.create(file=each)
 
 def export_file(request):
-    user = request.user
-    pdf = make_pdf(user)
-    return HttpResponseRedirect(pdf.output('I'))
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="mypdf.pdf"'
+
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer)
+
+    # Start writing the PDF here
+    p.drawString(100, 100, 'Hello world.')
+    # End writing
+
+    p.showPage()
+    p.save()
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+
+    return response
 
 def get_permissions(user):
     if hasattr(user, 'patient'):
