@@ -32,7 +32,7 @@
     <a class="left btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('Sorry, but this appointment has already been confirmed! Please contact your hospital or doctor to reschedule.',12000);">
       <i class="material-icons left">delete</i>Delete
     </a>
-    {% else %}
+    {% elif permissions == 'doctor' or permissions == 'patient'%}
     <button class="left waves-effect waves-red btn-flat" type="submit" name="Delete">
       <i class="material-icons left">delete</i>Delete
     </button>
