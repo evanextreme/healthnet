@@ -378,7 +378,7 @@ def new_appt(request):
             cal_form = CalendarEventForm(initial={'doctor': user.doctor})
             cal_form.fields['doctor'].widget = forms.HiddenInput()
         elif permissions == 'patient':
-            cal_form = CalendarEventForm(initial={'patient': user.patient
+            cal_form = CalendarEventForm(initial={'patient': user.patient,
                                                   'doctor': user.patient.doctor,
                                                   'hospital': user.patient.hospital})
             cal_form.fields['doctor'].widget.attrs['disabled'] = True
@@ -407,7 +407,7 @@ def export_file(request):
     p = canvas.Canvas(buffer)
 
     # Start writing the PDF here
-    p.drawString(100, 100, 'Hello world.')
+    p.drawString(275,500,'Hello world.')
     # End writing
 
     p.showPage()
