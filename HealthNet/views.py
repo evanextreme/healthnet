@@ -378,7 +378,9 @@ def new_appt(request):
             cal_form = CalendarEventForm(initial={'doctor': user.doctor})
             cal_form.fields['doctor'].widget = forms.HiddenInput()
         elif permissions == 'patient':
-            cal_form = CalendarEventForm(initial={'patient': user.patient})
+            cal_form = CalendarEventForm(initial={'patient': user.patient
+                                                  'doctor': user.patient.doctor,
+                                                  'hospital': user.patient.hospital})
             cal_form.fields['doctor'].widget.attrs['disabled'] = True
             cal_form.fields['hospital'].widget.attrs['disabled'] = True
             cal_form.fields['patient'].widget = forms.HiddenInput()
