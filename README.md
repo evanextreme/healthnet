@@ -6,7 +6,7 @@ This project is a group effort created by SE Team 4, also known as "You Can't Te
 To install, simply follow the following steps in your command line enviornment
 
 * Change to the root directory of the repository
-* `python -m pip install -r pip-requirements.txt`
+* `python -m pip install -r requirements.txt`
 * `python manage.py makemigrations`
 * `python manage.py migrate --run-syncdb`
 
