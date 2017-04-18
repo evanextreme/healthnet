@@ -7,7 +7,7 @@
             <img src="../../static/blank_picture.png" alt="Profile Picture" class="circle responsive-img">
         {% endif %}
     </div>
-    <div class="col s9 card-stacked">
+    <div class="col s12 card-stacked">
       <div class="card-content">
         <h4>{{user.first_name}} {{user.last_name}}</h4>
       </div>
@@ -25,7 +25,6 @@
       </div>
       <div class="card-content">
         <span class="black-text">Weight: {{user.patient.weight}} pounds</span>
-      </div>
       </div>
       <div class="card-action row">
           <a class="waves-effect waves-blue btn-flat" href="mailto:"{{user.email}}><i class="material-icons left">email</i>Email</a>

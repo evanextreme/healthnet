@@ -31,4 +31,10 @@
     <p>You currently do not have any prescribed medications.</p>
 
 {% endif %}
+<div class="fixed-action-btn horizontal">
+  <form action="new_prescription/" method="POST">
+ <button id="menu" class="btn-floating btn-large red" name="get_patient_id" value={{patient.patient_id}}>
+   <i class="large material-icons">mode_edit</i>
+ </button>
+ </form>
 {% endblock %}

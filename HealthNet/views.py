@@ -328,6 +328,7 @@ def change_hospital(request):
 @csrf_exempt
 def change_password(request):
     user = request.user
+    permissions = get_permissions(user)
     if request.method == 'POST':
         passform = PasswordChangeForm(user, request.POST)
         if passform.is_valid():
