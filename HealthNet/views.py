@@ -40,7 +40,6 @@ def home(request):
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             attachments = appointment.attachment_set.all()
             cal_form = UpdateCalendarEventForm(instance=appointment)
-            print(str(appointment.confirmed))
             confirmed = 'False'
             if appointment.confirmed == False:
                 confirmed = 'False'
@@ -62,6 +61,13 @@ def home(request):
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
             cal_form = CalendarEventForm(request.POST, request.FILES)
+            print(request.POST)
+            if permissions == 'doctor':
+                cal_form.doctor = user.doctor
+            elif permissions == 'patient':
+                cal_form.patient = user.patient
+                cal_form.doctor = user.patient.doctor
+                cal_form.hospital = user.patient.hospital
             if cal_form.is_valid():
                 appointment = cal_form.save(commit=False)
                 if permissions == 'doctor' or permissions == 'nurse':
@@ -69,12 +75,6 @@ def home(request):
                     appointment.color = '#00b0ff'
                     #TODO change from confirmation email to creation email
                     appointment_confirmation_email(appointment.patient,appointment.doctor,appointment)
-                if get_permissions(user) == 'doctor':
-                    appointment.doctor = user.doctor
-                elif get_permissions(user) == 'patient':
-                    appointment.patient = user.patient
-                    appointment.doctor = user.patient.doctor
-                    appointment.hospital= user.patient.hospital
                 appointment.save()
                 for each in cal_form.cleaned_data['attachments']:
                     attachment = Attachment.objects.create(file=each,appointment=appointment)
@@ -383,9 +383,9 @@ def new_appt(request):
             cal_form = CalendarEventForm(initial={'patient': user.patient,
                                                   'doctor': user.patient.doctor,
                                                   'hospital': user.patient.hospital})
-            cal_form.fields['doctor'].widget.attrs['disabled'] = True
-            cal_form.fields['hospital'].widget.attrs['disabled'] = True
             cal_form.fields['patient'].widget = forms.HiddenInput()
+            cal_form.fields['doctor'].widget = forms.HiddenInput()
+            cal_form.fields['hospital'].widget = forms.HiddenInput()
             cal_form.fields['type'].widget = forms.HiddenInput()
             cal_form.fields['attachments'].widget = forms.HiddenInput()
         else:

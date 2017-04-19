@@ -20,6 +20,16 @@
       background-color: rgba(0, 176, 255, 0.65);
       }</style>
     {% block header %} {%endblock%}
+
+        {% fullcalendar_css %}
+        {% fullcalendar_print_css %}
+        <script src="jquery-3.2.0.min.js"></script>
+
+        {% fullcalendar_jquery %}
+        {% fullcalendar_jquery_ui %}
+        {% fullcalendar_javascript %}
+
+        {% calendar_init calendar_config_options %}
     <ul id="dropdown1" class="dropdown-content">
 
       <li><a class="waves-effect waves-light blue-text" href="/account">Account</a></li>
@@ -61,11 +71,7 @@
   </body>
     <footer>
     <!--Import jQuery before materialize.js-->
-     {% block footer %}
-              <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-              <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
-              <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
-      {% endblock %}
+      <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
       {% include 'material/includes/material_css.html' %}
       {% include 'material/includes/material_js.html' %}
 
