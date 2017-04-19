@@ -7,17 +7,12 @@
     {% if user.is_authenticated %}
     <br>
     <div id="main-container" class="">
-        <div id="apt-modal" class="modal modal-fixed-footer">
 
-          <form action='.' method='post' enctype="multipart/form-data">
-              <div id="apt-div">
-              </div>
-        </div>
         <div class="row">
-        <div class="col s9">
+        <div class="col s8">
         {% calendar %}
         </div>
-        <div class="col s3">
+        <div class="col s4">
           {% if permissions == 'patient' %}
 
           {% if prescriptions %}
@@ -40,7 +35,8 @@
           {% endif %}
 
           {% elif permissions == 'doctor' %}
-                  <ul class="collapsible" data-collapsible="accordion">
+              <br><br>
+              <ul class="collapsible" data-collapsible="accordion">
 
 
               {% for patient in patients %}
@@ -62,23 +58,7 @@
         </div>
       </div>
 
-        <div class="fixed-action-btn horizontal">
-          {% if permissions == 'doctor' %}
-           <a id="menu" class="btn-floating btn-large red">
-           <i class="large material-icons">mode_edit</i>
-           {% else %}
-           <a id="menu" class="btn-floating btn-large red" onclick="newAppointment()">
-           {% endif %}
-           <i class="large material-icons">library_add</i>
-         </a>
-         <ul>
-           {% if permissions == 'doctor' %}
-           <li><a class="btn-floating red" onclick="newAppointment()"><i class="material-icons">library_add</i></a></li>
-           <li><a class="btn-floating green" onclick="newPrescription()"><i class="material-icons">playlist_add</i></a></li>
-           {% endif %}
-         </ul>
 
-        </div>
 
     </div>
     {% else %}
@@ -185,83 +165,4 @@
     }
 </style>
 
-<script type="text/javascript">
-$(document).ready(function(){
-      $('.modal').modal();
-      $('.parallax').parallax();
-});
-function newAppointment(){
-  $.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie != '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-            // Only send the token to relative URLs i.e. locally.
-              xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-        }
-    }
-  });
-  $.get("/appointments/new/",function(response){
-      $('#apt-div').html(response);
-  });
-  $('#apt-modal').modal('open');
-}
-
-function newPrescription(){
-  $.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie != '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-            // Only send the token to relative URLs i.e. locally.
-              xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-        }
-    }
-  });
-  $.get("/prescriptions/new/",function(response){
-      $('#apt-div').html(response);
-  });
-  $('#apt-modal').modal('open');
-}
-
-
-(function( $ ){
-   $.fn.healthToast = function(text) {
-      alert('TEST BOY')
-      Materialize.toast('I am a toast!', 3000, 'rounded')
-      alert('hello world');
-      return this;
-   };
-})( jQuery );
-
-function closeModal(){
-  $('#apt-modal').modal('close');
-}
-</script>
 {% endblock %}
