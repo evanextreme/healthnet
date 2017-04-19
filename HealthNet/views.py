@@ -27,10 +27,16 @@ def home(request):
     permissions = get_permissions(user)
     event_url = 'all_events/'
     opentap = ''
+    prescriptions = ''
+    patients = ''
     if (permissions == 'patient' and user.patient.new_user) or (permissions == 'nurse' and user.nurse.new_user) or (permissions == 'doctor' and user.doctor.new_user):
         opentap = 'True'
     #If user is admin, redirect to admin dashboard
-    if permissions == 'admin':
+    if permissions == 'patient':
+        prescriptions = user.patient.prescription_set.all()
+    elif permissions == 'doctor':
+        patients = user.doctor.patient_set.all()
+    elif permissions == 'admin':
         return HttpResponseRedirect('/admin')
 
     if request.method == 'POST':
@@ -115,9 +121,21 @@ def home(request):
             variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
             return render_to_response('index.html', variables)
 
+        elif 'create_prescription' in request.POST:
+            form = PrescriptionForm(request.POST)
+            if form.is_valid():
+                form.save()
+                event=log(user=user,action="new_prescription")
+                if user.doctor:
+                    patients = user.doctor.patient_set.all()
+                elif user.nurse:
+                    patients = user.nurse.patient_set.all()
+                return render_to_response('index.html', {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions},RequestContext(request))
+
     else:
         cal_form = CalendarEventForm()
-        variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
+
+        variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients})
         return render_to_response('index.html',variables)
 
 def logout_page(request):
@@ -290,24 +308,10 @@ def employee_edit_prescription(request):
 def new_prescription(request):
     user = request.user
     permissions = get_permissions(user)
-    if request.method == 'POST' and 'get_patient_id' in request.POST:
-        post_id = request.POST['get_patient_id']
-        patient = Patient.patients.get(patient_id = post_id)
-        form = PrescriptionForm()
-        form.fields['patient'].initial = patient
-        form.fields['patient'].widget.attrs['readonly'] = True
-        return render_to_response('patients/new_prescription.html', {'user':user, 'prescriptionform':form, 'permissions':permissions}, RequestContext(request))
+    form = PrescriptionForm()
+    return render_to_response('prescriptions/new.html', {'user':user, 'prescriptionform':form, 'permissions':permissions}, RequestContext(request))
 
-    if request.method == 'POST':
-        form = PrescriptionForm(request.POST)
-        if form.is_valid():
-            form.save()
-            event=log(user=user,action="new_prescription")
-            if user.doctor:
-                patients = user.doctor.patient_set.all()
-            elif user.nurse:
-                patients = user.nurse.patient_set.all()
-            return render_to_response('patients/index.html', {'user':user,'patients':patients, 'permissions':permissions},RequestContext(request))
+
 
 
 

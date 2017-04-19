@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^patients/new_prescription/$', views.new_prescription, name='new_prescription'),
     url(r'^patients/employee_edit_prescription/$', views.employee_edit_prescription, name='employee_edit_prescription'),
     url(r'^appointments/new/$', views.new_appt, name='new_appt'),
+    url(r'^prescriptions/new/$', views.new_prescription, name='new_prescription'),
 	url(r'^login/$', auth_views.login, name='login'),
 	url(r'^logout/$', views.logout_page, name='logout'),
     url(r'^register/$', views.register_page,name='register'),
