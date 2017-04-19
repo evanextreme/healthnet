@@ -14,5 +14,5 @@ def appointment_confirmation_email(patient, doctor, appointment):
             [patient.user.email],
             fail_silently=False,
         )
-    except ConnectionRefusedError as error:
+    except Exception as error:
         print_status('FAIL',str('Appointment confirmation email to Patient {} {} and Doctor {} {} failed!'.format(patient.user.first_name,patient.user.last_name,doctor.user.first_name,doctor.user.last_name)))

@@ -1,17 +1,8 @@
 {% extends "basic.html" %}
 {% load fullcalendar_tags %}
 {% load material_form %}
-{% block header %}
 
-        {% fullcalendar_css %}
-        {% fullcalendar_print_css %}
-        {% fullcalendar_jquery %}
-        {% fullcalendar_jquery_ui %}
-        {% fullcalendar_javascript %}
 
-        {% calendar_init calendar_config_options %}
-
-{% endblock %}
 {% block body %}
     {% if user.is_authenticated %}
     <br>
@@ -82,8 +73,7 @@
   		</div>
   	</div>
     {% endif %}
-{% endblock %}
-{% block footer %}
+
 <style>
 .parallax-container {
       width: 100%;
