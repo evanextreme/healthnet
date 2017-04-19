@@ -221,6 +221,7 @@ def update_profile(request):
 def employee_update_patient(request):
     user = request.user
     permissions = get_permissions(user)
+    print(str(request.POST))
     if request.method == 'POST' and 'get_patient_id' in request.POST:
         post_id = request.POST['get_patient_id']
         patient = Patient.patients.get(patient_id=post_id)
@@ -228,7 +229,7 @@ def employee_update_patient(request):
         if permissions == 'nurse':
             patientform.fields['hospital'].widget = forms.HiddenInput()
 
-    if request.method == 'POST' and 'get_patient_prescriptions' in request.POST:
+    elif request.method == 'POST' and 'get_patient_prescriptions' in request.POST:
         post_id = request.POST['get_patient_prescriptions']
         patient = Patient.patients.get(patient_id=post_id)
         prescriptions = patient.prescription_set.all()
