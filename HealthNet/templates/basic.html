@@ -9,6 +9,7 @@
         <title>{% block title %}{%endblock%}HealthNet</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="/static/css/healthnet.css">
     <!--Import materialize.css-->
     <link type="text/css" rel="stylesheet" href="{% static 'materialize/bin/materialize.css' %}"  media="screen,projection"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -23,7 +24,10 @@
 
         {% fullcalendar_css %}
         {% fullcalendar_print_css %}
+
+        {% include 'material/includes/material_css.html' %}
         <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
+        {% include 'material/includes/material_js.html' %}
 
         {% fullcalendar_jquery_ui %}
         {% fullcalendar_javascript %}
@@ -63,17 +67,36 @@
 
   </head>
   <body>
+    <div class="preloader-background">
+    	<div class="preloader-wrapper big active">
+    		<div class="spinner-layer spinner-blue-only">
+    			<div class="circle-clipper left">
+    				<div class="circle"></div>
+    			</div>
+    			<div class="gap-patch">
+    				<div class="circle"></div>
+    			</div>
+    			<div class="circle-clipper right">
+    				<div class="circle"></div>
+    			</div>
+    		</div>
+    	</div>
+    </div>
+
     <div id="apt-modal" class="modal modal-fixed-footer">
 
       <form action='.' method='post' enctype="multipart/form-data">
           <div id="apt-div">
           </div>
+
     </div>
+
     {% block body %}
 
         <p>Basic template loaded. Body not overwritten.</p>
-    {% endblock %}
 
+    {% endblock %}
+    {% block button %}
     <div class="fixed-action-btn horizontal">
       {% if permissions == 'doctor' %}
        <a id="menu" class="btn-floating btn-large red">
@@ -91,92 +114,9 @@
      </ul>
 
     </div>
+    {% endblock %}
   </body>
     <footer>
-    <!--Import jQuery before materialize.js-->
-      <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
-      {% include 'material/includes/material_css.html' %}
-      {% include 'material/includes/material_js.html' %}
-
-      <script type="text/javascript">
-      $(document).ready(function(){
-            $('.modal').modal();
-            $('.parallax').parallax();
-      });
-      function newAppointment(){
-        $.ajaxSetup({
-          beforeSend: function(xhr, settings) {
-              function getCookie(name) {
-                  var cookieValue = null;
-                  if (document.cookie && document.cookie != '') {
-                      var cookies = document.cookie.split(';');
-                      for (var i = 0; i < cookies.length; i++) {
-                          var cookie = jQuery.trim(cookies[i]);
-                          // Does this cookie string begin with the name we want?
-                          if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                              break;
-                          }
-                      }
-                  }
-                  return cookieValue;
-              }
-              if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                  // Only send the token to relative URLs i.e. locally.
-                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-              }
-          }
-        });
-        $.get("/appointments/new/",function(response){
-            $('#apt-div').html(response);
-        });
-        $('#apt-modal').modal('open');
-      }
-
-      function newPrescription(){
-        $.ajaxSetup({
-          beforeSend: function(xhr, settings) {
-              function getCookie(name) {
-                  var cookieValue = null;
-                  if (document.cookie && document.cookie != '') {
-                      var cookies = document.cookie.split(';');
-                      for (var i = 0; i < cookies.length; i++) {
-                          var cookie = jQuery.trim(cookies[i]);
-                          // Does this cookie string begin with the name we want?
-                          if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                              break;
-                          }
-                      }
-                  }
-                  return cookieValue;
-              }
-              if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                  // Only send the token to relative URLs i.e. locally.
-                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-              }
-          }
-        });
-        $.get("/prescriptions/new/",function(response){
-            $('#apt-div').html(response);
-        });
-        $('#apt-modal').modal('open');
-      }
-
-
-      (function( $ ){
-         $.fn.healthToast = function(text) {
-            alert('TEST BOY')
-            Materialize.toast('I am a toast!', 3000, 'rounded')
-            alert('hello world');
-            return this;
-         };
-      })( jQuery );
-
-      function closeModal(){
-        $('#apt-modal').modal('close');
-      }
-      </script>
-
+      <script src="/static/js/healthnet.js"></script>
     </footer>
 </html>

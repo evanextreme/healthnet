@@ -249,9 +249,11 @@ def employee_update_patient(request):
 
     elif request.method == 'POST' and 'get_patient_prescriptions' in request.POST:
         post_id = request.POST['get_patient_prescriptions']
+        if not type(post_id) is int:
+            post_id = post_id[0]
         patient = Patient.patients.get(patient_id=post_id)
         prescriptions = patient.prescription_set.all()
-        return render_to_response('patients/prescriptions.html', {'user':user,'patient':patient,'prescriptions':prescriptions,'permissions':permissions},RequestContext(request))
+        return render_to_response('prescriptions/index.html', {'user':user,'patient':patient,'prescriptions':prescriptions,'permissions':permissions},RequestContext(request))
 
     elif request.method == 'POST':
         post_id = request.POST['patient_id']
@@ -311,10 +313,6 @@ def new_prescription(request):
     form = PrescriptionForm()
     return render_to_response('prescriptions/new.html', {'user':user, 'prescriptionform':form, 'permissions':permissions}, RequestContext(request))
 
-
-
-
-
 @csrf_exempt
 def change_hospital(request):
     user = request.user
@@ -360,7 +358,6 @@ def prescriptions(request):
     prescriptions = user.patient.prescription_set.all()
     variables = RequestContext(request, {'user':user,'permissions':permissions, 'prescriptions':prescriptions})
     return render_to_response('account/prescriptions.html', variables)
-
 
 def patients(request):
     user = request.user
@@ -448,6 +445,13 @@ def all_events(request):
         appointments = user.nurse.hospital.calendarevent_set.all()
     return HttpResponse(events_to_json(appointments), content_type='application/json')
 
+@csrf_exempt
+def get_card(request):
+    if 'patientid' in request.POST:
+        post_id = request.POST['patientid']
+        patient = Patient.patients.get(patient_id=post_id)
+        variables = {'user':patient.user}
+        return(render_to_response('card/patient.html',variables))
 
 OPTIONS = """{  timeFormat: "H:mm",
 
