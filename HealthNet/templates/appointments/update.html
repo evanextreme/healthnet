@@ -1,7 +1,6 @@
 {% load staticfiles %}
 {% load material_form %}
 
-
   <!-- Dropdown Structure -->
 <div class="modal-content">
     <h4>Update Appointment{% if permissions == 'doctor'%}/Test{% endif %}</h4>
@@ -46,9 +45,11 @@
     {% endif %}
 </div>
 
+<script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
 <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
 {% include 'material/includes/material_css.html' %}
 {% include 'material/includes/material_js.html' %}
+
 <script type="text/javascript">
     $(document).ready(function(){
       $('.tooltipped').tooltip({delay: 50});

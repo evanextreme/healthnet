@@ -9,7 +9,7 @@
       {% if permissions == 'patient' %}
         <h4>Your Profile</h4>
         {{user.patient.card}}
-        <p>This is your profile. It is how your patients see you on myHealth.</p>
+        <p>This is your profile. It is how your doctor and hospital see you on myHealth.</p>
       {% elif permissions == 'doctor' %}
         {{user.doctor.card}}
         <p>This is your profile. It is how your patients see you on myHealth.</p>

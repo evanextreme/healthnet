@@ -3,20 +3,22 @@
 
 <!DOCTYPE html>
 <div class="modal-content">
-  <h4>New Appointment{% if permissions == 'doctor'%}/Test{% endif %}</h4>
+  <h4>New Prescription</h4>
+      <input type="hidden" name="edit_prescription" value="1">
       {% csrf_token %}
-      {% form form=cal_form %}{% endform %}
+      {% form form=prescriptionform %}
+      {% endform %}
 </div>
 <div class="modal-footer">
     <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
-    <button class="modal-action modal-close waves-effect waves-light btn red" onclick="Materialize.toast('Appointment confirmed!',4000);" type="submit" name="Create">Create</button>
+    <button class="modal-action modal-close waves-effect waves-light btn green" onclick="Materialize.toast('Prescription created!',4000);" name="create_prescription" value="{{ prescription.prescription_id }}">Create<i class="material-icons right">system_update_alt</i></button>
 </div>
-
 
 <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
 <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
 {% include 'material/includes/material_css.html' %}
 {% include 'material/includes/material_js.html' %}
+
 <script type="text/javascript"> $(document).ready(function(){
     $('.modal').modal();
     })
