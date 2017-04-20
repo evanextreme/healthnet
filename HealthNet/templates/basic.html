@@ -83,6 +83,17 @@
     	</div>
     </div>
 
+
+
+
+    {% block body %}
+
+        <p>Basic template loaded. Body not overwritten.</p>
+
+    {% endblock %}
+    {% block actionable %}
+    {% if user.is_authenticated %}
+
     <div id="apt-modal" class="modal modal-fixed-footer">
 
       <form action='.' method='post' enctype="multipart/form-data">
@@ -91,12 +102,6 @@
 
     </div>
 
-    {% block body %}
-
-        <p>Basic template loaded. Body not overwritten.</p>
-
-    {% endblock %}
-    {% block button %}
     <div class="fixed-action-btn horizontal">
       {% if permissions == 'doctor' %}
        <a id="menu" class="btn-floating btn-large red">
@@ -114,6 +119,7 @@
      </ul>
 
     </div>
+    {% endif %}
     {% endblock %}
   </body>
     <footer>
