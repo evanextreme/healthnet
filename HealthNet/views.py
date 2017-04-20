@@ -173,7 +173,8 @@ def doc_register_page(request):
 def register_page(request):
 
     if request.method == 'POST':
-        userform = UserForm(data=request.POST)
+        print(str(request.POST))
+        userform = UserForm(request.POST)
         patientform = PatientForm(request.POST, request.FILES)
         if userform.is_valid() and patientform.is_valid():
             user = userform.save(commit=False)
