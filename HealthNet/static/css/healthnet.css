@@ -70,3 +70,7 @@
   right: 0;
   bottom: 0;
 }
+
+#pat-actions {
+    border-bottom: 1px solid #ddd;
+}
