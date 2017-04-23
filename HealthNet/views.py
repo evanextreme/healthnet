@@ -256,6 +256,30 @@ def employee_update_patient(request):
         prescriptions = patient.prescription_set.all()
         return render_to_response('prescriptions/index.html', {'user':user,'patient':patient,'prescriptions':prescriptions,'permissions':permissions},RequestContext(request))
 
+    elif request.method == 'POST' and 'edit_prescription' in request.POST:
+        post_id = request.POST['prescription_id']
+        if not type(post_id) is int:
+            post_id = post_id[0]
+        prescription = Prescription.prescriptions.get(prescription_id = post_id)
+        prescriptionform = PrescriptionForm(request.POST, instance = prescription)
+        patient = prescription.patient
+        prescriptions = patient.prescription_set.all()
+        if prescriptionform.is_valid():
+            prescriptionform.save()
+            event = log(user=user, action = "employee_edit_prescription")
+            event.save()
+            return render_to_response('prescriptions/edit_confirmed.html', {'user':user, 'prescription':prescription, 'prescriptionform':prescriptionform, 'permissions':permissions}, RequestContext(request))
+        else:
+            return render_to_response('prescriptions/employee_edit.html', {'user':user, 'prescription':prescription, 'prescriptionform':prescriptionform, 'permissions':permissions}, RequestContext(request))
+
+    elif request.method == 'POST' and 'prescription_id' in request.POST:
+        post_id = request.POST['prescription_id']
+        if not type(post_id) is int:
+            post_id = post_id[0]
+        prescription = Prescription.prescriptions.get(prescription_id = post_id)
+        prescriptionform = PrescriptionForm(instance = prescription)
+        return render_to_response('prescriptions/employee_edit.html', {'user':user, 'prescription':prescription, 'prescriptionform':prescriptionform, 'permissions':permissions}, RequestContext(request))
+
     elif request.method == 'POST':
         post_id = request.POST['patient_id']
         patient = Patient.patients.get(patient_id=post_id)
@@ -271,41 +295,28 @@ def edit_prescription(request):
     user = request.user
     permissions = get_permissions(user)
     if request.method == 'POST' and 'refill' in request.POST:
-        post_id = request.POST['prescription_id']
-        prescription = Prescription.prescriptions.get(prescription_id = post_id)
-        prescription.refill()
-        prescription.save()
+        if request.POST.get("refill"):
+            post_id = request.POST['prescription_id']
+            prescription = Prescription.prescriptions.get(prescription_id = post_id)
+            prescription.refill()
+            prescription.save()
+        elif request.POST.get("remove"):
+            post_id = request.POST['prescription_id']
+            prescription = Prescription.prescriptions.get(prescription_id = post_id)
+            prescription.delete()
+            prescriptions = user.patient.prescription_set.all()
+            return render_to_response('account/prescriptions.html', {'user':user, 'permissions':permissions,'prescriptions':prescriptions}, RequestContext(request))
     if request.method == 'POST':
         post_id = request.POST['prescription_id']
         prescription = Prescription.prescriptions.get(prescription_id = post_id)
         form = PrescriptionForm(instance=prescription)
         form.fields['patient'].widget = forms.HiddenInput()
-        if permissions != 'doctor' or permissions != 'nurse':
-            fields = ['patient', 'drug_name', 'dosage', 'side_effects', 'refills_remaining']
-            form.fields['drug_name'].widget = forms.HiddenInput()
-            form.fields['dosage'].widget = forms.HiddenInput()
-            form.fields['side_effects'].widget = forms.HiddenInput()
-            form.fields['refills_remaining'].widget.attrs['readonly'] = True
+        fields = ['patient', 'drug_name', 'dosage', 'side_effects', 'refills_remaining']
+        form.fields['drug_name'].widget = forms.HiddenInput()
+        form.fields['dosage'].widget = forms.HiddenInput()
+        form.fields['side_effects'].widget = forms.HiddenInput()
+        form.fields['refills_remaining'].widget.attrs['readonly'] = True
         return render_to_response('account/edit_prescription.html', {'user':user, 'prescriptionform':form,'prescription':prescription, 'permissions':permissions}, RequestContext(request))
-
-@csrf_exempt
-def employee_edit_prescription(request):
-    user = request.user
-    permissions = get_permissions(user)
-    if request.method == 'POST' and 'edit_prescription' in request.POST:
-        post_id = request.POST['prescription_id']
-        prescription = Prescription.prescriptions.get(prescription_id = post_id)
-        form = PrescriptionForm(request.POST, instance = prescription)
-        if form.is_valid():
-            form.save()
-            event=log(user=user,action="employee_edit_prescription")
-            return render_to_response('patients/employee_edit_prescription.html', {'user':user, 'prescriptionform':form, 'prescription':prescription})
-    if request.method == 'POST':
-        post_id = request.POST['prescription_id']
-        prescription = Prescription.prescriptions.get(prescription_id = post_id)
-        form = PrescriptionForm(instance = prescription)
-        form.fields['patient'].widget.attrs['readonly'] = True
-        return render_to_response('patients/employee_edit_prescription.html', {'user':user, 'prescriptionform':form, 'prescription':prescription})
 
 @csrf_exempt
 def new_prescription(request):
@@ -353,6 +364,7 @@ def account(request):
     variables = RequestContext(request, {'user':user,'permissions':permissions})
     return render_to_response('account/index.html', variables)
 
+@csrf_exempt
 def prescriptions(request):
     user = request.user
     permissions = get_permissions(user)
