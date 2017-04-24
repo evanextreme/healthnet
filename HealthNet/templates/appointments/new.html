@@ -3,7 +3,8 @@
 
 <!DOCTYPE html>
 <div class="modal-content">
-  <h4>New Appointment{% if permissions == 'doctor'%}/Test{% endif %}</h4>
+  <h4>New Appointment{% if permissions == 'doctor' %}/Test{% endif %}</h4>
+  {% if permissions == 'patient' %}<h5> with {{user.patient.doctor}} at {{user.patient.hospital}}</h5>{% endif %}
       {% csrf_token %}
       {% form form=cal_form %}{% endform %}
 </div>
