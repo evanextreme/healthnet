@@ -55,6 +55,8 @@ def home(request):
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
             elif permissions == 'patient':
                 cal_form.fields['patient'].widget = forms.HiddenInput()
+                cal_form.fields['doctor'].widget = forms.HiddenInput()
+                cal_form.fields['hospital'].widget = forms.HiddenInput()
                 cal_form.fields['type'].widget = forms.HiddenInput()
                 cal_form.fields['attachments'].widget = forms.HiddenInput()
             if permissions == 'patient' and appointment.confirmed:
