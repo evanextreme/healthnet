@@ -4,6 +4,7 @@
   <!-- Dropdown Structure -->
 <div class="modal-content">
     <h4>Update Appointment{% if permissions == 'doctor'%}/Test{% endif %}</h4>
+    {% if permissions == 'patient' %}<h5> with {{user.patient.doctor}} at {{user.patient.hospital}}</h5>{% endif %}
 
 
         {% if confirmed == 'True' and permissions == 'patient'%}
