@@ -35,6 +35,17 @@ class PatientForm(forms.ModelForm):
     class Meta:
         model = Patient
         fields = ['date_of_birth', 'phone_number', 'height', 'weight', 'doctor', 'hospital', 'profile_picture']
+    def clean(self):
+        clean_data = super(PatientForm,self).clean()
+        doctor = clean_data.get('doctor')
+        hospital = clean_data.get('hospital')
+
+        if doctor and hospital:
+            if not hospital in doctor.hospital.all():
+                message = str(doctor) + 'only works at: '
+                for h in doctor.hospital.all():
+                    message += str(h) + ", "
+                self.add_error('doctor', forms.ValidationError(message))
 
 class DoctorForm(forms.ModelForm):
     class Meta:
