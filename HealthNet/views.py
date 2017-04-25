@@ -193,11 +193,8 @@ def register_page(request):
 
             event = log(user=patient.user, action="user_registered")
             event.save()
-            response = HttpResponse()
-            #TODO fix response
-            response.write("<h1>Congratulation! You are registered!</h1>")
-            response.write("<h2>Please <a href='../login/'>log in</a>.</h2>")
-            return response
+
+            return render_to_response("registration/register_confirmed.html")
         else:
             variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
             return render_to_response("registration/register.html",variables)
