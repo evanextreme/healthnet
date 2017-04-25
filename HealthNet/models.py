@@ -87,7 +87,7 @@ class Patient(models.Model):
     admitted = models.BooleanField(default=False)
     discharge_date = models.DateTimeField(default=None, null=True)
 
-    profile_picture = models.ImageField(upload_to='patients',blank=True)
+    profile_picture = models.FileField(upload_to='patients',blank=True)
 
     new_user = models.BooleanField(default=True)
 

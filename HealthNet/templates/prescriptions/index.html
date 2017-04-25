@@ -7,11 +7,7 @@
                 <li class="collection-item">
                     <div>
                         {{prescription}}
-                        <form action="prescriptions/update/" method="POST">
-                            <input type="hidden" name="prescription_id" value="{{ prescription.prescription_id }}">
-                            <button class="modal-action modal-close waves-effect waves-light btn light-blue accent-3" type="submit">Edit</button>
-                        </form>
-
+                            <a class="modal-action modal-close waves-effect waves-light btn light-blue accent-3" onclick="getPrescriptionForm({{prescription.prescription_id}})">Edit</a>
                     </div>
                 </li>
             {% endfor %}

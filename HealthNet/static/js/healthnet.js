@@ -87,12 +87,25 @@ function getPrescriptions(patientid){
   var div = '#pat-div' + patientid;
   $.ajax({
       type: 'POST',
-      url: '/prescriptions/update/',
+      url: '/prescriptions/',
       data: { get_patient_prescriptions: patientid },
       success: function(response) {
         $(div).html(response);
       }
   });
+}
+
+function getPrescriptionForm(prescriptionid){
+  $.ajax({
+      type: 'POST',
+      url: '/prescriptions/update/',
+      data: { update_prescription: prescriptionid },
+      success: function(response) {
+        $('#apt-div').html(response);
+
+      }
+  });
+  $('#apt-modal').modal('open');
 }
 
 function returnToCard(patientid){

@@ -44,6 +44,7 @@ class CalendarEvent(models.Model):
     hospital = models.ForeignKey(Hospital, default=None)
 
     confirmed = models.BooleanField(default=False)
+    released = models.BooleanField(default=False)
 
     color = models.CharField(_('color'), default='#b0bec5',max_length=7)
 

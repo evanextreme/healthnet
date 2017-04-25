@@ -16,12 +16,23 @@
         {% csrf_token %}
         {% form form=cal_form %}
         {% endform %}
-        {% if permissions != 'patient' %}
-            <a class='dropdown-button btn' href='#' data-activates='attachment-dropdown'>Attachments</a>
-            <ul id='attachment-dropdown' class='dropdown-content'>
-            {% for attachment in attachments %}
-                <li><a href="{{attachment.file.url}}">{{attachment.file.name}}</a></li>
-            {% endfor %}
+        {% if permissions != 'patient' or released == 'True' %}
+
+
+              <ul class="collapsible" data-collapsible="accordion">
+              <li>
+                {% for attachment in attachments %}
+                <div class="collapsible-header"><i class="material-icons">filter_drama</i>{{attachment.file.name}}</div>
+
+                <div class="collapsible-body"><p>
+
+                  <img src="{{attachment.file.url}}" alt="Mountain View" style="maxwidth:500px;maxheight:350px;">
+                  <a class="btn" href="{{attachment.file.url}}" download >Download File</a>
+                </p></div>
+                {% endfor %}
+              </li>
+              </ul>
+
         {% endif %}
     {% endif %}
     </ul>
@@ -38,7 +49,7 @@
     {% endif %}
     <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
     {% if confirmed == 'False' and permissions == 'doctor' or confirmed == 'False' and permissions == 'nurse'%}
-    <button class="modal-action modal-close waves-effect waves-light btn red" type="submit" name="Update" onclick="Materialize.toast('Appointment confirmed!',4000);">Confirm</button>
+    <button class="modal-action modal-close waves-effect waves-light btn red" type="submit" name="Update">Confirm</button>
     {% elif confirmed == 'False' and permissions == 'patient' or confirmed == 'True' and permissions == 'doctor' or confirmed == 'True' and permissions == 'nurse' %}
     <button class="modal-action modal-close waves-effect waves-red btn-flat" type="submit" name="Update">Update</button>
     {% elif confirmed == 'True' and permissions == 'patient'%}
