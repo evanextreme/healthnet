@@ -2,6 +2,7 @@
 {% load fullcalendar_tags %}
 {% load material_form %}
 
+{% block active_dashboard %}class="active"{% endblock %}
 
 {% block body %}
     {% if user.is_authenticated %}
@@ -45,9 +46,17 @@
                 <div id="pat-div{{patient.patient_id}}" style="border-bottom: 0px" class="collapsible-body">
                   {{patient.card}}
                 </div>
+
                 <div id="pat-actions{{patient_id}}" class="collapsible-body">
+                  <form action='.' method='post' enctype="multipart/form-data" id="patform{{patient.patient_id}}"/>
                     <button class="waves-effect waves-light btn light-blue accent-3" type="submit" name="get_patient_id" value="{{patient.patient_id}}">Update</button>
                     <a class="waves-effect waves-light btn light-blue accent-3" type="submit" onclick="getPrescriptions({{patient.patient_id}})">View/Edit Medications</a>
+                    {% if patient.admitted %}
+                    <button class="waves-effect waves-light btn red" type="submit" name="discharge_patient" value="{{patient.patient_id}}">Discharge</button>
+                    {% else %}
+                    <button class="waves-effect waves-light btn red" type="submit" name="admit_patient" value="{{patient.patient_id}}">Admit</button>
+                    {% endif %}
+                  </form>
                 </div>
               </li>
 

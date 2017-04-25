@@ -46,11 +46,12 @@
           <a href="/" class="brand-logo">myHealth</a>
             <ul class="right">
 
-            {% if permissions == 'admin' %}
-            <li><a class="waves-effect waves-light" href="/admin/">Admin Dashboard</a></li>
+            {% if user.is_authenticated %}
 
-            {% elif permissions == 'doctor' or permissions == 'nurse'%}
-            <li {% block active_patients %} {% endblock %}><a class="waves-effect waves-light" href="/patients">Patients</a></li>
+            <li {% block active_dashboard %} {% endblock %}><a class="waves-effect waves-light" href="/">{% if unconfirmed != 0 %}<span class="badge red left white-text">{{unconfirmed}}</span>{%else%}{% endif %}Dashboard</a></li>
+
+            {% endif %}
+            {% if permissions == 'doctor' or permissions == 'nurse'%}
             <li {% block active_account %} {% endblock %}><a class="dropdown-button" href="#!" data-activates="dropdown1">{% if permissions == 'doctor' %}Dr. {% elif permissions == 'nurse'%}Nurse {%endif%}{{user.last_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
             {% elif user.is_authenticated %}
             <li><a class="dropdown-button" href="#!" data-activates="dropdown1">{{user.first_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
@@ -99,15 +100,19 @@
         <form action='.' method='post' enctype="multipart/form-data">
             <div id="apt-div">
             </div>
-
+        </form>
       </div>
 
       <div class="fixed-action-btn horizontal">
         {% if permissions == 'doctor' %}
          <a id="menu" class="btn-floating btn-large red">
          <i class="large material-icons">mode_edit</i>
-         {% else %}
-         <a id="menu" class="btn-floating btn-large red" onclick="newAppointment()">
+         {% elif permissions == 'patient' %}
+          {% if user.patient.admitted == True %}
+           <a id="menu" class="btn-floating btn-large red" onclick="newAppointment()">
+          {% else %}
+           <a id="menu" class="btn-floating btn-large grey" onclick="Materialize.toast('You are not admitted to a hospital currently.',8000);">
+          {% endif %}
          {% endif %}
          <i class="large material-icons">library_add</i>
        </a>

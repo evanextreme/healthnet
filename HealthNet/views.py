@@ -23,19 +23,24 @@ from reportlab.pdfgen import canvas
 
 @csrf_exempt
 def home(request):
+
     user = request.user
     permissions = get_permissions(user)
     event_url = 'all_events/'
     opentap = ''
     prescriptions = ''
     patients = ''
+    unconfirmed = 0
+
     if (permissions == 'patient' and user.patient.new_user) or (permissions == 'nurse' and user.nurse.new_user) or (permissions == 'doctor' and user.doctor.new_user):
         opentap = 'True'
     #If user is admin, redirect to admin dashboard
     if permissions == 'patient':
         prescriptions = user.patient.prescription_set.all()
     elif permissions == 'doctor':
+        unconfirmed = confirmed_appointments(user)
         patients = user.doctor.patient_set.all()
+
     elif permissions == 'admin':
         return HttpResponseRedirect('/admin')
 
@@ -65,6 +70,7 @@ def home(request):
                 cal_form.fields['end'].widget.attrs['disabled'] = True
                 cal_form.fields['all_day'].widget.attrs['disabled'] = True
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
+
             variables = RequestContext(request, {'user':user,'cal_form':cal_form,'attachments':attachments,'confirmed':confirmed,'permissions':permissions,'calendar_config_options':calendar_options(event_url, OPTIONS)})
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
@@ -107,6 +113,8 @@ def home(request):
                     attachment = Attachment.objects.create(file=each,appointment=appointment)
                     attachment.save()
                 appointment.save()
+                if permissions == 'doctor':
+                    unconfirmed = confirmed_appointments(user)
                 event=log(user=user,action="update_apt")
                 event.save()
                 variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
@@ -134,11 +142,49 @@ def home(request):
                     patients = user.nurse.patient_set.all()
                 return render_to_response('index.html', {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions},RequestContext(request))
 
+        elif 'admit_patient' in request.POST:
+            post_id = request.POST['admit_patient']
+            patient = Patient.patients.get(patient_id=post_id)
+            patient.admitted = True
+            patient.save()
+            variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
+            return render_to_response('index.html',variables)
+
+        elif 'discharge_patient' in request.POST:
+            post_id = request.POST['discharge_patient']
+            patient = Patient.patients.get(patient_id=post_id)
+            patient.admitted = False
+            patient.save()
+            variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
+            return render_to_response('index.html',variables)
+        elif 'update_prescription' in request.POST:
+            post_id = request.POST['update_prescription']
+            prescription = Prescription.prescriptions.get(prescription_id = post_id)
+            prescriptionform = PrescriptionForm(request.POST, instance = prescription)
+            if prescriptionform.is_valid():
+                prescriptionform.save()
+                event = log(user=user, action = "employee_edit_prescription")
+                event.save()
+            cal_form = CalendarEventForm()
+
+            variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
+            return render_to_response('index.html',variables)
+
+
     else:
+
         cal_form = CalendarEventForm()
 
-        variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients})
+        variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
         return render_to_response('index.html',variables)
+
+def confirmed_appointments(user):
+    appointments = user.doctor.calendarevent_set.all()
+    unconfirmed = 0
+    for appt in appointments:
+        if appt.confirmed == False:
+            unconfirmed += 1
+    return unconfirmed
 
 def logout_page(request):
     logout(request)
@@ -290,6 +336,15 @@ def employee_update_patient(request):
     return render_to_response('patients/update.html', {'user':user,'patientform':patientform,'permissions':permissions},RequestContext(request))
 
 @csrf_exempt
+def update_prescription(request):
+    user = request.user
+    permissions = get_permissions(user)
+    post_id = request.POST['update_prescription']
+    prescription = Prescription.prescriptions.get(prescription_id = post_id)
+    prescriptionform = PrescriptionForm(instance = prescription)
+    return render_to_response('prescriptions/update.html', {'user':user, 'prescription':prescription, 'prescriptionform':prescriptionform, 'permissions':permissions}, RequestContext(request))
+
+@csrf_exempt
 def edit_prescription(request):
     user = request.user
     permissions = get_permissions(user)
@@ -360,7 +415,13 @@ def change_password(request):
 def account(request):
     user = request.user
     permissions = get_permissions(user)
-    variables = RequestContext(request, {'user':user,'permissions':permissions})
+    unconfirmed = 0
+    if permissions == 'doctor':
+        appointments = user.doctor.calendarevent_set.all()
+        for appt in appointments:
+            if appt.confirmed == False:
+                unconfirmed += 1
+    variables = RequestContext(request, {'user':user,'permissions':permissions,'unconfirmed':unconfirmed})
     return render_to_response('account/index.html', variables)
 
 @csrf_exempt
@@ -444,7 +505,7 @@ def get_permissions(user):
     elif user.is_superuser:
         return 'admin'
     else:
-        return 'None'
+        return 'none'
 
 def all_events(request):
     user = request.user
