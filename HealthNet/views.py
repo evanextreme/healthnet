@@ -71,7 +71,7 @@ def home(request):
                 cal_form.fields['all_day'].widget.attrs['disabled'] = True
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
 
-            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'attachments':attachments,'confirmed':confirmed,'permissions':permissions,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'appointment':appointment,'attachments':attachments,'confirmed':confirmed,'permissions':permissions,'calendar_config_options':calendar_options(event_url, OPTIONS)})
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
             cal_form = CalendarEventForm(request.POST, request.FILES)
