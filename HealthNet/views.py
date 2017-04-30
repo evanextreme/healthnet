@@ -19,6 +19,7 @@ from django.contrib.auth.decorators import login_required
 from HealthNet.email import appointment_confirmation_email
 from io import BytesIO
 from reportlab.pdfgen import canvas
+from django.contrib.auth import authenticate
 
 
 @csrf_exempt
@@ -37,6 +38,9 @@ def home(request):
     #If user is admin, redirect to admin dashboard
     if permissions == 'patient':
         prescriptions = user.patient.prescription_set.all()
+    elif permissions == 'nurse':
+        patients = user.nurse.hospital.patient_set.all()
+        print(str(patients))
     elif permissions == 'doctor':
         unconfirmed = confirmed_appointments(user)
         patients = user.doctor.patient_set.all()
@@ -58,6 +62,11 @@ def home(request):
                 confirmed = 'True'
             if permissions == 'doctor':
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
+            elif permissions == 'nurse':
+                cal_form.fields['doctor'].widget = forms.HiddenInput()
+                cal_form.fields['hospital'].widget = forms.HiddenInput()
+                cal_form.fields['type'].widget = forms.HiddenInput()
+                cal_form.fields['attachments'].widget = forms.HiddenInput()
             elif permissions == 'patient':
                 cal_form.fields['patient'].widget = forms.HiddenInput()
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
@@ -70,18 +79,27 @@ def home(request):
                 cal_form.fields['end'].widget.attrs['disabled'] = True
                 cal_form.fields['all_day'].widget.attrs['disabled'] = True
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
-
-            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'appointment':appointment,'attachments':attachments,'confirmed':confirmed,'permissions':permissions,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+            released = appointment.released
+            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'attachments':attachments,'confirmed':confirmed,'released':released,'permissions':permissions,'calendar_config_options':calendar_options(event_url, OPTIONS)})
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
+            if permissions == 'nurse':
+                post_id = request.POST['patient']
+                patient = Patient.patients.get(patient_id=post_id)
+                doctor_id = patient.doctor.doctor_id
+                request.POST['doctor'] = doctor_id
+
             cal_form = CalendarEventForm(request.POST, request.FILES)
-            print(request.POST)
+
             if permissions == 'doctor':
                 cal_form.doctor = user.doctor
+
+
             elif permissions == 'patient':
                 cal_form.patient = user.patient
                 cal_form.doctor = user.patient.doctor
                 cal_form.hospital = user.patient.hospital
+
             if cal_form.is_valid():
                 appointment = cal_form.save(commit=False)
                 if permissions == 'doctor' or permissions == 'nurse':
@@ -127,6 +145,17 @@ def home(request):
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             appointment.delete()
             event=log(user=user,action="deleted_apt")
+            event.save()
+            variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
+            return render_to_response('index.html', variables)
+
+        elif 'Release' in request.POST:
+            post_id = request.POST['appointment_id']
+            appointment = CalendarEvent.appointments.get(appointment_id=post_id)
+            appointment.released = True
+            appointment.save()
+            #TODO send email to patient
+            event=log(user=user,action="released_apt")
             event.save()
             variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
             return render_to_response('index.html', variables)
@@ -215,7 +244,6 @@ def doc_register_page(request):
     docform=DoctorForm()
     variables=RequestContext(request,{'userform':userform, 'docform':docform,'permissions':permissions})
     return render_to_response("admin/register.html",variables)
-
 
 @csrf_exempt
 def register_page(request):
@@ -453,6 +481,12 @@ def new_appt(request):
         if permissions == 'doctor':
             cal_form = CalendarEventForm(initial={'doctor': user.doctor})
             cal_form.fields['doctor'].widget = forms.HiddenInput()
+        elif permissions == 'nurse':
+            cal_form = CalendarEventForm(initial={'hospital': user.nurse.hospital})
+            cal_form.fields['doctor'].widget = forms.HiddenInput()
+            cal_form.fields['hospital'].widget = forms.HiddenInput()
+            cal_form.fields['type'].widget = forms.HiddenInput()
+            cal_form.fields['attachments'].widget = forms.HiddenInput()
         elif permissions == 'patient':
             cal_form = CalendarEventForm(initial={'patient': user.patient,
                                                   'doctor': user.patient.doctor,
@@ -538,7 +572,7 @@ OPTIONS = """{  timeFormat: "H:mm",
                 minTime: '07:30:00', // Start time for the calendar
                 maxTime: '22:00:00', // End time for the calendar
                 columnFormat: {
-                    week: 'ddd' // Only show day of the week names
+                    week: 'ddd M/d' // Only show day of the week names
                 },
                 displayEventTime: true,
                 allDayText: 'Unscheduled',

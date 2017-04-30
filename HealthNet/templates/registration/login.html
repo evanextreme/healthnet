@@ -1,23 +1,15 @@
 {% extends "basic.html" %}
+{% load material_form %}
+
 
 {% block body %}
 
-{% if form.has_errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
 <div class="container col s4">
 <form method="post" action=".">
-    <div class="input-field">
-    <p><label for="id_username">Username:</label>
-        {{ form.username }}</p>
-        {{ form.username.errors }}
-    </div>
+    {% form form=form %}
 
-    <div class="input-field">
-    <p><label for="id_password">Password:</label>
-        {{ form.password }}</p>
-        {{ form.password.errors }}
-    </div>
+    {% endform %}
+
     <input type="hidden" name="next" value="/" />
     <button class="waves-effect waves-light btn light-blue accent-3" type="submit" value="login">Login<i class="material-icons right">vpn_key</i></button>
     {% csrf_token %}

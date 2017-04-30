@@ -15,15 +15,11 @@
     {% endif %}
 
 
-        {% if confirmed == 'True' and permissions == 'patient'%}
         {% csrf_token %}
         {% form form=cal_form %}
         {% endform %}
 
-        {% else %}
-        {% csrf_token %}
-        {% form form=cal_form %}
-        {% endform %}
+
         {% if permissions != 'patient' or released == 'True' %}
 
 
@@ -42,10 +38,11 @@
               </ul>
 
         {% endif %}
-    {% endif %}
     </ul>
 </div>
 <div class="modal-footer">
+
+
     {% if confirmed == 'True' and permissions == 'patient'%}
     <a class="left btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('Sorry, but this appointment has already been confirmed! Please contact your hospital or doctor to reschedule.',12000);">
       <i class="material-icons left">delete</i>Delete
@@ -62,6 +59,15 @@
     <button class="modal-action modal-close waves-effect waves-red btn-flat" type="submit" name="Update">Update</button>
     {% elif confirmed == 'True' and permissions == 'patient'%}
     <a class="btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('Sorry, but this appointment has already been confirmed! Please contact your hospital or doctor to reschedule.',12000);">Update</a>
+    {% endif %}
+    {% if released == False and permissions == 'doctor' %}
+    <button class="modal-action modal-close waves-effect waves-light btn red" type="submit" name="Release">
+      Release
+    </button>
+    {% elif released == True and permissions == 'doctor' %}
+    <a class="btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('The results of this appointment/test have already been released',12000);">
+      Release
+    </a>
     {% endif %}
 </div>
 
