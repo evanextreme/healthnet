@@ -88,7 +88,7 @@ class UpdatePatientForm(forms.ModelForm):
     weight.label = 'Weight (Pounds)'
     class Meta:
         model = Patient
-        fields = ['phone_number','height', 'weight', 'doctor', 'hospital']
+        fields = ['phone_number','height', 'weight']
 
 class EmployeeUpdatePatientForm(forms.ModelForm):
     patient_id = forms.IntegerField(widget=forms.HiddenInput())

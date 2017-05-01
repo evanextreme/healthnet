@@ -304,8 +304,7 @@ def update_profile(request):
         p_updateform = UpdatePatientForm(initial={
             'height':user.patient.height,
             'weight':user.patient.weight,
-            'assigned_doctor':user.patient.doctor,
-            'current_hospital_assignment':user.patient.hospital})
+            'phone_number':user.patient.phone_number,})
     variables = RequestContext(request, {'user':user,'update_form':updateform, 'p_updateform':p_updateform,'permissions':permissions})
     return render_to_response('account/profile.html', variables)
 
