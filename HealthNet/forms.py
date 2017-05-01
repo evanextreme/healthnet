@@ -39,7 +39,15 @@ class PatientForm(forms.ModelForm):
         clean_data = super(PatientForm, self).clean()
         doctor = clean_data.get('doctor')
         hospital = clean_data.get('hospital')
-
+        height = clean_data.get('height')
+        weight = clean_data.get('weight')
+        if height and weight:
+            if height <=0:
+                message = 'Height cannot be negative'
+                self.add_error('height', forms.ValidationError(message))
+            if weight <=0:
+                message = 'Weight cannot be negative'
+                self.add_error('weight', forms.ValidationError(message))
         if doctor and hospital:
             if not hospital in doctor.hospital.all():
                 message = str(doctor) + 'only works at: '
