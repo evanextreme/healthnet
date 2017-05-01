@@ -36,15 +36,22 @@ class PatientForm(forms.ModelForm):
         model = Patient
         fields = ['date_of_birth', 'phone_number', 'height', 'weight', 'doctor', 'hospital', 'profile_picture']
     def clean(self):
-        clean_data = super(PatientForm,self).clean()
+        clean_data = super(PatientForm, self).clean()
         doctor = clean_data.get('doctor')
         hospital = clean_data.get('hospital')
 
         if doctor and hospital:
             if not hospital in doctor.hospital.all():
                 message = str(doctor) + 'only works at: '
+                i = 0
                 for h in doctor.hospital.all():
-                    message += str(h) + ", "
+                    i+=1
+                for h in doctor.hospital.all():
+                    i-=1
+                    if i == 0:
+                        message += str(h) + " "
+                    else:
+                        message += str(h) + ", "
                 self.add_error('doctor', forms.ValidationError(message))
 
 class DoctorForm(forms.ModelForm):
