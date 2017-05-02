@@ -8,7 +8,7 @@ from HealthNet.forms import *
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from eventlog.models import log
+from EventLog.models import log
 from HealthNet.models import *
 from django.contrib.auth.models import User
 from Calendar.models import CalendarEvent, Attachment
@@ -24,7 +24,6 @@ from django.contrib.auth import authenticate
 
 @csrf_exempt
 def home(request):
-
     user = request.user
     permissions = get_permissions(user)
     event_url = 'all_events/'
@@ -111,7 +110,7 @@ def home(request):
                 for each in cal_form.cleaned_data['attachments']:
                     attachment = Attachment.objects.create(file=each,appointment=appointment)
                     attachment.save()
-                event=log(user=user,action="new_appt")
+                event=log(user=user,action="new_appt",notes={})
                 event.save()
                 return HttpResponseRedirect('/')
             else:
@@ -133,7 +132,7 @@ def home(request):
                 appointment.save()
                 if permissions == 'doctor':
                     unconfirmed = confirmed_appointments(user)
-                event=log(user=user,action="update_apt")
+                event=log(user=user,action="update_apt",notes={})
                 event.save()
                 variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
                 return render_to_response('index.html', variables)
@@ -144,7 +143,7 @@ def home(request):
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             appointment.delete()
-            event=log(user=user,action="deleted_apt")
+            event=log(user=user,action="deleted_apt",notes={})
             event.save()
             variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
             return render_to_response('index.html', variables)
@@ -155,7 +154,7 @@ def home(request):
             appointment.released = True
             appointment.save()
             #TODO send email to patient
-            event=log(user=user,action="released_apt")
+            event=log(user=user,action="released_apt",notes={})
             event.save()
             variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
             return render_to_response('index.html', variables)
@@ -164,7 +163,7 @@ def home(request):
             form = PrescriptionForm(request.POST)
             if form.is_valid():
                 form.save()
-                event=log(user=user,action="new_prescription")
+                event=log(user=user,action="new_prescription",notes={})
                 if user.doctor:
                     patients = user.doctor.patient_set.all()
                 elif user.nurse:
@@ -176,6 +175,8 @@ def home(request):
             patient = Patient.patients.get(patient_id=post_id)
             patient.admitted = True
             patient.save()
+            event=log(user=user,action="admit_patient",notes={"patient":patient})
+            event.save()
             variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
             return render_to_response('index.html',variables)
 
@@ -184,6 +185,8 @@ def home(request):
             patient = Patient.patients.get(patient_id=post_id)
             patient.admitted = False
             patient.save()
+            event=log(user=user,action="discharge_patient",notes={"patient":patient})
+            event.save()
             variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
             return render_to_response('index.html',variables)
         elif 'update_prescription' in request.POST:
@@ -192,7 +195,7 @@ def home(request):
             prescriptionform = PrescriptionForm(request.POST, instance = prescription)
             if prescriptionform.is_valid():
                 prescriptionform.save()
-                event = log(user=user, action = "employee_edit_prescription")
+                event = log(user=user, action = "employee_edit_prescription",notes={})
                 event.save()
             cal_form = CalendarEventForm()
 
@@ -201,9 +204,7 @@ def home(request):
 
 
     else:
-
         cal_form = CalendarEventForm()
-
         variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
         return render_to_response('index.html',variables)
 
@@ -234,7 +235,7 @@ def doc_register_page(request):
             patient.user = user
             patient.save()
 
-            event = log(user=patient.user, action="user_registered")
+            event = log(user=patient.user, action="employee_registered",notes={})
             event.save()
             variables=RequestContext(request,{'userform':userform, 'docform':docform})
             return render_to_response("admin/register.html",variables)
@@ -265,7 +266,7 @@ def register_page(request):
             patient.user = user
             patient.save()
 
-            event = log(user=patient.user, action="user_registered")
+            event = log(user=patient.user, action="user_registered",notes={})
             event.save()
 
             return render_to_response("registration/register_confirmed.html")
@@ -293,7 +294,7 @@ def update_profile(request):
             user.first_name = user.first_name.title()
             user.last_name = user.last_name.title()
             user.save()
-            event=log(user=user,action="user_updateprofile")
+            event=log(user=user,action="user_updateprofile",notes={})
             event.save()
             return HttpResponseRedirect('/')
     else:
@@ -338,7 +339,7 @@ def employee_update_patient(request):
         prescriptions = patient.prescription_set.all()
         if prescriptionform.is_valid():
             prescriptionform.save()
-            event = log(user=user, action = "employee_edit_prescription")
+            event = log(user=user, action = "edit_patient_prescription", notes={"To patient":patient})
             event.save()
             return render_to_response('prescriptions/edit_confirmed.html', {'user':user, 'prescription':prescription, 'prescriptionform':prescriptionform, 'permissions':permissions}, RequestContext(request))
         else:
@@ -358,7 +359,7 @@ def employee_update_patient(request):
         patientform = EmployeeUpdatePatientForm(request.POST, instance = patient)
         if patientform.is_valid():
             patientform.save()
-            event=log(user=user,action="employee_updateprofile")
+            event=log(user=user,action="update_patient_profile",notes={"To patient":patient})
             event.save()
     return render_to_response('patients/update.html', {'user':user,'patientform':patientform,'permissions':permissions},RequestContext(request))
 
@@ -381,10 +382,14 @@ def edit_prescription(request):
             prescription = Prescription.prescriptions.get(prescription_id = post_id)
             prescription.refill()
             prescription.save()
+            event=log(user=user,action="refill_prescription",notes={})
+            event.save()
         elif request.POST.get("remove"):
             post_id = request.POST['prescription_id']
             prescription = Prescription.prescriptions.get(prescription_id = post_id)
             prescription.delete()
+            event=log(user=user,action="delete_prescription",notes={})
+            event.save()
             prescriptions = user.patient.prescription_set.all()
             return render_to_response('account/prescriptions.html', {'user':user, 'permissions':permissions,'prescriptions':prescriptions}, RequestContext(request))
     if request.method == 'POST':
@@ -413,7 +418,7 @@ def change_hospital(request):
         hospital_change_form = DoctorForm(request.POST, instance = user)
         if hospital_change_form.is_valid():
             hospital_change_form.save()
-            event=log(user=user,action="doctor_changehosptial")
+            event=log(user=user,action="change_doctor_hosptial",notes={})
             event.save()
             return HttpResponseRedirect('/')
     hospital_change_form = DoctorForm(initial={'hospital':user.doctor.hospital})
@@ -430,7 +435,7 @@ def change_password(request):
         if passform.is_valid():
             user = passform.save()
             auth.update_session_auth_hash(request, user)
-            event=log(user=user,action="user_updatepassword")
+            event=log(user=user,action="user_updatepassword",notes={})
             event.save()
             return HttpResponseRedirect('/')
     else:
@@ -525,6 +530,9 @@ def export_file(request):
     pdf = buffer.getvalue()
     buffer.close()
     response.write(pdf)
+
+    event=log(user=user,action="user_export_file",notes={})
+    event.save()
 
     return response
 

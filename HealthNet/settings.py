@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'HealthNet',
     'fullcalendar',
     'Calendar',
-    'eventlog',
+    'EventLog',
     'datetimewidget',
     'phonenumber_field',
     'materialize',
