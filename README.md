@@ -10,9 +10,14 @@ To install, simply follow the following steps in your command line enviornment
 * `python manage.py makemigrations`
 * `python manage.py migrate --run-syncdb`
 
+# Installation (Docker)
 However, we now include a Dockerfile which should make setting up a container a snap! You can use this too instead of the above
-* `docker build -t myhealth .`
+* `docker pull evanextreme/healthnet`
 * `docker run --name healthnet -p 8000:8000 -d myhealth`
+
+# Configure
+
+If you are running this off your own server, natively, we reccomend editing the settings.py file located in the HealthNet directory, in order to configure the SMTP server and address to send notification emails from.
 
 # Use
 Now, just make an admin user and get set up!
@@ -22,4 +27,6 @@ Now, just make an admin user and get set up!
 * When you're done, it's time to run the server!
 * `python manage.py runserver`
 
-All set! As long as the server is running can access the administration page through localhost:8000/login using the account you just created. Also, the website is accessible via localhost:8000! Make sure to create hospitals and doctors after you log in, otherwise patients will not be able to register. 
+
+
+All set! As long as the server is running can access the administration page through localhost:8000/login using the account you just created. Also, the website is accessible via localhost:8000! Make sure to create hospitals and doctors after you log in, otherwise patients will not be able to register.

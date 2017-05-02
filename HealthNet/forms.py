@@ -38,9 +38,9 @@ class PatientForm(forms.ModelForm):
     def clean(self):
         clean_data = super(PatientForm, self).clean()
         doctor = clean_data.get('doctor')
-        hospital = clean_data.get('hospital')
         height = clean_data.get('height')
         weight = clean_data.get('weight')
+        hospital = clean_data.get('hospital')
         if height and weight:
             if height <=0:
                 message = 'Height cannot be negative'
