@@ -13,6 +13,9 @@ $(document).ready(function(){
            } // Callback for Modal close
          }
        );
+       $(".dropdown-button").dropdown({hover: false});
+       $(".button-collapse").sideNav({hover: false});
+
     });
 
 document.addEventListener("DOMContentLoaded", function(){
@@ -118,4 +121,17 @@ function returnToCard(patientid){
         $(div).html(response);
       }
   });
+}
+
+function downloadAttachment(attachmenturl){
+  var txt;
+  var r = confirm("This doccument may contain sensitive information, by agreeing to view you will BLAH BLAH BLAH! By pressing OK you agree to these conditions");
+  if (r == true) {
+    window.open (attachmenturl,'_blank',false)
+  } else {
+      txt = "Welp we can't let you view the file then ¯\\_(ツ)_/¯";
+      alert(txt)
+  }
+
+
 }

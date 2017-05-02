@@ -31,17 +31,21 @@ def home(request):
     prescriptions = ''
     patients = ''
     unconfirmed = 0
+    appointments = ''
 
     if (permissions == 'patient' and user.patient.new_user) or (permissions == 'nurse' and user.nurse.new_user) or (permissions == 'doctor' and user.doctor.new_user):
         opentap = 'True'
     #If user is admin, redirect to admin dashboard
     if permissions == 'patient':
         prescriptions = user.patient.prescription_set.all()
+        appointments = user.patient.calendarevent_set.all()
     elif permissions == 'nurse':
         patients = user.nurse.hospital.patient_set.all()
+        appointments = user.nurse.hospital.calendarevent_set.all()
         print(str(patients))
     elif permissions == 'doctor':
         unconfirmed = confirmed_appointments(user)
+        appointments = user.doctor.calendarevent_set.all()
         patients = user.doctor.patient_set.all()
 
     elif permissions == 'admin':
@@ -175,7 +179,7 @@ def home(request):
             patient = Patient.patients.get(patient_id=post_id)
             patient.admitted = True
             patient.save()
-            event=log(user=user,action="admit_patient",notes={"patient":patient})
+            event=log(user=user,action="admit_patient",notes={"patient":str(patient.user.first_name + " " + patient.user.last_name)})
             event.save()
             variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
             return render_to_response('index.html',variables)
@@ -185,7 +189,7 @@ def home(request):
             patient = Patient.patients.get(patient_id=post_id)
             patient.admitted = False
             patient.save()
-            event=log(user=user,action="discharge_patient",notes={"patient":patient})
+            event=log(user=user,action="admit_patient",notes={"patient":str(patient.user.first_name + " " + patient.user.last_name)})
             event.save()
             variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
             return render_to_response('index.html',variables)
@@ -205,7 +209,7 @@ def home(request):
 
     else:
         cal_form = CalendarEventForm()
-        variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
+        variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed,'appointments':appointments})
         return render_to_response('index.html',variables)
 
 def confirmed_appointments(user):
@@ -277,6 +281,7 @@ def register_page(request):
     else:
         userform=UserForm()
         patientform=PatientForm()
+        patientform.fields['hospital'].label = "Preferred Hospital"
         variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
         return render_to_response("registration/register.html",variables)
 

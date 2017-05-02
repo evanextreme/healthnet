@@ -35,6 +35,19 @@
 
           {% endif %}
 
+
+          {% for appointment in appointments %}
+          <ul class="collapsible" data-collapsible="accordion">
+          <li>
+          {% if permissions != 'patient' or appointment.released == True %}
+          <div class="collapsible-header">Results from {{appointment.title}} on {{appointment.start}}</div>
+          <div id="" style="border-bottom: 0px" class="collapsible-body">
+            {{appointment.attachment_cards}}
+          </div>
+          </li>
+          {% endif %}
+          {% endfor %}
+          </ul>
           {% elif permissions == 'doctor' or permissions == 'nurse' %}
               <br><br>
               <ul class="collapsible" data-collapsible="accordion">

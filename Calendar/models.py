@@ -3,6 +3,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from HealthNet.models import Doctor, Patient, Hospital
+from django.template.loader import render_to_string
 
 class CalendarEvent(models.Model):
     """The event set a record for an
@@ -55,8 +56,14 @@ class CalendarEvent(models.Model):
         return self.title
     def __unicode__(self):
         return self.title
-
+    def attachment_cards(self):
+        variables = {'attachments':self.attachment_set.all()}
+        return(render_to_string('appointments/attachments.html',variables))
 
 class Attachment(models.Model):
     file = models.FileField(upload_to='attachments', null=True)
     appointment = models.ForeignKey(CalendarEvent)
+    def __str__(self):
+        name = self.file.name
+        name = name[12:]
+        return name

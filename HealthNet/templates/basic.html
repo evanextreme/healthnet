@@ -44,23 +44,23 @@
       <nav>
         <div class="nav-wrapper light-blue accent-3">
           <a href="/" class="brand-logo">myHealth</a>
-            <ul class="right">
+              <ul class="right hide-on-med-and-down">
 
-            {% if user.is_authenticated %}
+              {% if user.is_authenticated %}
 
-            <li {% block active_dashboard %} {% endblock %}><a class="waves-effect waves-light" href="/">{% if unconfirmed != 0 %}<span class="badge red left white-text">{{unconfirmed}}</span>{%else%}{% endif %}Dashboard</a></li>
+              <li {% block active_dashboard %} {% endblock %}><a class="waves-effect waves-light" href="/">{% if unconfirmed != 0 %}<span class="badge red left white-text">{{unconfirmed}}</span>{%else%}{% endif %}Dashboard</a></li>
 
-            {% endif %}
-            {% if permissions == 'doctor' or permissions == 'nurse'%}
-            <li {% block active_account %} {% endblock %}><a class="dropdown-button" href="#!" data-activates="dropdown1">{% if permissions == 'doctor' %}Dr. {% elif permissions == 'nurse'%}Nurse {%endif%}{{user.last_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
-            {% elif user.is_authenticated %}
-            <li><a class="dropdown-button" href="#!" data-activates="dropdown1">{{user.first_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
-            {% else %}
-            <li><a class="waves-effect waves-light" href="/register">Register</a></li>
-            <li><a class="waves-effect waves-light" href="/login">Login</a></li>
-            {% endif %}
-            <!-- Dropdown Trigger -->
-          </ul>
+              {% endif %}
+              {% if permissions == 'doctor' or permissions == 'nurse'%}
+              <li {% block active_account %} {% endblock %}><a class="dropdown-button" href="#!" data-activates="dropdown1">{% if permissions == 'doctor' %}Dr. {% elif permissions == 'nurse'%}Nurse {%endif%}{{user.last_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
+              {% elif user.is_authenticated %}
+              <li><a class="dropdown-button" href="#!" data-activates="dropdown1">{{user.first_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
+              {% else %}
+              <li><a class="waves-effect waves-light" href="/register">Register</a></li>
+              <li><a class="waves-effect waves-light" href="/login">Login</a></li>
+              {% endif %}
+              <!-- Dropdown Trigger -->
+            </ul>
         </div>
       </nav>
     </div>
