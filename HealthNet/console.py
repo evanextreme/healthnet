@@ -15,10 +15,14 @@ def print_status(status,message):
         print(bcolors.DEFAULT + "[" + bcolors.OKGREEN + "GOOD" + bcolors.DEFAULT + "]", end=" ")
     elif status == 'FAIL':
         print(bcolors.DEFAULT + "[" + bcolors.FAIL + "FAIL" + bcolors.DEFAULT +"]", end=" ")
+    elif status == 'STATUS':
+        print(bcolors.DEFAULT + "[" + bcolors.OKBLUE + "STATUS" + bcolors.DEFAULT +"]", end=" ")
     elif status == 'USER':
         print(bcolors.DEFAULT + "[" + bcolors.OKBLUE + "USER" + bcolors.DEFAULT +"]", end=" ")
     elif status == 'WARN':
         print(bcolors.DEFAULT + "[" + bcolors.WARNING + "WARN" + bcolors.DEFAULT +"]", end=" ")
+    elif status == 'HARDWARN':
+        print(bcolors.DEFAULT + "[" + bcolors.FAIL + "WARN" + bcolors.DEFAULT +"]", end=" ")
     elif status == 'DATA':
         print(bcolors.DEFAULT + "[" + bcolors.HEADER + "DATA" + bcolors.DEFAULT +"]", end=" ")
     elif status == 'SERVER':
