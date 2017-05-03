@@ -86,8 +86,12 @@ def initialize_database():
 
 
 def email_test():
-    print_status('STATUS',str('Please input an email address to act as a recipient for testing'))
-    TEST_EMAIL = input('Email: ')
+    try:
+        print_status('STATUS',str('Please input an email address to act as a recipient for testing'))
+        TEST_EMAIL = input('Email: ')
+    except EOFError as error:
+        print_status('STATUS',str("""Meh, well you're probably in a docker container so we'll forgive you <3"""))
+        TEST_EMAIL = 'evanx11@gmail.com'
     patient = User.objects.get(username='test_patient').patient
     doctor = User.objects.get(username='test_doctor').doctor
     patient.user.email = TEST_EMAIL
