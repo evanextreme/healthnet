@@ -16,7 +16,7 @@ from Calendar.util import events_to_json, calendar_options
 from Calendar.forms import CalendarEventForm, UpdateCalendarEventForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
-from HealthNet.email import appointment_confirmation_email
+from HealthNet.email import *
 from io import BytesIO
 from reportlab.pdfgen import canvas
 from django.contrib.auth import authenticate
@@ -146,6 +146,7 @@ def home(request):
         elif 'Delete' in request.POST:
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
+            appointment_deletion_email(appointment.patient, appointment.doctor, appointment)
             appointment.delete()
             event=log(user=user,action="deleted_apt",notes={})
             event.save()
@@ -157,7 +158,7 @@ def home(request):
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             appointment.released = True
             appointment.save()
-            #TODO send email to patient
+            results_released_email(appointment.patient, appointment.doctor, appointment)
             event=log(user=user,action="released_apt",notes={})
             event.save()
             variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})

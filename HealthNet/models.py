@@ -43,7 +43,6 @@ class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     doctors = models.Manager()
     employment_date = models.DateTimeField(default=timezone.now)
-    doctors = models.Manager()
     doctor_id = models.AutoField(primary_key=True)
 
     phone_number = PhoneNumberField(default=None)
