@@ -126,7 +126,7 @@
          <i class="large material-icons">mode_edit</i>
          {% elif permissions == 'patient' %}
             {% if user.patient.admitted == True %}
-             <a id="menu" class="btn-floating btn-large red tooltipped" data-position="bottom" data-delay="50" data-tooltip="I am tooltip" onclick="newAppointment()">
+             <a id="menu" class="btn-floating btn-large red tooltipped" data-position="left" data-delay="50" data-tooltip="Schedule an Appointment" onclick="newAppointment()">
             {% else %}
              <a id="menu" class="btn-floating btn-large grey" onclick="Materialize.toast('You are not admitted to a hospital currently.',8000);">
             {% endif %}

@@ -9,3 +9,4 @@ django-multiupload
 git+https://github.com/rodrigoamaral/django-fullcalendar.git#egg=django-fullcalendar
 Pillow
 reportlab
+WeasyPrint

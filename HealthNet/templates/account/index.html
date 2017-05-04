@@ -15,12 +15,8 @@
         <p>This is your profile. It is how your patients see you on myHealth.</p>
       {% endif %}
 
-      {% if permissions == 'patient' %}
-        <a class="waves-effect waves-light btn light-blue accent-3" href="profile/">Update Profile<i class="material-icons right">system_update_alt</i></a>
-      {% endif %}
-      <a class="waves-effect waves-light btn light-blue accent-3" href="password/">Change Password<i class="material-icons right">system_update_alt</i></a>
-
       </div>
+
     <div class="col s6">
       {% if permissions == 'patient' %}
         <h4>Your Doctor</h4>
@@ -29,6 +25,16 @@
 
     </div>
   </div>
+</div>
+<div class="container">
+  {% if permissions == 'patient' %}
+    <a class="waves-effect waves-light btn light-blue accent-3" href="profile/">Edit Profile<i class="material-icons right">build</i></a>
+  {% endif %}
+  <a class="waves-effect waves-light btn light-blue accent-3" href="password/">Change Password<i class="material-icons right">build</i></a>
+  {% if permissions == 'patient' %}
+  <a class="waves-effect waves-light btn light-blue accent-3" href="/export/">Export Information<i class="material-icons right">file_download</i></a>
+  {% endif %}
+
 </div>
 
 {% endblock %}
