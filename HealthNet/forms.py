@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from HealthNet.models import *
 from multiupload.fields import MultiFileField
+import datetime
 
 
 
@@ -41,6 +42,12 @@ class PatientForm(forms.ModelForm):
         height = clean_data.get('height')
         weight = clean_data.get('weight')
         hospital = clean_data.get('hospital')
+        date_of_birth = clean_data.get('date_of_birth')
+        if date_of_birth:
+            today = datetime.datetime.now().date()
+            if today < date_of_birth:
+                message = 'Date of birth cannot be after today!'
+                self.add_error('date_of_birth', forms.ValidationError(message))
         if height and weight:
             if height <=0:
                 message = 'Height cannot be negative'
