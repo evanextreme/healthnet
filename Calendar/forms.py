@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import CalendarEvent
 from datetimewidget.widgets import DateTimeWidget
 from multiupload.fields import MultiFileField
+from datetime import datetime, timezone
 
 class CalendarEventForm(forms.ModelForm):
     #doctor = forms.ModelChoiceField(queryset=Doctor.doctor.all(), empty_label=None)
@@ -16,6 +17,23 @@ class CalendarEventForm(forms.ModelForm):
             'start': DateTimeWidget(attrs={'class':"yourdatetime"}, usel10n = True),
             'end': DateTimeWidget(attrs={'class':"yourdatetime"}, usel10n = True),
             }
+    def clean(self):
+        clean_data = super(CalendarEventForm, self).clean()
+        start = clean_data.get('start')
+        end = clean_data.get('end')
+        if start and end:
+            today = datetime.now(timezone.utc)
+            if start < today:
+                message = "You can't choose a start time before today!"
+                self.add_error('start', forms.ValidationError(message))
+            if end < today:
+                message = "You can't choose a end time before today!"
+                self.add_error('end', forms.ValidationError(message))
+            if end < start:
+                message = " You can't choose a end time before the start!"
+                self.add_error('end', forms.ValidationError(message))
+
+
 
 class UpdateCalendarEventForm(forms.ModelForm):
     #doctor = forms.ModelChoiceField(queryset=Doctor.doctor.all(), empty_label=None)
@@ -29,3 +47,18 @@ class UpdateCalendarEventForm(forms.ModelForm):
             'start': DateTimeWidget(attrs={'class':"yourdatetime"}, usel10n = True),
             'end': DateTimeWidget(attrs={'class':"yourdatetime"}, usel10n = True),
             }
+        def clean(self):
+            clean_data = super(UpdateCalendarEventForm, self).clean()
+            start = clean_data.get('start')
+            end = clean_data.get('end')
+            if start and end:
+                today = datetime.now(timezone.utc)
+                if start < today:
+                    message = "You can't choose a start time before today!"
+                    self.add_error('start', forms.ValidationError(message))
+                if end < today:
+                    message = "You can't choose a end time before today!"
+                    self.add_error('end', forms.ValidationError(message))
+                if end < start:
+                    message = " You can't choose a end time before the start!"
+                    self.add_error('end', forms.ValidationError(message))
