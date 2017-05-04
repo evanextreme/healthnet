@@ -91,7 +91,7 @@ def email_test():
         TEST_EMAIL = input('Email: ')
     except EOFError as error:
         print_status('STATUS',str("""Meh, well you're probably in a docker container so we'll forgive you <3"""))
-        TEST_EMAIL = 'evanx11@gmail.com'
+        TEST_EMAIL = ''
     patient = User.objects.get(username='test_patient').patient
     doctor = User.objects.get(username='test_doctor').doctor
     patient.user.email = TEST_EMAIL
@@ -115,7 +115,7 @@ The appointment '{}' is scheduled for {}, at your hospital, {}. If you would lik
         )
         print_status('GOOD',str("""Appointment confirmation email to Patient '{} {}' and Doctor '{} {}' about appointment '{}' sent!""".format(patient.user.first_name,patient.user.last_name,doctor.user.first_name,doctor.user.last_name,appointment.title)))
     except Exception as error:
-        print_status('WARN',str('Appointment confirmation email to Patient {} {} and Doctor {} {} failed! This is likely because your SMTP settings are incorrect, or the email entered as a test recipient was incorrect. If it is the former, email functionality will not work without proper settings set in HealthNet/settings.py'.format(patient.user.first_name,patient.user.last_name,doctor.user.first_name,doctor.user.last_name)))
+        print_status('WARN',str('Appointment confirmation email to Patient {} {} and Doctor {} {} failed! This is likely because your SMTP settings are incorrect, the email entered as a test recipient was incorrect, of you are using Docker and Evan did not fix the container. If it is the first problem, email functionality will not work without proper settings set in HealthNet/settings.py'.format(patient.user.first_name,patient.user.last_name,doctor.user.first_name,doctor.user.last_name)))
         print(error)
 
 def delete_test_objects():
@@ -124,6 +124,10 @@ def delete_test_objects():
     for appointment in appointments:
         print_status('DATA',str("""Deleting Appointment ID '{}'""").format(appointment.appointment_id))
         appointment.delete()
+    hospitals = User.objects.get(username='test_doctor').doctor.hospital_set.all()
+    for hospital in hospitals:
+        print_status('DATA',str("""Deleting Appointment ID '{}'""").format(hospital.hospital_id))
+        hospital.delete()
 
     User.objects.get(username='test_patient').patient.delete()
     print_status('GOOD',str('Patient object deleted'))

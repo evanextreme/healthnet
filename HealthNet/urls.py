@@ -24,11 +24,11 @@ from . import signals, views
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
     url(r'^patients/$', views.patients, name='patients'),
-    url(r'^patients/update$', views.employee_update_patient, name='employee_update_patient'),
+    url(r'^patients/update$', views.update_patient, name='employee_update_patient'),
     url(r'^patients/new_prescription/$', views.new_prescription, name='new_prescription'),
     url(r'^appointments/new/$', views.new_appt, name='new_appt'),
     url(r'^prescriptions/new/$', views.new_prescription, name='new_prescription'),
-    url(r'^prescriptions/$', views.employee_update_patient, name='employee_edit_prescription'),
+    url(r'^prescriptions/get/$', views.get_prescriptions, name='get_prescriptions'),
     url(r'^prescriptions/update/$', views.update_prescription, name='update_prescription'),
 	url(r'^login/$', auth_views.login, name='login'),
 	url(r'^logout/$', views.logout_page, name='logout'),

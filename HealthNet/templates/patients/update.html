@@ -1,20 +1,25 @@
-{% extends "basic.html" %}
+{% load staticfiles %}
 {% load material_form %}
 
-{% block body %}
-<div class="container">
-  <h4>
-<form method="post" action="/patients/update" enctype="multipart/form-data">
-  {% csrf_token %}
-    {% form form=patientform %}
-    {% if form.subject.errors %}
-    <ol>
-        {% for error in form.subject.errors %}
-            <li><strong>{{ error|escape }}</strong></li>
-        {% endfor %}
-    </ol>
-    {% endif %}
-    {% endform %}
-    <button class="waves-effect waves-light btn light-blue accent-3" type="submit" value="update">Register<i class="material-icons right">system_update_alt</i></button>
+<!DOCTYPE html>
+<div class="modal-content">
+  <h4>Update Patient</h4>
+      {% csrf_token %}
+      {% form form=patientform %}
+
+      {% endform %}
 </div>
-{% endblock %}
+<div class="modal-footer">
+    <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
+    <button class="modal-action modal-close waves-effect waves-light btn blue" onclick="Materialize.toast('Patient updated!',4000);" name="update_patient" value="{{ patient.patient_id }}">Update<i class="material-icons right">system_update_alt</i></button>
+</div>
+
+<script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
+<script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
+{% include 'material/includes/material_css.html' %}
+{% include 'material/includes/material_js.html' %}
+
+<script type="text/javascript"> $(document).ready(function(){
+    $('.modal').modal();
+    })
+</script>

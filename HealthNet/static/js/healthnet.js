@@ -14,8 +14,7 @@ $(document).ready(function(){
          }
        );
        $(".dropdown-button").dropdown({hover: false});
-       $(".button-collapse").sideNav({hover: false});
-
+       $(".button-collapse").sideNav();
     });
 
 document.addEventListener("DOMContentLoaded", function(){
@@ -24,7 +23,9 @@ $('.preloader-background').delay(1000).fadeOut('slow');
 $('.preloader-wrapper')
     .delay(1000)
     .fadeOut();
+
 });
+
 
 function newAppointment(){
   $.ajaxSetup({
@@ -90,7 +91,7 @@ function getPrescriptions(patientid){
   var div = '#pat-div' + patientid;
   $.ajax({
       type: 'POST',
-      url: '/prescriptions/',
+      url: '/prescriptions/get/',
       data: { get_patient_prescriptions: patientid },
       success: function(response) {
         $(div).html(response);
@@ -132,6 +133,39 @@ function downloadAttachment(attachmenturl){
       txt = "Welp we can't let you view the file then ¯\\_(ツ)_/¯";
       alert(txt)
   }
+}
 
-
+function updatePatient(get_patient_id) {
+      $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+              function getCookie(name) {
+                  var cookieValue = null;
+                  if (document.cookie && document.cookie != '') {
+                      var cookies = document.cookie.split(';');
+                      for (var i = 0; i < cookies.length; i++) {
+                          var cookie = jQuery.trim(cookies[i]);
+                          // Does this cookie string begin with the name we want?
+                          if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                              break;
+                          }
+                      }
+                  }
+                  return cookieValue;
+              }
+              if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                  // Only send the token to relative URLs i.e. locally.
+                  xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+              }
+          }
+      });
+    $.ajax({
+        type: 'POST',
+        url: 'patients/update',
+        data: { patient_id: get_patient_id },
+        success: function(response) {
+          $('#apt-div').html(response);
+        }
+    });
+    $('#apt-modal').modal('open');
 }

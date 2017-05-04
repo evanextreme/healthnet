@@ -11,9 +11,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="/static/css/healthnet.css">
     <!--Import materialize.css-->
-    <link type="text/css" rel="stylesheet" href="{% static 'materialize/bin/materialize.css' %}"  media="screen,projection"/>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!--Fullcalendar stuff, oh fun-->
+    <!--Import Google Icon Font-->
+     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+     <!--Import materialize.css-->
+     <link type="text/css" rel="stylesheet" href="/static/css/materialize.min.css"  media="screen,projection"/>
+
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
       <style>    .waves-effect.waves-blue .waves-ripple {
      /* The alpha value allows the text and background color
@@ -26,7 +28,8 @@
         {% fullcalendar_print_css %}
 
         {% include 'material/includes/material_css.html' %}
-        <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
         {% include 'material/includes/material_js.html' %}
 
         {% fullcalendar_jquery_ui %}
@@ -39,17 +42,24 @@
       <li class="divider"></li>
       <li><a class="waves-effect waves-light blue-text" href="/logout">Logout</a></li>
     </ul>
+    <ul id="dropdown2" class="dropdown-content">
+      {% for appointment in appointments %}
+      {% if appointment.confirmed == False %}
+      <li><a class="waves-effect waves-light blue-text" onclick="updateAppointment({{appointment.appointment_id}})">{{appointment.title}} with {{appointment.patient.user.first_name}} {{appointment.patient.user.last_name}}</a></li>
+      {% endif %}
+      {% endfor %}
+    </ul>
     {% block nav %}
     <div class="navbar-fixed">
       <nav>
         <div class="nav-wrapper light-blue accent-3">
-          <a href="/" class="brand-logo">myHealth</a>
-              <ul class="right hide-on-med-and-down">
+              <a href="/" class="brand-logo">myHealth</a>
+              <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
 
+            <ul class="right hide-on-med-and-down">
               {% if user.is_authenticated %}
 
-              <li {% block active_dashboard %} {% endblock %}><a class="waves-effect waves-light" href="/">{% if unconfirmed != 0 %}<span class="badge red left white-text">{{unconfirmed}}</span>{%else%}{% endif %}Dashboard</a></li>
-
+              <li {% block active_dashboard %} {% endblock %}><a class="waves-effect waves-light dropdown-button" href="#!" data-activates="dropdown2">{% if unconfirmed != 0 %}<span class="red badge white-text">{{unconfirmed}}</span></span><i class="material-icons right ">notifications</i></a>{%else%}<i class="material-icons">notifications_none</i></a>{% endif %}</li>
               {% endif %}
               {% if permissions == 'doctor' or permissions == 'nurse'%}
               <li {% block active_account %} {% endblock %}><a class="dropdown-button" href="#!" data-activates="dropdown1">{% if permissions == 'doctor' %}Dr. {% elif permissions == 'nurse'%}Nurse {%endif%}{{user.last_name}}<i class="material-icons right">arrow_drop_down</i></a></li>
@@ -59,7 +69,14 @@
               <li><a class="waves-effect waves-light" href="/register">Register</a></li>
               <li><a class="waves-effect waves-light" href="/login">Login</a></li>
               {% endif %}
+
               <!-- Dropdown Trigger -->
+            </ul>
+            <ul class="side-nav" id="mobile-demo">
+              <li><a href="sass.html">Sass</a></li>
+              <li><a href="badges.html">Components</a></li>
+              <li><a href="collapsible.html">Javascript</a></li>
+              <li><a href="mobile.html">Mobile</a></li>
             </ul>
         </div>
       </nav>
@@ -109,7 +126,7 @@
          <i class="large material-icons">mode_edit</i>
          {% elif permissions == 'patient' %}
             {% if user.patient.admitted == True %}
-             <a id="menu" class="btn-floating btn-large red" onclick="newAppointment()">
+             <a id="menu" class="btn-floating btn-large red tooltipped" data-position="bottom" data-delay="50" data-tooltip="I am tooltip" onclick="newAppointment()">
             {% else %}
              <a id="menu" class="btn-floating btn-large grey" onclick="Materialize.toast('You are not admitted to a hospital currently.',8000);">
             {% endif %}
@@ -121,8 +138,8 @@
        </a>
        <ul>
          {% if permissions == 'doctor' %}
-         <li><a class="btn-floating red" onclick="newAppointment()"><i class="material-icons">library_add</i></a></li>
-         <li><a class="btn-floating green" onclick="newPrescription()"><i class="material-icons">playlist_add</i></a></li>
+         <li><a class="btn-floating red tooltipped" data-position="top" data-delay="50" data-tooltip="New Appointment/Test" onclick="newAppointment()"><i class="material-icons">library_add</i></a></li>
+         <li><a class="btn-floating green tooltipped" data-position="top" data-delay="50" data-tooltip="New Prescription" onclick="newPrescription()"><i class="material-icons">playlist_add</i></a></li>
          {% endif %}
        </ul>
 
@@ -131,6 +148,7 @@
 
   </body>
     <footer>
+      <script type="text/javascript" src="/static/js/materialize.min.js"></script>
       <script src="/static/js/healthnet.js"></script>
     </footer>
 </html>
