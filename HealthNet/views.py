@@ -20,7 +20,7 @@ from HealthNet.email import *
 from io import BytesIO
 from reportlab.pdfgen import canvas
 from django.contrib.auth import authenticate
-from weasyprint import HTML
+#from weasyprint import HTML
 
 
 
@@ -548,8 +548,8 @@ def export_file(request):
     print(str(appointments))
     html_string = render_to_string('export/template.html', {'user': user,'permissions':permissions,'appointments':appointments})
 
-    html = HTML(string=html_string)
-    html.write_pdf(target='/tmp/myHealthExport.pdf');
+    #html = HTML(string=html_string)
+    #html.write_pdf(target='/tmp/myHealthExport.pdf');
 
     fs = FileSystemStorage('/tmp')
     with fs.open('myHealthExport.pdf') as pdf:
