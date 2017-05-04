@@ -35,7 +35,7 @@ def home(request):
     unconfirmed = 0
     appointments = ''
     notification = ''
-    autoopen = ''
+    error = ''
 
     if (permissions == 'patient' and user.patient.new_user) or (permissions == 'nurse' and user.nurse.new_user) or (permissions == 'doctor' and user.doctor.new_user):
         opentap = 'open'
@@ -61,7 +61,7 @@ def home(request):
     elif permissions == 'admin':
         return HttpResponseRedirect('/admin')
 
-    variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed,'appointments':appointments,'notification':notification,'autoopen':autoopen})
+    variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed,'appointments':appointments,'notification':notification,'error':error})
 
     if request.method == 'POST':
         appointment = CalendarEvent()
@@ -100,7 +100,6 @@ def home(request):
             print(str(confirmed))
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
-            print('HIT')
             if permissions == 'nurse':
                 post_id = request.POST['patient']
                 patient = Patient.patients.get(patient_id=post_id)
@@ -134,9 +133,23 @@ def home(request):
                 variables['notification'] = str('Appointment successfully created')
                 return render_to_response('index.html', variables)
             else:
+                if permissions == 'doctor':
+                    cal_form.fields['doctor'].widget = forms.HiddenInput()
+                elif permissions == 'nurse':
+                    cal_form.fields['doctor'].widget = forms.HiddenInput()
+                    cal_form.fields['hospital'].widget = forms.HiddenInput()
+                    cal_form.fields['type'].widget = forms.HiddenInput()
+                    cal_form.fields['attachments'].widget = forms.HiddenInput()
+                elif permissions == 'patient':
+                    cal_form.fields['patient'].widget = forms.HiddenInput()
+                    cal_form.fields['doctor'].widget = forms.HiddenInput()
+                    cal_form.fields['hospital'].widget = forms.HiddenInput()
+                    cal_form.fields['type'].widget = forms.HiddenInput()
+                    cal_form.fields['attachments'].widget = forms.HiddenInput()
+
                 variables['cal_form'] = cal_form
-                variables['autoopen'] = 'True'
-                return render_to_response("appointments/new.html",variables)
+                variables['error'] = 'True'
+                return render_to_response("index.html",variables)
         elif 'Update' in request.POST:
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)

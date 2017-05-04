@@ -28,6 +28,7 @@ class Nurse(models.Model):
     phone_number = PhoneNumberField()
 
     hospital = models.ForeignKey(Hospital)
+    profile_picture = models.FileField(upload_to='nurses',blank=True)
 
     new_user = models.BooleanField(default=True)
 
@@ -48,6 +49,8 @@ class Doctor(models.Model):
     phone_number = PhoneNumberField(default=None)
 
     hospital = models.ManyToManyField(Hospital)
+
+    profile_picture = models.FileField(upload_to='doctors',blank=True)
 
     new_user = models.BooleanField(default=True)
 

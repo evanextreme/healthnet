@@ -57,8 +57,7 @@
               <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
 
             <ul class="right hide-on-med-and-down">
-              {% if user.is_authenticated %}
-
+              {% if permissions == 'doctor' %}
               <li {% block active_dashboard %} {% endblock %}><a class="waves-effect waves-light dropdown-button" href="#!" data-activates="dropdown2">{% if unconfirmed != 0 %}<span class="red badge white-text">{{unconfirmed}}</span></span><i class="material-icons right ">notifications</i></a>{%else%}<i class="material-icons">notifications_none</i></a>{% endif %}</li>
               {% endif %}
               {% if permissions == 'doctor' or permissions == 'nurse'%}
@@ -116,7 +115,18 @@
 
         <form action='.' method='post' enctype="multipart/form-data">
             <div id="apt-div">
-              
+              {% if error == 'True' %}
+              <div class="modal-content">
+                <h4>New Appointment{% if permissions == 'doctor' %}/Test{% endif %}</h4>
+                {% if permissions == 'patient' %}<h5> with {{user.patient.doctor}} at {{user.patient.hospital}}</h5>{% endif %}
+                    {% csrf_token %}
+                    {% form form=cal_form %}{% endform %}
+              </div>
+              <div class="modal-footer">
+                  <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
+                  <button class="modal-action modal-close waves-effect waves-light btn red" onclick="Materialize.toast('Appointment confirmed!',4000);" type="submit" name="Create">Create</button>
+              </div>
+              {% endif %}
             </div>
         </form>
       </div>

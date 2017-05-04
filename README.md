@@ -27,6 +27,9 @@ Now, just make an admin user and get set up!
 * When you're done, it's time to run the server!
 * `python manage.py runserver`
 
+# Admin Funtime!
 
+* `python manage.py runtests`
+Allows you to run our unit tests and check the stability of the system.
 
 All set! As long as the server is running can access the administration page through localhost:8000/login using the account you just created. Also, the website is accessible via localhost:8000! Make sure to create hospitals and doctors after you log in, otherwise patients will not be able to register.
