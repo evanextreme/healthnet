@@ -62,7 +62,7 @@
 
                 <div id="pat-actions{{patient_id}}" class="collapsible-body">
                   <form action='.' method='post' enctype="multipart/form-data" id="patform{{patient.patient_id}}"/>
-                    <button class="waves-effect waves-light btn light-blue accent-3" type="submit" name="get_patient_id" value="{{patient.patient_id}}">Update</button>
+                    <a class="waves-effect waves-light btn light-blue accent-3" onclick="updatePatient({{patient.patient_id}})">Update</button>
                     <a class="waves-effect waves-light btn light-blue accent-3" type="submit" onclick="getPrescriptions({{patient.patient_id}})">View{% if permissions == 'doctor'%}/Edit{%endif%} Medications</a>
                     {% if patient.admitted %}
                     <button class="waves-effect waves-light btn red" type="submit" name="discharge_patient" value="{{patient.patient_id}}">Discharge</button>
@@ -127,9 +127,34 @@
   		</div>
   	</div>
     {% endif %}
+    <!-- Tap Target Structure -->
+    <div class="tap-target red light-2" data-activates="menu">
+      <div class="tap-target-content white-text">
+        <h5>Welcome to myHealth!</h5>
+        <p>{% if permissions == 'doctor'%}Hover over this button to open up your 'new' menu. It allows you to add new appointments, tests, and prescriptions!
+          {% else %}
+          Click this button to add a new appointment!
+          {% endif %}
 
+        </p>
+      </div>
+    </div>
 <style>
 
 </style>
 
+{% block footer %}
+<script type="text/javascript">
+
+document.addEventListener("DOMContentLoaded", function(){
+var toast_msg = '{{notification}}'
+if (toast_msg != null){
+   Materialize.toast(toast_msg, 8000)
+}
+$('.tap-target').tapTarget('{{opentap}}').delay(2000);
+
+});
+</script>
+
+{% endblock %}
 {% endblock %}

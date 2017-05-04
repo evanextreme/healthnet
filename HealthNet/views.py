@@ -32,24 +32,33 @@ def home(request):
     patients = ''
     unconfirmed = 0
     appointments = ''
+    notification = ''
 
     if (permissions == 'patient' and user.patient.new_user) or (permissions == 'nurse' and user.nurse.new_user) or (permissions == 'doctor' and user.doctor.new_user):
-        opentap = 'True'
+        opentap = 'open'
     #If user is admin, redirect to admin dashboard
     if permissions == 'patient':
         prescriptions = user.patient.prescription_set.all()
         appointments = user.patient.calendarevent_set.all()
+        user.patient.new_user = False
+        user.patient.save()
     elif permissions == 'nurse':
         patients = user.nurse.hospital.patient_set.all()
         appointments = user.nurse.hospital.calendarevent_set.all()
-        print(str(patients))
+        user.nurse.new_user = False
+        user.nurse.save()
+
     elif permissions == 'doctor':
         unconfirmed = confirmed_appointments(user)
         appointments = user.doctor.calendarevent_set.all()
         patients = user.doctor.patient_set.all()
+        user.doctor.new_user = False
+        user.doctor.save()
 
     elif permissions == 'admin':
         return HttpResponseRedirect('/admin')
+
+    variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed,'appointments':appointments,'notification':notification})
 
     if request.method == 'POST':
         appointment = CalendarEvent()
@@ -82,8 +91,8 @@ def home(request):
                 cal_form.fields['end'].widget.attrs['disabled'] = True
                 cal_form.fields['all_day'].widget.attrs['disabled'] = True
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
-            released = appointment.released
-            variables = RequestContext(request, {'user':user,'cal_form':cal_form,'attachments':attachments,'confirmed':confirmed,'released':released,'permissions':permissions,'calendar_config_options':calendar_options(event_url, OPTIONS)})
+            variables['released'] = appointment.released
+            variables['cal_form'] = cal_form
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
             if permissions == 'nurse':
@@ -116,9 +125,9 @@ def home(request):
                     attachment.save()
                 event=log(user=user,action="new_appt",notes={})
                 event.save()
-                return HttpResponseRedirect('/')
+                variables['notification'] = str('Appointment successfully created')
+                return render_to_response('index.html', variables)
             else:
-                variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
                 return render_to_response("appointments/new.html",variables)
         elif 'Update' in request.POST:
             post_id = request.POST['appointment_id']
@@ -138,7 +147,7 @@ def home(request):
                     unconfirmed = confirmed_appointments(user)
                 event=log(user=user,action="update_apt",notes={})
                 event.save()
-                variables = RequestContext(request, {'user':user,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
+                variables['notification'] = str('Appointment successfully updated')
                 return render_to_response('index.html', variables)
             else:
                 print(str(cal_form.errors))
@@ -150,7 +159,7 @@ def home(request):
             appointment.delete()
             event=log(user=user,action="deleted_apt",notes={})
             event.save()
-            variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
+            variables['notification'] = str('Appointment successfully deleted')
             return render_to_response('index.html', variables)
 
         elif 'Release' in request.POST:
@@ -161,7 +170,7 @@ def home(request):
             results_released_email(appointment.patient, appointment.doctor, appointment)
             event=log(user=user,action="released_apt",notes={})
             event.save()
-            variables = RequestContext(request, {'user':user,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions})
+            variables['notification'] = str('Appointment successfully released')
             return render_to_response('index.html', variables)
 
         elif 'create_prescription' in request.POST:
@@ -173,7 +182,8 @@ def home(request):
                     patients = user.doctor.patient_set.all()
                 elif user.nurse:
                     patients = user.nurse.patient_set.all()
-                return render_to_response('index.html', {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions},RequestContext(request))
+                variables['notification'] = str('Prescription successfully created')
+                return render_to_response('index.html', variables)
 
         elif 'admit_patient' in request.POST:
             post_id = request.POST['admit_patient']
@@ -182,7 +192,7 @@ def home(request):
             patient.save()
             event=log(user=user,action="admit_patient",notes={"patient":str(patient.user.first_name + " " + patient.user.last_name)})
             event.save()
-            variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
+            variables['notification'] = str('{} {} successfully admitted').format(patient.user.first_name,patient.user.last_name)
             return render_to_response('index.html',variables)
 
         elif 'discharge_patient' in request.POST:
@@ -192,8 +202,19 @@ def home(request):
             patient.save()
             event=log(user=user,action="admit_patient",notes={"patient":str(patient.user.first_name + " " + patient.user.last_name)})
             event.save()
-            variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
+            variables['notification'] = str('{} {} successfully discharged').format(patient.user.first_name,patient.user.last_name)
+
             return render_to_response('index.html',variables)
+        elif 'update_patient' in request.POST:
+            post_id = request.POST['patient_id']
+            patient = Patient.patients.get(patient_id=post_id)
+            patient.save()
+            event=log(user=user,action="update_patient",notes={"patient":str(patient.user.first_name + " " + patient.user.last_name)})
+            event.save()
+            variables['notification'] = str('{} {} successfully updated').format(patient.user.first_name,patient.user.last_name)
+
+            return render_to_response('index.html',variables)
+
         elif 'update_prescription' in request.POST:
             post_id = request.POST['update_prescription']
             prescription = Prescription.prescriptions.get(prescription_id = post_id)
@@ -202,15 +223,13 @@ def home(request):
                 prescriptionform.save()
                 event = log(user=user, action = "employee_edit_prescription",notes={})
                 event.save()
-            cal_form = CalendarEventForm()
-
-            variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed})
+            variables['cal_form'] = CalendarEventForm()
+            variables['notification'] = str('Prescription successfully updated')
             return render_to_response('index.html',variables)
 
 
     else:
-        cal_form = CalendarEventForm()
-        variables = RequestContext(request, {'user':user,'opentap':opentap,'cal_form':cal_form,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed,'appointments':appointments})
+        variables['cal_form'] = CalendarEventForm()
         return render_to_response('index.html',variables)
 
 def confirmed_appointments(user):
@@ -316,58 +335,26 @@ def update_profile(request):
     return render_to_response('account/profile.html', variables)
 
 @csrf_exempt
-def employee_update_patient(request):
+def update_patient(request):
     user = request.user
     permissions = get_permissions(user)
-    print(str(request.POST))
-    if request.method == 'POST' and 'get_patient_id' in request.POST:
-        post_id = request.POST['get_patient_id']
+    if request.method == 'POST':
+        post_id = request.POST['patient_id']
         patient = Patient.patients.get(patient_id=post_id)
-        patientform = EmployeeUpdatePatientForm(instance = patient)
-        if permissions == 'nurse':
-            patientform.fields['hospital'].widget = forms.HiddenInput()
+        patientform = EmployeeUpdatePatientForm(request.POST, instance = patient)
+        return render_to_response('patients/update.html', {'user':user,'patientform':patientform,'permissions':permissions},RequestContext(request))
 
-    elif request.method == 'POST' and 'get_patient_prescriptions' in request.POST:
+@csrf_exempt
+def get_prescriptions(request):
+    user = request.user
+    permissions = get_permissions(user)
+    if request.method == 'POST':
         post_id = request.POST['get_patient_prescriptions']
         if not type(post_id) is int:
             post_id = post_id[0]
         patient = Patient.patients.get(patient_id=post_id)
         prescriptions = patient.prescription_set.all()
         return render_to_response('prescriptions/index.html', {'user':user,'patient':patient,'prescriptions':prescriptions,'permissions':permissions},RequestContext(request))
-
-    elif request.method == 'POST' and 'edit_prescription' in request.POST:
-        post_id = request.POST['prescription_id']
-        if not type(post_id) is int:
-            post_id = post_id[0]
-        prescription = Prescription.prescriptions.get(prescription_id = post_id)
-        prescriptionform = PrescriptionForm(request.POST, instance = prescription)
-        patient = prescription.patient
-        prescriptions = patient.prescription_set.all()
-        if prescriptionform.is_valid():
-            prescriptionform.save()
-            event = log(user=user, action = "edit_patient_prescription", notes={"To patient":patient})
-            event.save()
-            return render_to_response('prescriptions/edit_confirmed.html', {'user':user, 'prescription':prescription, 'prescriptionform':prescriptionform, 'permissions':permissions}, RequestContext(request))
-        else:
-            return render_to_response('prescriptions/employee_edit.html', {'user':user, 'prescription':prescription, 'prescriptionform':prescriptionform, 'permissions':permissions}, RequestContext(request))
-
-    elif request.method == 'POST' and 'prescription_id' in request.POST:
-        post_id = request.POST['prescription_id']
-        if not type(post_id) is int:
-            post_id = post_id[0]
-        prescription = Prescription.prescriptions.get(prescription_id = post_id)
-        prescriptionform = PrescriptionForm(instance = prescription)
-        return render_to_response('prescriptions/employee_edit.html', {'user':user, 'prescription':prescription, 'prescriptionform':prescriptionform, 'permissions':permissions}, RequestContext(request))
-
-    elif request.method == 'POST':
-        post_id = request.POST['patient_id']
-        patient = Patient.patients.get(patient_id=post_id)
-        patientform = EmployeeUpdatePatientForm(request.POST, instance = patient)
-        if patientform.is_valid():
-            patientform.save()
-            event=log(user=user,action="update_patient_profile",notes={"To patient":patient})
-            event.save()
-    return render_to_response('patients/update.html', {'user':user,'patientform':patientform,'permissions':permissions},RequestContext(request))
 
 @csrf_exempt
 def update_prescription(request):
@@ -434,8 +421,13 @@ def change_hospital(request):
 
 @csrf_exempt
 def change_password(request):
+    prescriptions = ''
+    patients = ''
+    unconfirmed = 0
+    appointments = ''
     user = request.user
     permissions = get_permissions(user)
+
     if request.method == 'POST':
         passform = PasswordChangeForm(user, request.POST)
         if passform.is_valid():
@@ -445,8 +437,9 @@ def change_password(request):
             event.save()
             return HttpResponseRedirect('/')
     else:
+
         passform = PasswordChangeForm(user)
-        variables = RequestContext(request, {'user':user,'password_form':passform,'permissions':permissions})
+        variables = RequestContext(request, {'user':user,'password_form':passform,'permissions':permissions,'appointments':appointments,'unconfirmed':unconfirmed})
         return render_to_response('account/password.html', variables)
 
 
