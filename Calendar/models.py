@@ -27,7 +27,7 @@ class CalendarEvent(models.Model):
     """
 
     appointment_id = models.AutoField(_('appointment_id'), primary_key=True, default=None)
-    title = models.CharField(_('title'), blank=True, max_length=200)
+    title = models.CharField(_('title'), max_length=200)
 
     type = models.CharField(choices=(
     ('1', 'General'),
