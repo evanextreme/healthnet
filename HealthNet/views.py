@@ -35,6 +35,7 @@ def home(request):
     unconfirmed = 0
     appointments = ''
     notification = ''
+    autoopen = ''
 
     if (permissions == 'patient' and user.patient.new_user) or (permissions == 'nurse' and user.nurse.new_user) or (permissions == 'doctor' and user.doctor.new_user):
         opentap = 'open'
@@ -60,7 +61,7 @@ def home(request):
     elif permissions == 'admin':
         return HttpResponseRedirect('/admin')
 
-    variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed,'appointments':appointments,'notification':notification})
+    variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed,'appointments':appointments,'notification':notification,'autoopen':autoopen})
 
     if request.method == 'POST':
         appointment = CalendarEvent()
@@ -133,6 +134,8 @@ def home(request):
                 variables['notification'] = str('Appointment successfully created')
                 return render_to_response('index.html', variables)
             else:
+                variables['cal_form'] = cal_form
+                variables['autoopen'] = 'True'
                 return render_to_response("appointments/new.html",variables)
         elif 'Update' in request.POST:
             post_id = request.POST['appointment_id']
@@ -222,7 +225,7 @@ def home(request):
 
             return render_to_response('index.html',variables)
 
-        elif 'update_prescription' in request.POST: 
+        elif 'update_prescription' in request.POST:
             post_id = request.POST['update_prescription']
             prescription = Prescription.prescriptions.get(prescription_id = post_id)
             prescriptionform = PrescriptionForm(request.POST, instance = prescription)
