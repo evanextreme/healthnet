@@ -22,5 +22,8 @@
 </div>
 {% else %}
     <p>This patient does not currently have any prescribed medications.</p>
+    <li class="collection-item">
+        <a class="waves-effect waves-blue btn btn-flat" type="submit" onclick="returnToCard({{patient.patient_id}})">View Patient Details</a>
+    </li>
 
 {% endif %}

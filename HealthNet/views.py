@@ -99,6 +99,7 @@ def home(request):
             print(str(confirmed))
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
+            print('HIT')
             if permissions == 'nurse':
                 post_id = request.POST['patient']
                 patient = Patient.patients.get(patient_id=post_id)
@@ -143,6 +144,8 @@ def home(request):
                     appointment.confirmed = True
                     appointment.color = '#00b0ff'
                     appointment_confirmation_email(appointment.patient,appointment.doctor,appointment)
+                    variables['unconfirmed'] = confirmed_appointments(user)
+                    variables['appointments'] = user.doctor.calendarevent_set.all()
                 for each in cal_form.cleaned_data['attachments']:
                     attachment = Attachment.objects.create(file=each,appointment=appointment)
                     attachment.save()
@@ -152,7 +155,7 @@ def home(request):
                 event=log(user=user,action="update_apt",notes={})
                 event.save()
                 variables['notification'] = str('Appointment successfully updated')
-                return render_to_response('index.html', variables)
+                return HttpResponseRedirect('/')
             else:
                 print(str(cal_form.errors))
 
@@ -219,7 +222,7 @@ def home(request):
 
             return render_to_response('index.html',variables)
 
-        elif 'update_prescription' in request.POST:
+        elif 'update_prescription' in request.POST: 
             post_id = request.POST['update_prescription']
             prescription = Prescription.prescriptions.get(prescription_id = post_id)
             prescriptionform = PrescriptionForm(request.POST, instance = prescription)
@@ -234,6 +237,7 @@ def home(request):
 
     else:
         variables['cal_form'] = CalendarEventForm()
+        print(str(variables))
         return render_to_response('index.html',variables)
 
 def confirmed_appointments(user):
