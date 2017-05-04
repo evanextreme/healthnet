@@ -19,11 +19,9 @@
         <span class="black-text">Date of Birth: {{user.patient.date_of_birth}}</span>
       </div>
       <div class="card-content">
-        {% if user.patient.admitted == True %}
-        <span class="black-text">Hospital: {{user.patient.hospital}}</span>
-        {% else %}
-        <span class="black-text">Hospital: Not Admitted</span>
-        {% endif %}
+        <span class="black-text">Preferred Hospital: {{user.patient.hospital}}</span>
+      <div class="card-content">
+        <span class="black-text">Admitted:  {% if user.patient.admitted == True %}Yes{% else %}No{% endif %}</span>
       </div>
       <div class="card-content">
         <span class="black-text">Height: {{user.patient.height}} inches</span>
@@ -33,4 +31,5 @@
       </div>
     </div>
   </div>
+</div>
 </div>

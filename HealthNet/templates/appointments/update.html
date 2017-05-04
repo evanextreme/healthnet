@@ -4,15 +4,7 @@
   <!-- Dropdown Structure -->
 <div class="modal-content">
     <h4>Update Appointment{% if permissions == 'doctor'%}/Test{% endif %}</h4>
-    {% if permissions == 'patient' %}
-        <h5> with {{user.patient.doctor}} at {{user.patient.hospital}}</h5>
-    {% endif %}
-    {% if permissions == 'nurse' %}
-        <h5> {{appointment.doctor}} and patient {{appointment.patient}} at {{appointment.hospital}}</h5>
-    {% endif %}
-    {% if permissions == 'doctor' %}
-        <h5> with patient {{appointment.patient}} at {{appointment.hospital}}</h5>
-    {% endif %}
+
 
 
         {% csrf_token %}
@@ -22,7 +14,7 @@
 
         {% if permissions != 'patient' or released == 'True' %}
 
-
+              {% if attachments %}
               <ul class="collapsible" data-collapsible="accordion">
               <li>
                 {% for attachment in attachments %}
@@ -36,6 +28,7 @@
                 {% endfor %}
               </li>
               </ul>
+              {% endif %}
 
         {% endif %}
     </ul>

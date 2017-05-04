@@ -58,12 +58,14 @@
                 <div class="collapsible-header">{{patient.user.first_name}} {{patient.user.last_name}}</div>
                 <div id="pat-div{{patient.patient_id}}" style="border-bottom: 0px" class="collapsible-body">
                   {{patient.card}}
+                  <div class="container">
+                  <a class=" btn-flat" type="submit" onclick="getPrescriptions({{patient.patient_id}})">View{% if permissions == 'doctor'%}/Edit{%endif%} Medications</a>
+                  </div>
                 </div>
 
                 <div id="pat-actions{{patient_id}}" class="collapsible-body">
                   <form action='.' method='post' enctype="multipart/form-data" id="patform{{patient.patient_id}}"/>
-                    <a class="waves-effect waves-light btn light-blue accent-3" onclick="updatePatient({{patient.patient_id}})">Update</button>
-                    <a class="waves-effect waves-light btn light-blue accent-3" type="submit" onclick="getPrescriptions({{patient.patient_id}})">View{% if permissions == 'doctor'%}/Edit{%endif%} Medications</a>
+                    <a class="waves-effect waves-light btn light-blue accent-3" onclick="updatePatient({{patient.patient_id}})">Update</a>
                     {% if patient.admitted %}
                     <button class="waves-effect waves-light btn red" type="submit" name="discharge_patient" value="{{patient.patient_id}}">Discharge</button>
                     {% else %}
