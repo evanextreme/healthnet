@@ -20,6 +20,8 @@ from HealthNet.email import *
 from io import BytesIO
 from reportlab.pdfgen import canvas
 from django.contrib.auth import authenticate
+from weasyprint import HTML
+
 
 
 @csrf_exempt
@@ -93,6 +95,8 @@ def home(request):
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
             variables['released'] = appointment.released
             variables['cal_form'] = cal_form
+            variables['confirmed'] = confirmed
+            print(str(confirmed))
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
             if permissions == 'nurse':
@@ -513,25 +517,27 @@ def new_test(request):
                 Attachment.objects.create(file=each)
 
 def export_file(request):
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename="mypdf.pdf"'
+    user = request.user
+    permissions = get_permissions(user)
+    if permissions == 'patient':
+        appointments = user.patient.calendarevent_set.all()
+    elif permissions == 'nurse':
+        appointments = user.nurse.calendarevent_set.all()
+    elif permissions == 'doctor':
+        appointments = user.doctor.calendarevent_set.all()
+    print(str(appointments))
+    html_string = render_to_string('export/template.html', {'user': user,'permissions':permissions,'appointments':appointments})
 
-    buffer = BytesIO()
-    p = canvas.Canvas(buffer)
+    html = HTML(string=html_string)
+    html.write_pdf(target='/tmp/myHealthExport.pdf');
 
-    # Start writing the PDF here
-    p.drawString(275,500,'Hello world.')
-    # End writing
-
-    p.showPage()
-    p.save()
-
-    pdf = buffer.getvalue()
-    buffer.close()
-    response.write(pdf)
-
-    event=log(user=user,action="user_export_file",notes={})
-    event.save()
+    fs = FileSystemStorage('/tmp')
+    with fs.open('myHealthExport.pdf') as pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="myHealthExport.pdf"'
+        event=log(user=user,action="user_export_file",notes={})
+        event.save()
+        return response
 
     return response
 

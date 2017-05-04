@@ -124,18 +124,10 @@ def delete_test_objects():
     for appointment in appointments:
         print_status('DATA',str("""Deleting Appointment ID '{}'""").format(appointment.appointment_id))
         appointment.delete()
-    hospitals = User.objects.get(username='test_doctor').doctor.hospital_set.all()
+    hospitals = User.objects.get(username='test_doctor').doctor.hospital.all()
     for hospital in hospitals:
-        print_status('DATA',str("""Deleting Appointment ID '{}'""").format(hospital.hospital_id))
+        print_status('DATA',str("""Deleting hospital '{}'""").format(hospital.name))
         hospital.delete()
-
-    User.objects.get(username='test_patient').patient.delete()
-    print_status('GOOD',str('Patient object deleted'))
-    User.objects.get(username='test_nurse').nurse.delete()
-    print_status('GOOD',str('Nurse object deleted'))
-    User.objects.get(username='test_doctor').doctor.delete()
-    print_status('GOOD',str('Doctor object deleted'))
-
 
     User.objects.get(username='test_patient').delete()
     print_status('GOOD',str('Patient user deleted'))
