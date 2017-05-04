@@ -564,7 +564,7 @@ def get_card(request):
         post_id = request.POST['patientid']
         patient = Patient.patients.get(patient_id=post_id)
         variables = {'user':patient.user}
-        return(render_to_response('card/patient.html',variables))
+        return(render_to_response('card/patientplus.html',variables))
 
 OPTIONS = """{  timeFormat: "H:mm",
 
