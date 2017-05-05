@@ -35,9 +35,9 @@ class Nurse(models.Model):
     def __str__(self):
         return str(self.user.first_name + " " + self.user.last_name)
 
-    def card(self):
+    def self_card(self):
         variables = {'user':self.user}
-        return(render_to_string('card/doctor.html',variables))
+        return(render_to_string('card/nurse.html',variables))
 
 
 class Doctor(models.Model):
@@ -57,6 +57,10 @@ class Doctor(models.Model):
     def __str__(self):
         return str("Dr. " + self.user.first_name + " " + self.user.last_name)
 
+    def self_card(self):
+        variables = {'user':self.user}
+        return(render_to_string('card/doctor_self.html',variables))
+
     def card(self):
         variables = {'user':self.user}
         return(render_to_string('card/doctor.html',variables))
@@ -71,6 +75,10 @@ class Patient(models.Model):
 
     def __str__(self):
         return str(self.user.first_name + ' ' + self.user.last_name)
+
+    def self_card(self):
+        variables = {'user':self.user}
+        return(render_to_string('card/patient_self.html',variables))
 
     def card(self):
         variables = {'user':self.user}

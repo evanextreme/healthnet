@@ -1,0 +1,22 @@
+<div class="card-panel grey lighten-5 z-depth-1">
+  <div class="row valign-wrapper">
+    <div class="col s4">
+        {% if user.doctor.profile_picture %}
+            <img src={{user.doctor.profile_picture.url}} alt="Profile Picture" class="circle responsive-img">
+        {% else %}
+            <img src="../../static/blank_picture.png" alt="Profile Picture" class="circle responsive-img">
+        {% endif %}
+    </div>
+    <div class="col s12 card-stacked">
+      <div class="card-content">
+        <h4>Dr. {{user.first_name}} {{user.last_name}}</h4>
+      </div>
+      <div class="card-content">
+        <span class="black-text">Email: {{user.email}}</span>
+      </div>
+      <div class="card-content">
+        <span class="black-text">Phone: {{user.doctor.phone_number}}</span>
+      </div>
+    </div>
+  </div>
+</div>
