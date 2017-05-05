@@ -4,6 +4,10 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from HealthNet.models import *
 from multiupload.fields import MultiFileField
+from django.core.validators import RegexValidator
+from localflavor.us.forms import USPhoneNumberField
+from input_mask.contrib.localflavor.br.widgets import BRPhoneNumberInput
+
 import datetime
 
 
@@ -32,7 +36,7 @@ class PatientForm(forms.ModelForm):
     height.label = 'Height (Inches)'
     weight.label = 'Weight (Pounds)'
     profile_picture = forms.ImageField(label="Upload a photo of yourself!", required=False)
-    phone_number = forms.CharField(initial='+12345678900')
+    phone_number = USPhoneNumberField()
     class Meta:
         model = Patient
         fields = ['date_of_birth', 'phone_number', 'height', 'weight', 'doctor', 'hospital', 'profile_picture']
@@ -43,6 +47,7 @@ class PatientForm(forms.ModelForm):
         weight = clean_data.get('weight')
         hospital = clean_data.get('hospital')
         date_of_birth = clean_data.get('date_of_birth')
+
         if date_of_birth:
             today = datetime.datetime.now().date()
             if today < date_of_birth:
