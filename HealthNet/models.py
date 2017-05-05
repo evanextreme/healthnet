@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.core.files.storage import FileSystemStorage
-from phonenumber_field.modelfields import PhoneNumberField
+from localflavor.us.models import PhoneNumberField
 
 class Hospital(models.Model):
     hospitals = models.Manager()
