@@ -115,18 +115,57 @@
 
         <form action='.' method='post' enctype="multipart/form-data">
             <div id="apt-div">
-              {% if error == 'True' %}
+              {% if error != '' %}
               <div class="modal-content">
                 <h4>New Appointment{% if permissions == 'doctor' %}/Test{% endif %}</h4>
                 {% if permissions == 'patient' %}<h5> with {{user.patient.doctor}} at {{user.patient.hospital}}</h5>{% endif %}
                     {% csrf_token %}
                     {% form form=cal_form %}{% endform %}
               </div>
-              <div class="modal-footer">
-                  <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
-                  <button class="modal-action modal-close waves-effect waves-light btn red" onclick="Materialize.toast('Appointment confirmed!',4000);" type="submit" name="Create">Create</button>
-              </div>
               {% endif %}
+              <div class="modal-footer">
+                  {% if error == 'new_appointment' %}
+                      <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
+                      <button class="modal-action modal-close waves-effect waves-light btn red" onclick="Materialize.toast('Appointment confirmed!',4000);" type="submit" name="Create">Create</button>
+                  {% elif error == 'update_appointment' %}
+                      {% if confirmed == 'True' and permissions == 'patient'%}
+                      <a class="left btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('Sorry, but this appointment has already been confirmed! Please contact your hospital or doctor to reschedule.',12000);">
+                        <i class="material-icons left">delete</i>Delete
+                      </a>
+                      {% elif permissions == 'doctor' or permissions == 'patient'%}
+                      <button class="left waves-effect waves-red btn-flat" type="submit" name="Delete">
+                        <i class="material-icons left">delete</i>Delete
+                      </button>
+                      {% endif %}
+                      <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
+                      {% if confirmed == 'False' and permissions == 'doctor' or confirmed == 'False' and permissions == 'nurse'%}
+                      <button class="modal-action modal-close waves-effect waves-light btn red" type="submit" name="Update">Confirm</button>
+                      {% elif confirmed == 'False' and permissions == 'patient' or confirmed == 'True' and permissions == 'doctor' or confirmed == 'True' and permissions == 'nurse' %}
+                      <button class="modal-action modal-close waves-effect waves-red btn-flat" type="submit" name="Update">Update</button>
+                      {% elif confirmed == 'True' and permissions == 'patient'%}
+                      <a class="btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('Sorry, but this appointment has already been confirmed! Please contact your hospital or doctor to reschedule.',12000);">Update</a>
+                      {% endif %}
+                      {% if released == False and permissions == 'doctor' %}
+                      <button class="modal-action modal-close waves-effect waves-light btn red" type="submit" name="Release">
+                        Release
+                      </button>
+                      {% elif released == True and permissions == 'doctor' %}
+                      <a class="btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('The results of this appointment/test have already been released',12000);">
+                        Release
+                      </a>
+                      {% endif %}
+                  {% elif error == 'new_prescription' %}
+                      <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
+                      <button class="modal-action modal-close waves-effect waves-light btn green" name="create_prescription" value="{{ prescription.prescription_id }}">Create<i class="material-icons right">system_update_alt</i></button>
+                  {% elif error == 'update_prescription' %}
+                      <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
+                      <button class="modal-action modal-close waves-effect waves-light btn green" name="update_prescription" value="{{ prescription.prescription_id }}">Update<i class="material-icons right">system_update_alt</i></button>
+                  {% elif error == 'update_patient' %}
+                      <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
+                      <button class="modal-action modal-close waves-effect waves-light btn blue" name="update_patient" value="{{ patient.patient_id }}">Update<i class="material-icons right">system_update_alt</i></button>
+                  {% endif %}
+              </div>
+
             </div>
         </form>
       </div>
@@ -154,7 +193,26 @@
       {% endif %}
 
   </body>
-    <footer>
+    <footer class="page-footer">
+         <div class="footer-copyright">
+           <div class="container">
+           <a class="grey-text text-lighten-4 left">© 2017 SE Team 4, proudly running on 🐳</a>
+           <a class="grey-text text-lighten-4 right" href="http://www.github.com/evanextreme/healthnet">GitHub</a>
+           </div>
+         </div>
+         <script type="text/javascript">
+
+         document.addEventListener("DOMContentLoaded", function(){
+         var auto_open = '{{error}}'
+         var toast_msg = '{{notification}}'
+         if (auto_open != ''){
+             $('#apt-modal').modal('open');
+         }
+         if (toast_msg != null){
+            Materialize.toast(toast_msg, 8000)
+         }
+         });
+         </script>
       <script type="text/javascript" src="/static/js/materialize.min.js"></script>
       <script src="/static/js/healthnet.js"></script>
     </footer>

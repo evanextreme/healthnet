@@ -6,9 +6,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
-COPY ./trunk/requirements.txt ./
+COPY ./requirements.txt ./
 RUN pip install -r requirements.txt
-ADD ./trunk ./
+ADD . .
 RUN python manage.py makemigrations 
 RUN python manage.py migrate --run-syncdb
 COPY . .
@@ -16,3 +16,4 @@ COPY . .
 EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 RUN python manage.py initadmin
+RUN python manage.py runtests

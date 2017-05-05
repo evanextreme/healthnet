@@ -14,7 +14,7 @@ def initialize_database():
     print_status('STATUS',str('Initializing test objects'))
     try:
         try:
-            patient_user = User.objects.create_user(username='test_patient', email='username@example.com', first_name="Patient",last_name="Test", password='qwertyuiop')
+            patient_user = User.objects.create_user(username='spidey', email='username@example.com', first_name="Peter",last_name="Parker", password='qwertyuiop')
             print_status('GOOD',str('Patient user created.'))
             patient_user.save()
         except Exception as error:
@@ -22,7 +22,7 @@ def initialize_database():
             patient_user = User.objects.get(username='test_patient')
 
         try:
-            nurse_user = User.objects.create_user(username='test_nurse', email='username@example.com', first_name="Nurse",last_name="Test", password='qwertyuiop')
+            nurse_user = User.objects.create_user(username='mj', email='username@example.com', first_name="Mary",last_name="Jane", password='qwertyuiop')
             print_status('GOOD',str('Nurse user created.'))
             nurse_user.save()
         except Exception as error:
@@ -30,7 +30,7 @@ def initialize_database():
             nurse_user = User.objects.get(username='test_nurse')
 
         try:
-            doctor_user = User.objects.create_user(username='test_doctor', email='username@example.com', first_name="Doctor",last_name="Test", password='qwertyuiop')
+            doctor_user = User.objects.create_user(username='dococ', email='username@example.com', first_name="Otto",last_name="Octavius", password='qwertyuiop')
             print_status('GOOD',str('Doctor user created.'))
             doctor_user.save()
         except Exception as error:
@@ -92,8 +92,8 @@ def email_test():
     except EOFError as error:
         print_status('STATUS',str("""Meh, well you're probably in a docker container so we'll forgive you <3"""))
         TEST_EMAIL = ''
-    patient = User.objects.get(username='test_patient').patient
-    doctor = User.objects.get(username='test_doctor').doctor
+    patient = User.objects.get(username='spidey').patient
+    doctor = User.objects.get(username='dococ').doctor
     patient.user.email = TEST_EMAIL
     patient.user.save()
     doctor.user.email = TEST_EMAIL
@@ -129,11 +129,11 @@ def delete_test_objects():
         print_status('DATA',str("""Deleting hospital '{}'""").format(hospital.name))
         hospital.delete()
 
-    User.objects.get(username='test_patient').delete()
+    User.objects.get(username='spidey').delete()
     print_status('GOOD',str('Patient user deleted'))
-    User.objects.get(username='test_nurse').delete()
+    User.objects.get(username='mj').delete()
     print_status('GOOD',str('Nurse user deleted'))
-    User.objects.get(username='test_doctor').delete()
+    User.objects.get(username='dococ').delete()
     print_status('GOOD',str('Doctor user deleted'))
 
 def settings_warn():
