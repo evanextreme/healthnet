@@ -10,3 +10,4 @@ Pillow
 reportlab
 git+git://github.com/Kozea/WeasyPrint
 django-localflavor
+django-input-mask

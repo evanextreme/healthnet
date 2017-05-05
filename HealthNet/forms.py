@@ -110,4 +110,4 @@ class EmployeeUpdatePatientForm(forms.ModelForm):
     weight.label = 'Weight (Pounds)'
     class Meta:
         model = Patient
-        fields = ['height', 'weight','hospital','patient_id']
+        fields = ['height', 'weight','hospital','doctor_notes','patient_id']
