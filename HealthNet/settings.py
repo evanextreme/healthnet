@@ -24,7 +24,7 @@ SECRET_KEY = '7l727j%%d%wyi7-jfhrf#7&b+()j0!#k@d#xgioe$!!f^^=-qi'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','server.ehirsh.com']
+ALLOWED_HOSTS = ['localhost','server.ehirsh.com','127.0.0.1']
 
 SITE_ID = 1
 # Application definition

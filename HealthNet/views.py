@@ -253,7 +253,6 @@ def home(request):
 
     else:
         variables['cal_form'] = CalendarEventForm()
-        print(str(variables))
         return render_to_response('index.html',variables)
 
 def confirmed_appointments(user):

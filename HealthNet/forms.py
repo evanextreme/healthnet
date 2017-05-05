@@ -37,6 +37,7 @@ class PatientForm(forms.ModelForm):
     weight.label = 'Weight (Pounds)'
     profile_picture = forms.ImageField(label="Upload a photo of yourself!", required=False)
     phone_number = USPhoneNumberField()
+    phone_number.label = 'Phone Number (Format: 123-456-7890)'
     class Meta:
         model = Patient
         fields = ['date_of_birth', 'phone_number', 'height', 'weight', 'doctor', 'hospital', 'profile_picture']
@@ -88,7 +89,6 @@ class UpdateUserForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(required=False)
     last_name = forms.CharField(required=False)
-
     class Meta:
         model = User
         fields = ['email','first_name','last_name']
