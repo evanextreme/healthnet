@@ -18,7 +18,7 @@ def initialize_database():
             patient_user.save()
         except Exception as error:
             print_status('FAIL',str('Patient user initialization failed! Attempting to grab existing from DB'))
-            patient_user = User.objects.get(username='test_patient')
+            patient_user = User.objects.get(username='spidey')
 
         try:
             nurse_user = User.objects.create_user(username='mj', email='username@example.com', first_name="Mary",last_name="Jane", password='qwertyuiop')
@@ -26,14 +26,14 @@ def initialize_database():
             nurse_user.save()
         except Exception as error:
             print_status('FAIL',str('Nurse user initialization failed!'))
-            nurse_user = User.objects.get(username='test_nurse')
+            nurse_user = User.objects.get(username='mj')
 
         try:
             doctor_user = User.objects.create_user(username='dococ', email='username@example.com', first_name="Otto",last_name="Octavius", password='qwertyuiop')
             print_status('GOOD',str('Doctor user created.'))
             doctor_user.save()
         except Exception as error:
-            doctor_user = User.objects.get(username='test_patient')
+            doctor_user = User.objects.get(username='dococ')
             print_status('FAIL',str('Doctor user initialization failed!'))
 
         try:
