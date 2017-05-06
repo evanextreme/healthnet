@@ -76,7 +76,10 @@
 #pat-actions {
     border-bottom: 1px solid #ddd;
 }
-
+.page-footer {
+  position: relative;
+  bottom: 0;
+}
 .really-dumb-badge-height{
   height: 50%;
 }
