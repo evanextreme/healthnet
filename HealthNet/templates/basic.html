@@ -174,11 +174,8 @@
         {% if permissions == 'doctor' %}
          <a id="menu" class="btn-floating btn-large red">
          <i class="large material-icons">mode_edit</i>
-         {% elif permissions == 'patient' %}
-             <a id="menu" class="btn-floating btn-large red tooltipped" data-position="left" data-delay="50" data-tooltip="Schedule an Appointment" onclick="newAppointment()">
-        {% elif permissions == 'nurse' %}
-        <a id="menu" class="btn-floating btn-large red" onclick="newAppointment()">
-
+         {% else %}
+          <a id="menu" class="btn-floating btn-large red tooltipped" data-position="left" data-delay="50" data-tooltip="Schedule an Appointment" onclick="newAppointment()">
         {% endif %}
         <i class="large material-icons">library_add</i>
        </a>
@@ -201,7 +198,7 @@
          <div class="footer-copyright">
            <div class="container">
            <a class="grey-text text-lighten-4 left">© 2017 SE Team 4, proudly running on 🐳</a>
-           <a class="grey-text text-lighten-4 right" href="http://www.github.com/evanextreme/healthnet">GitHub</a>
+           <!--<a class="grey-text text-lighten-4 right" href="http://www.github.com/evanextreme/healthnet">GitHub</a>-->
            </div>
          </div>
          <script type="text/javascript">

@@ -20,7 +20,9 @@ from HealthNet.email import *
 from io import BytesIO
 from reportlab.pdfgen import canvas
 from django.contrib.auth import authenticate
-from weasyprint import HTML
+from itertools import chain
+
+#from weasyprint import HTML
 
 
 
@@ -46,7 +48,7 @@ def home(request):
         user.patient.new_user = False
         user.patient.save()
     elif permissions == 'nurse':
-        patients = user.nurse.hospital.patient_set.all()
+        patients = get_nurse_patients(user.nurse)
         appointments = user.nurse.hospital.calendarevent_set.all()
         user.nurse.new_user = False
         user.nurse.save()
@@ -182,7 +184,7 @@ def home(request):
             appointment.delete()
             event=log(user=user,action="deleted_apt",notes={})
             event.save()
-            variables['notification'] = str('Appointment successfully deleted')
+            variables['notification'] = str('Appointment successfully deleted, email sent')
             return render_to_response('index.html', variables)
 
         elif 'Release' in request.POST:
@@ -193,19 +195,20 @@ def home(request):
             results_released_email(appointment.patient, appointment.doctor, appointment)
             event=log(user=user,action="released_apt",notes={})
             event.save()
-            variables['notification'] = str('Appointment successfully released')
+            variables['notification'] = str('Appointment successfully released, email sent')
             return render_to_response('index.html', variables)
 
         elif 'create_prescription' in request.POST:
             form = PrescriptionForm(request.POST)
             if form.is_valid():
-                form.save()
+                prescription = form.save()
                 event=log(user=user,action="new_prescription",notes={})
                 if user.doctor:
                     patients = user.doctor.patient_set.all()
                 elif user.nurse:
                     patients = user.nurse.patient_set.all()
-                variables['notification'] = str('Prescription successfully created')
+                prescription_created_email(patient,doctor,prescription)
+                variables['notification'] = str('Prescription successfully created, email sent')
                 return render_to_response('index.html', variables)
 
         elif 'admit_patient' in request.POST:
@@ -425,6 +428,9 @@ def new_prescription(request):
     user = request.user
     permissions = get_permissions(user)
     form = PrescriptionForm()
+    if permissions == 'doctor':
+        form.fields['patient'].queryset = user.doctor.patient_set.all()
+
     return render_to_response('prescriptions/new.html', {'user':user, 'prescriptionform':form, 'permissions':permissions}, RequestContext(request))
 
 @csrf_exempt
@@ -513,6 +519,7 @@ def new_appt(request):
             cal_form.fields['hospital'].widget = forms.HiddenInput()
             cal_form.fields['type'].widget = forms.HiddenInput()
             cal_form.fields['attachments'].widget = forms.HiddenInput()
+            cal_form.fields['patient'].queryset = get_nurse_patients(user.nurse)
         elif permissions == 'patient':
             cal_form = CalendarEventForm(initial={'patient': user.patient,
                                                   'doctor': user.patient.doctor,
@@ -590,6 +597,13 @@ def get_card(request):
         patient = Patient.patients.get(patient_id=post_id)
         variables = {'user':patient.user}
         return(render_to_response('card/patientplus.html',variables))
+
+def get_nurse_patients(nurse):
+    doctors = nurse.hospital.doctor_set.all()
+    nurse_patients = Patient.patients.none()
+    for doctor in doctors:
+        nurse_patients = nurse_patients | doctor.patient_set.all()
+    return nurse_patients
 
 OPTIONS = """{  timeFormat: "H:mm",
 
