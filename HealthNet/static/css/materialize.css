@@ -2862,7 +2862,11 @@ ul.staggered-list li {
 }
 
 .page-footer {
-  padding-top: 20px;
+  position:absolute;
+  right:0;
+  bottom:0;
+  left:0;
+  padding-top:20px;
   background-color: #ee6e73;
 }
 
