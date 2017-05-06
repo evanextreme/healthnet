@@ -3,7 +3,7 @@
 
 
 {% block body %}
-
+<br>
 <div class="container col s4">
 <form method="post" action=".">
     {% form form=form %}
@@ -17,7 +17,8 @@
 </div>
 
 {% endblock %}
-<footer>
-  <script type="text/javascript" src="/static/js/materialize.min.js"></script>
-  <script src="/static/js/healthnet.js"></script>
-</footer>
+
+{% block thefooter %}
+<script type="text/javascript" src="/static/js/materialize.min.js"></script>
+<script src="/static/js/healthnet.js"></script>
+{% endblock %}

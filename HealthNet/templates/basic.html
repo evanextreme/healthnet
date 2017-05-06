@@ -193,7 +193,11 @@
       {% endif %}
 
   </body>
+
+    {% block thefooter %}
+    <br>
     <footer class="page-footer">
+
          <div class="footer-copyright">
            <div class="container">
            <a class="grey-text text-lighten-4 left">© 2017 SE Team 4, proudly running on 🐳</a>
@@ -216,4 +220,5 @@
       <script type="text/javascript" src="/static/js/materialize.min.js"></script>
       <script src="/static/js/healthnet.js"></script>
     </footer>
+    {% endblock %}
 </html>
