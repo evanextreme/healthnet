@@ -46,4 +46,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^admin/doctor', views.doc_register_page,name='doc_register_page'),
     url(r'^accounts/', include('registration.backends.hmac.urls')),
+    url(r'^chaining/', include('smart_selects.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

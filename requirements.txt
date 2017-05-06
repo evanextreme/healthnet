@@ -1,5 +1,4 @@
 Django==1.10.5
-eventlog
 django-registration
 django-datetime-widget
 django-materialize-css
@@ -11,3 +10,4 @@ reportlab
 git+git://github.com/Kozea/WeasyPrint
 django-localflavor
 django-input-mask
+django-smart-selects

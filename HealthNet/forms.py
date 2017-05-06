@@ -63,16 +63,14 @@ class PatientForm(forms.ModelForm):
                 self.add_error('weight', forms.ValidationError(message))
         if doctor and hospital:
             if not hospital in doctor.hospital.all():
-                message = str(doctor) + 'only works at: '
-                i = 0
+                message = str(doctor) + ' only works at: '
+                num_of_hospitals = doctor.hospital.all().count()
                 for h in doctor.hospital.all():
-                    i+=1
-                for h in doctor.hospital.all():
-                    i-=1
-                    if i == 0:
-                        message += str(h) + " "
+                    if num_of_hospitals == 1:
+                        message += str(h) + "."
                     else:
                         message += str(h) + ", "
+                    num_of_hospitals -= 1
                 self.add_error('doctor', forms.ValidationError(message))
 
 class DoctorForm(forms.ModelForm):
