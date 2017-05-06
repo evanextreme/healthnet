@@ -8,13 +8,17 @@ import jsonfield
 from .signals import event_logged
 
 class Log(models.Model):
+    #the username of the user who acts
     user = models.ForeignKey(
         getattr(settings, "AUTH_USER_MODEL", "auth.User"),
         null=True,
         on_delete=models.SET_NULL
     )
+    #the time of the action
     timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+    #the abbreviation of the action
     action = models.CharField(max_length=50, db_index=True)
+    #addtional notes
     notes = jsonfield.JSONField()
 
     @property

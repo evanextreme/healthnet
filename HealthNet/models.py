@@ -57,6 +57,10 @@ class Doctor(models.Model):
         return str("Dr. " + self.user.first_name + " " + self.user.last_name)
 
     # Returns the doctor as a user object, for rendering him into a 'card' template
+    def self_card(self):
+        variables = {'user':self.user}
+        return(render_to_string('card/doctor_self.html',variables))
+
     def card(self):
         variables = {'user':self.user}
         return(render_to_string('card/doctor.html',variables))
@@ -86,6 +90,10 @@ class Patient(models.Model):
     # Example "Peter Parker"
     def __str__(self):
         return str(self.user.first_name + ' ' + self.user.last_name)
+
+    def self_card(self):
+        variables = {'user':self.user}
+        return(render_to_string('card/patient_self.html',variables))
 
     def card(self):
         variables = {'user':self.user}
