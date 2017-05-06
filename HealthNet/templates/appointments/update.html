@@ -3,9 +3,17 @@
 
   <!-- Dropdown Structure -->
 <div class="modal-content">
-    <h4>Update Appointment{% if permissions == 'doctor'%}/Test{% endif %}</h4>
-
-
+    <h4>
+      {% if confirmed == 'True' and permissions == 'patient' %}View
+      {% else %}Update{% endif %}
+       Appointment{% if permissions == 'doctor'%}/Test{% endif %}</h4>
+    {% if permissions == 'patient' %}
+    <h5>with {{user.patient.doctor}} at {{appointment.hospital}}</h5>
+    {% elif permissions == 'doctor' %}
+    <h5>with {{appointment.patient}} {% if hospitalnumber == 1 %}at {{appointment.hospital}}{% endif %}</h5>
+    {% elif permissions == 'nurse' %}
+    <h5>between {{appointment.doctor}} and {{appointment.patient}} at {{appointment.hospital}}</h5>
+    {% endif %}
 
         {% csrf_token %}
         {% form form=cal_form %}
