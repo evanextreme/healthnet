@@ -151,14 +151,7 @@
 <script type="text/javascript">
 
 document.addEventListener("DOMContentLoaded", function(){
-var auto_open = '{{error}}'
-var toast_msg = '{{notification}}'
-if (auto_open == 'True'){
-    $('#apt-modal').modal('open');
-}
-if (toast_msg != null){
-   Materialize.toast(toast_msg, 8000)
-}
+
 $('.tap-target').tapTarget('{{opentap}}').delay(2000);
 
 });

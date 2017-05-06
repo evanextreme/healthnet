@@ -150,7 +150,7 @@ def home(request):
                     cal_form.fields['attachments'].widget = forms.HiddenInput()
 
                 variables['cal_form'] = cal_form
-                variables['error'] = 'True'
+                variables['error'] = 'new_appointment'
                 return render_to_response("index.html",variables)
         elif 'Update' in request.POST:
             post_id = request.POST['appointment_id']
@@ -173,10 +173,25 @@ def home(request):
                 event=log(user=user,action="update_apt",notes={})
                 event.save()
                 variables['notification'] = str('Appointment successfully updated')
-                return HttpResponseRedirect('/')
+                return render_to_response('index.html', variables)
             else:
-                print(str(cal_form.errors))
+                if permissions == 'doctor':
+                    cal_form.fields['doctor'].widget = forms.HiddenInput()
+                elif permissions == 'nurse':
+                    cal_form.fields['doctor'].widget = forms.HiddenInput()
+                    cal_form.fields['hospital'].widget = forms.HiddenInput()
+                    cal_form.fields['type'].widget = forms.HiddenInput()
+                    cal_form.fields['attachments'].widget = forms.HiddenInput()
+                elif permissions == 'patient':
+                    cal_form.fields['patient'].widget = forms.HiddenInput()
+                    cal_form.fields['doctor'].widget = forms.HiddenInput()
+                    cal_form.fields['hospital'].widget = forms.HiddenInput()
+                    cal_form.fields['type'].widget = forms.HiddenInput()
+                    cal_form.fields['attachments'].widget = forms.HiddenInput()
 
+                variables['cal_form'] = cal_form
+                variables['error'] = 'update_appointment'
+                return render_to_response("index.html",variables)
         elif 'Delete' in request.POST:
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
@@ -210,6 +225,10 @@ def home(request):
                 prescription_created_email(patient,doctor,prescription)
                 variables['notification'] = str('Prescription successfully created, email sent')
                 return render_to_response('index.html', variables)
+            else:
+                variables['cal_form'] = form
+                variables['error'] = 'create_prescription'
+                return render_to_response("index.html",variables)
 
         elif 'admit_patient' in request.POST:
             post_id = request.POST['admit_patient']
@@ -232,6 +251,7 @@ def home(request):
 
             return render_to_response('index.html',variables)
         elif 'update_patient' in request.POST:
+
             post_id = request.POST['patient_id']
             patient = Patient.patients.get(patient_id=post_id)
             patient.save()
@@ -249,9 +269,12 @@ def home(request):
                 prescriptionform.save()
                 event = log(user=user, action = "employee_edit_prescription",notes={})
                 event.save()
-            variables['cal_form'] = CalendarEventForm()
-            variables['notification'] = str('Prescription successfully updated')
-            return render_to_response('index.html',variables)
+                variables['notification'] = str('Prescription successfully updated')
+                return render_to_response('index.html',variables)
+            else:
+                variables['cal_form'] = prescriptionform
+                variables['error'] = 'update_prescription'
+                return render_to_response("index.html",variables)
 
         elif 'refill_prescription' in request.POST:
             post_id = request.POST['refill_prescription']
@@ -272,7 +295,6 @@ def home(request):
 
     else:
         variables['cal_form'] = CalendarEventForm()
-        print(str(variables))
         return render_to_response('index.html',variables)
 
 def confirmed_appointments(user):
@@ -384,7 +406,7 @@ def update_patient(request):
     if request.method == 'POST':
         post_id = request.POST['patient_id']
         patient = Patient.patients.get(patient_id=post_id)
-        patientform = EmployeeUpdatePatientForm(request.POST, instance = patient)
+        patientform = EmployeeUpdatePatientForm(instance = patient)
         return render_to_response('patients/update.html', {'user':user,'patientform':patientform,'permissions':permissions},RequestContext(request))
 
 @csrf_exempt
