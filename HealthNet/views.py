@@ -254,12 +254,19 @@ def home(request):
             return render_to_response('index.html',variables)
 
         elif 'refill_prescription' in request.POST:
-            print("Butts")
             post_id = request.POST['refill_prescription']
             prescription = Prescription.prescriptions.get(prescription_id = post_id)
             prescription.refill()
             prescription.save()
             event = log(user=user, action = "patient_refill_prescription",notes={})
+            event.save()
+            return render_to_response('index.html', variables)
+
+        elif 'remove_prescription' in request.POST:
+            post_id = request.POST['remove_prescription']
+            prescription = Prescription.prescriptions.get(prescription_id = post_id)
+            prescription.delete()
+            event = log(user=user, action = "patient_remove_prescription",notes={})
             event.save()
             return render_to_response('index.html', variables)
 
