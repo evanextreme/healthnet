@@ -2,12 +2,11 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from Calendar.models import *
 from .models import *
-from .email import appointment_confirmation_email
+from .email import EmailThread
 from .console import print_status
 from django.core.mail import send_mail
 from .console import print_status
 from .settings import EMAIL_HOST_USER, DEBUG
-
 
 
 def initialize_database():
@@ -105,14 +104,7 @@ def email_test():
         message = """Hi {}! We're letting you know that your appointment with Doctor {} has been confirmed. Here are the details: \n
 The appointment '{}' is scheduled for {}, at your hospital, {}. If you would like to reschedule, please contact your doctor, at {}. Do NOT reply to this email. Thank you, and have a good day!
 """.format(patient.user.first_name, doctor.user.last_name, appointment.title, appointment.start, patient.hospital, doctor.user.email)
-
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=EMAIL_HOST_USER,
-            recipient_list=[str(patient.user.email),str(doctor.user.email)],
-            fail_silently=False,
-        )
+        EmailThread(subject=subject, message=message, recipient_list=[str(patient.user.email),str(doctor.user.email)]).start()
         print_status('GOOD',str("""Appointment confirmation email to Patient '{} {}' and Doctor '{} {}' about appointment '{}' sent!""".format(patient.user.first_name,patient.user.last_name,doctor.user.first_name,doctor.user.last_name,appointment.title)))
     except Exception as error:
         print_status('WARN',str('Appointment confirmation email to Patient {} {} and Doctor {} {} failed! This is likely because your SMTP settings are incorrect, the email entered as a test recipient was incorrect, of you are using Docker and Evan did not fix the container. If it is the first problem, email functionality will not work without proper settings set in HealthNet/settings.py'.format(patient.user.first_name,patient.user.last_name,doctor.user.first_name,doctor.user.last_name)))
@@ -120,11 +112,12 @@ The appointment '{}' is scheduled for {}, at your hospital, {}. If you would lik
 
 def delete_test_objects():
     print_status('STATUS',str('Cleanup of database artifacts starting!'))
-    appointments = User.objects.get(username='test_doctor').doctor.calendarevent_set.all()
+    appointments = User.objects.get(username='dococ').doctor.calendarevent_set.all()
+    hospitals = User.objects.get(username='dococ').doctor.hospital.all()
     for appointment in appointments:
         print_status('DATA',str("""Deleting Appointment ID '{}'""").format(appointment.appointment_id))
         appointment.delete()
-    hospitals = User.objects.get(username='test_doctor').doctor.hospital.all()
+
     for hospital in hospitals:
         print_status('DATA',str("""Deleting hospital '{}'""").format(hospital.name))
         hospital.delete()
