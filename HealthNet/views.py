@@ -562,6 +562,7 @@ def new_appt(request):
             else:
                 cal_form = CalendarEventForm(initial={'doctor': user.doctor})
             cal_form.fields['doctor'].widget = forms.HiddenInput()
+            cal_form.fields['patient'].queryset = user.doctor.patient_set.all()
         elif permissions == 'nurse':
             cal_form = CalendarEventForm(initial={'hospital': user.nurse.hospital})
             cal_form.fields['doctor'].widget = forms.HiddenInput()
