@@ -24,10 +24,10 @@ class CalendarEventForm(forms.ModelForm):
         if start and end:
             today = datetime.now(timezone.utc)
             if start < today:
-                message = "You can't choose a start time before today!"
+                message = "Must make an appointment at least one day in advance!"
                 self.add_error('start', forms.ValidationError(message))
             if end < today:
-                message = "You can't choose a end time before today!"
+                message = "Must make an appointment at least one day in advance!"
                 self.add_error('end', forms.ValidationError(message))
             if end < start:
                 message = " You can't choose a end time before the start!"
