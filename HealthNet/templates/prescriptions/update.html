@@ -1,0 +1,24 @@
+{% load staticfiles %}
+{% load material_form %}
+
+<!DOCTYPE html>
+<div class="modal-content">
+  <h4>Update Prescription</h4>
+      {% csrf_token %}
+      {% form form=prescriptionform %}
+      {% endform %}
+</div>
+<div class="modal-footer">
+    <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
+    <button class="modal-action modal-close waves-effect waves-light btn green" name="update_prescription" value="{{ prescription.prescription_id }}">Update<i class="material-icons right">system_update_alt</i></button>
+</div>
+
+<script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
+<script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
+{% include 'material/includes/material_css.html' %}
+{% include 'material/includes/material_js.html' %}
+
+<script type="text/javascript"> $(document).ready(function(){
+    $('.modal').modal();
+    })
+</script>
