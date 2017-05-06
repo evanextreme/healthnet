@@ -213,7 +213,7 @@ def home(request):
             appointment.released = True
             appointment.save()
             results_released_email(appointment.patient, appointment.doctor, appointment)
-            event=log(user=user,action="released_apt",notes={})
+            event=log(user=user,action="released_attachments",notes={})
             event.save()
             variables['notification'] = str('Appointment successfully released, email sent')
             return render_to_response('index.html', variables)
