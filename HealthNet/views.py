@@ -20,7 +20,7 @@ from HealthNet.email import *
 from io import BytesIO
 from reportlab.pdfgen import canvas
 from django.contrib.auth import authenticate
-#from weasyprint import HTML
+from weasyprint import HTML
 
 
 
@@ -36,8 +36,6 @@ def home(request):
     appointments = ''
     notification = ''
     error = ''
-    hospitalnumber = ''
-    justone = ''
 
     if (permissions == 'patient' and user.patient.new_user) or (permissions == 'nurse' and user.nurse.new_user) or (permissions == 'doctor' and user.doctor.new_user):
         opentap = 'open'
@@ -57,10 +55,6 @@ def home(request):
         unconfirmed = confirmed_appointments(user)
         appointments = user.doctor.calendarevent_set.all()
         patients = user.doctor.patient_set.all()
-        hospitalnumber = user.doctor.hospital.all().count()
-        if hospitalnumber == 1:
-            for h in user.doctor.hospital.all():
-                justone = h
         user.doctor.new_user = False
         user.doctor.save()
 
@@ -85,13 +79,13 @@ def home(request):
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
             elif permissions == 'nurse':
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
-                #cal_form.fields['hospital'].widget = forms.HiddenInput()
+                cal_form.fields['hospital'].widget = forms.HiddenInput()
                 cal_form.fields['type'].widget = forms.HiddenInput()
                 cal_form.fields['attachments'].widget = forms.HiddenInput()
             elif permissions == 'patient':
                 cal_form.fields['patient'].widget = forms.HiddenInput()
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
-                #Scal_form.fields['hospital'].widget = forms.HiddenInput()
+                cal_form.fields['hospital'].widget = forms.HiddenInput()
                 cal_form.fields['type'].widget = forms.HiddenInput()
                 cal_form.fields['attachments'].widget = forms.HiddenInput()
             if permissions == 'patient' and appointment.confirmed:
@@ -100,8 +94,6 @@ def home(request):
                 cal_form.fields['end'].widget.attrs['disabled'] = True
                 cal_form.fields['all_day'].widget.attrs['disabled'] = True
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
-            if permissions != 'doctor' or hospitalnumber == 1:
-                cal_form.fields['hospital'].widget = forms.HiddenInput()
             variables['released'] = appointment.released
             variables['cal_form'] = cal_form
             variables['confirmed'] = confirmed
@@ -118,11 +110,7 @@ def home(request):
 
             if permissions == 'doctor':
                 cal_form.doctor = user.doctor
-                if hospitalnumber == 1:
-                    cal_form.hospital = justone
 
-            if permissions == 'nurse':
-                cal_form.hospital = user.nurse.hospital
 
             elif permissions == 'patient':
                 cal_form.patient = user.patient
@@ -149,20 +137,18 @@ def home(request):
                     cal_form.fields['doctor'].widget = forms.HiddenInput()
                 elif permissions == 'nurse':
                     cal_form.fields['doctor'].widget = forms.HiddenInput()
-                    #cal_form.fields['hospital'].widget = forms.HiddenInput()
+                    cal_form.fields['hospital'].widget = forms.HiddenInput()
                     cal_form.fields['type'].widget = forms.HiddenInput()
                     cal_form.fields['attachments'].widget = forms.HiddenInput()
                 elif permissions == 'patient':
                     cal_form.fields['patient'].widget = forms.HiddenInput()
                     cal_form.fields['doctor'].widget = forms.HiddenInput()
-                    #cal_form.fields['hospital'].widget = forms.HiddenInput()
+                    cal_form.fields['hospital'].widget = forms.HiddenInput()
                     cal_form.fields['type'].widget = forms.HiddenInput()
                     cal_form.fields['attachments'].widget = forms.HiddenInput()
-                if permissions != 'doctor' or hospitalnumber == 1:
-                    cal_form.fields['hospital'].widget = forms.HiddenInput()
 
                 variables['cal_form'] = cal_form
-                variables['error'] = 'new_appointment'
+                variables['error'] = 'True'
                 return render_to_response("index.html",variables)
         elif 'Update' in request.POST:
             post_id = request.POST['appointment_id']
@@ -184,36 +170,10 @@ def home(request):
                     unconfirmed = confirmed_appointments(user)
                 event=log(user=user,action="update_apt",notes={})
                 event.save()
-                variables['unconfirmed'] = unconfirmed
                 variables['notification'] = str('Appointment successfully updated')
-                return render_to_response("index.html",variables)
+                return HttpResponseRedirect('/')
             else:
-                if permissions == 'doctor':
-                    cal_form.fields['doctor'].widget = forms.HiddenInput()
-                elif permissions == 'nurse':
-                    cal_form.fields['doctor'].widget = forms.HiddenInput()
-                    #cal_form.fields['hospital'].widget = forms.HiddenInput()
-                    cal_form.fields['type'].widget = forms.HiddenInput()
-                    cal_form.fields['attachments'].widget = forms.HiddenInput()
-                elif permissions == 'patient':
-                    cal_form.fields['patient'].widget = forms.HiddenInput()
-                    cal_form.fields['doctor'].widget = forms.HiddenInput()
-                    #cal_form.fields['hospital'].widget = forms.HiddenInput()
-                    cal_form.fields['type'].widget = forms.HiddenInput()
-                    cal_form.fields['attachments'].widget = forms.HiddenInput()
-                if permissions != 'doctor' or hospitalnumber == 1:
-                    cal_form.fields['hospital'].widget = forms.HiddenInput()
-                if permissions == 'patient' and appointment.confirmed:
-                    cal_form.fields['title'].widget.attrs['disabled'] = True
-                    cal_form.fields['start'].widget.attrs['disabled'] = True
-                    cal_form.fields['end'].widget.attrs['disabled'] = True
-                    cal_form.fields['all_day'].widget.attrs['disabled'] = True
-                cal_form.fields['appointment_id'].widget = forms.HiddenInput()
-                variables['released'] = appointment.released
-                variables['cal_form'] = cal_form
-                variables['notification'] = str("""Uh oh! Looks like you didn't enter everything correctly. Fix any errors and try again""")
-                variables['error'] = 'update_appointment'
-                return render_to_response("index.html",variables)
+                print(str(cal_form.errors))
 
         elif 'Delete' in request.POST:
             post_id = request.POST['appointment_id']
@@ -247,11 +207,7 @@ def home(request):
                     patients = user.nurse.patient_set.all()
                 variables['notification'] = str('Prescription successfully created')
                 return render_to_response('index.html', variables)
-            else:
-                variables['cal_form'] = form
-                variables['notification'] = str("""Uh oh! Looks like you didn't enter everything correctly. Fix any errors and try again""")
-                variables['error'] = 'new_prescription'
-                return render_to_response("index.html",variables)
+
         elif 'admit_patient' in request.POST:
             post_id = request.POST['admit_patient']
             patient = Patient.patients.get(patient_id=post_id)
@@ -290,15 +246,23 @@ def home(request):
                 prescriptionform.save()
                 event = log(user=user, action = "employee_edit_prescription",notes={})
                 event.save()
-                variables['notification'] = str('Prescription successfully updated')
-                return render_to_response('index.html',variables)
-            else:
-                variables['cal_form'] = prescriptionform
-                variables['notification'] = str("""Uh oh! Looks like you didn't enter everything correctly. Fix any errors and try again""")
-                variables['error'] = 'update_prescription'
-                return render_to_response("index.html",variables)
+            variables['cal_form'] = CalendarEventForm()
+            variables['notification'] = str('Prescription successfully updated')
+            return render_to_response('index.html',variables)
+
+        elif 'refill_prescription' in request.POST:
+            print("Butts")
+            post_id = request.POST['refill_prescription']
+            prescription = Prescription.prescriptions.get(prescription_id = post_id)
+            prescription.refill()
+            prescription.save()
+            event = log(user=user, action = "patient_refill_prescription",notes={})
+            event.save()
+            return render_to_response('index.html', variables)
+
     else:
         variables['cal_form'] = CalendarEventForm()
+        print(str(variables))
         return render_to_response('index.html',variables)
 
 def confirmed_appointments(user):
@@ -410,7 +374,7 @@ def update_patient(request):
     if request.method == 'POST':
         post_id = request.POST['patient_id']
         patient = Patient.patients.get(patient_id=post_id)
-        patientform = EmployeeUpdatePatientForm(instance=patient)
+        patientform = EmployeeUpdatePatientForm(request.POST, instance = patient)
         return render_to_response('patients/update.html', {'user':user,'patientform':patientform,'permissions':permissions},RequestContext(request))
 
 @csrf_exempt
@@ -454,16 +418,6 @@ def edit_prescription(request):
             event.save()
             prescriptions = user.patient.prescription_set.all()
             return render_to_response('account/prescriptions.html', {'user':user, 'permissions':permissions,'prescriptions':prescriptions}, RequestContext(request))
-    if request.method == 'POST':
-        post_id = request.POST['prescription_id']
-        prescription = Prescription.prescriptions.get(prescription_id = post_id)
-        form = PrescriptionForm(instance=prescription)
-        form.fields['patient'].widget = forms.HiddenInput()
-        fields = ['patient', 'drug_name', 'dosage', 'side_effects', 'refills_remaining']
-        form.fields['drug_name'].widget = forms.HiddenInput()
-        form.fields['dosage'].widget = forms.HiddenInput()
-        form.fields['side_effects'].widget = forms.HiddenInput()
-        form.fields['refills_remaining'].widget.attrs['readonly'] = True
         return render_to_response('account/edit_prescription.html', {'user':user, 'prescriptionform':form,'prescription':prescription, 'permissions':permissions}, RequestContext(request))
 
 @csrf_exempt
@@ -506,6 +460,7 @@ def change_password(request):
             event.save()
             return HttpResponseRedirect('/')
     else:
+
         passform = PasswordChangeForm(user)
         variables = RequestContext(request, {'user':user,'password_form':passform,'permissions':permissions,'appointments':appointments,'unconfirmed':unconfirmed})
         return render_to_response('account/password.html', variables)
@@ -548,21 +503,10 @@ def patients(request):
 def new_appt(request):
     user = request.user
     permissions = get_permissions(user)
-    hospitalnumber = ''
-    justone = ''
     if request.method != 'POST':
         if permissions == 'doctor':
-            hospitalnumber = user.doctor.hospital.all().count()
-            if hospitalnumber == 1:
-                for h in user.doctor.hospital.all():
-                    justone = h
-                cal_form = CalendarEventForm(initial={'doctor': user.doctor,
-                                                      'hospital':justone})
-                cal_form.fields['hospital'].widget = forms.HiddenInput()
-            else:
-                cal_form = CalendarEventForm(initial={'doctor': user.doctor})
+            cal_form = CalendarEventForm(initial={'doctor': user.doctor})
             cal_form.fields['doctor'].widget = forms.HiddenInput()
-            cal_form.fields['patient'].queryset = user.doctor.patient_set.all()
         elif permissions == 'nurse':
             cal_form = CalendarEventForm(initial={'hospital': user.nurse.hospital})
             cal_form.fields['doctor'].widget = forms.HiddenInput()
@@ -580,7 +524,7 @@ def new_appt(request):
             cal_form.fields['attachments'].widget = forms.HiddenInput()
         else:
             cal_form = CalendarEventForm()
-        variables=RequestContext(request,{'user':user,'cal_form':cal_form,'permissions':permissions,'hospitalnumber':hospitalnumber,'justone':justone})
+        variables=RequestContext(request,{'user':user,'cal_form':cal_form,'permissions':permissions})
         return render_to_response("appointments/new.html",variables)
 
 def new_test(request):
@@ -603,8 +547,8 @@ def export_file(request):
     print(str(appointments))
     html_string = render_to_string('export/template.html', {'user': user,'permissions':permissions,'appointments':appointments})
 
-    #html = HTML(string=html_string)
-    #html.write_pdf(target='/tmp/myHealthExport.pdf');
+    html = HTML(string=html_string)
+    html.write_pdf(target='/tmp/myHealthExport.pdf');
 
     fs = FileSystemStorage('/tmp')
     with fs.open('myHealthExport.pdf') as pdf:
