@@ -18,15 +18,16 @@
 
           {% if prescriptions %}
 
-              <ul class="collection with-header">
-                  <li class="collection-header"><p>Prescriptions</p></li>
-                      {% for prescription in prescriptions %}
-                          <li class="collection-item">
-                              <div>
-                                  {{prescription}}
-
-                              </div>
-                          </li>
+              <ul class="collapsible" data-collapsible="accordion">
+                {% for prescription in prescriptions %}
+                  <li>
+                      <div class="collapsible-header">{{prescription}}</div>
+                      <div class="collapsible-body">
+                        <form action="." method='POST'>
+                          <button class="waves-effect waves-light btn red" type="submit" name="refill_prescription" value="{{prescription.prescription_id}}">Refill</button>
+                        </form>
+                      </div>
+                  </li>
                       {% endfor %}
               </ul>
 
@@ -102,27 +103,27 @@
   				<div class="col s12 m4">
   					<div class="icon-block">
   						<h2 class="center blue-text"><i class="mdi-hardware-desktop-windows"></i></h2>
-  						<h5 class="center">Fast and Interactive</h5>
+  						<h5 class="center">Fast and light</h5>
 
-  						<p class="light">myHealth is built using the latest in web and mobile technology. myHealth is a convenient and quick way to interact with your doctor, nurse, and hospital. </p>
+  						<p class="light">Tomorrow is built using the latest in web and mobile technology. Tomorrow looks and works the same on every device you own, from your phone to your desktop. Tomorrow is available wherever you are, to help you get whatever you need done.</p>
   					</div>
   				</div>
 
   				<div class="col s12 m4">
   					<div class="icon-block">
   						<h2 class="center blue-text"><i class="mdi-social-people"></i></h2>
-  						<h5 class="center">Schedule Appointments</h5>
+  						<h5 class="center">Built for humans</h5>
 
-  						<p class="light">Tired of having to play phone tag with your doctors office just to set up an appointment? myHealth allows you to schedule appointments with your doctor or nurse with the click of a button. </p>
+  						<p class="light">No one wants to use a planer that is deigned for robots. So why do we insist on doing so? Tomorrow elminates stress by only letting you plan tasks for Tomorrow. Soon Tomorrow will include automatic reminders throughout the day so that you don't need to plan your life around tasks, but so that you can plan tasks around your life.</p>
   					</div>
   				</div>
 
   				<div class="col s12 m4">
   					<div class="icon-block">
   						<h2 class="center blue-text"><i class="mdi-action-settings"></i></h2>
-  						<h5 class="center">View Test Results</h5>
+  						<h5 class="center">Productivity focused</h5>
 
-  						<p class="light">No longer do you have to go back to your doctor's office to view your test results or refill your prescriptions, myHealth makes it simple to do all of these.  You can export your test results in seconds with myHealth.</p>
+  						<p class="light">Tomorrow is designed to make sure you get everything that you need to do out of the way, so you can live your life. We have built the app to place your productivity first and foremost, and signifigantly increases productivity when used versus similar applications.</p>
   					</div>
   				</div>
   			</div>
@@ -149,7 +150,14 @@
 <script type="text/javascript">
 
 document.addEventListener("DOMContentLoaded", function(){
-
+var auto_open = '{{error}}'
+var toast_msg = '{{notification}}'
+if (auto_open == 'True'){
+    $('#apt-modal').modal('open');
+}
+if (toast_msg != null){
+   Materialize.toast(toast_msg, 8000)
+}
 $('.tap-target').tapTarget('{{opentap}}').delay(2000);
 
 });
