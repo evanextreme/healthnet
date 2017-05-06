@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'material',
     'multiupload',
     'PIL',
+    'smart_selects',
 ]
 
 

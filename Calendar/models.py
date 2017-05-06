@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from HealthNet.models import Doctor, Patient, Hospital
 from django.template.loader import render_to_string
+from smart_selects.db_fields import GroupedForeignKey
 
 class CalendarEvent(models.Model):
     """The event set a record for an
@@ -40,9 +41,11 @@ class CalendarEvent(models.Model):
     end = models.DateTimeField()
     all_day = models.BooleanField(('Unscheduled'), default=False)
     appointments = models.Manager()
-    doctor = models.ForeignKey(Doctor, default=None)
-    patient = models.ForeignKey(Patient, default=None)
+
     hospital = models.ForeignKey(Hospital, default=None)
+    doctor = models.ForeignKey(Doctor, default=None)
+    patient = GroupedForeignKey(Patient, "doctor")
+    
 
     confirmed = models.BooleanField(default=False)
     released = models.BooleanField(default=False)
