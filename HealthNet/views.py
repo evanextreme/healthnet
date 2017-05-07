@@ -241,7 +241,7 @@ def home(request):
                     patients = user.doctor.patient_set.all()
                 elif user.nurse:
                     patients = user.nurse.patient_set.all()
-                prescription_created_email(patient,doctor,prescription)
+                prescription_created_email(prescription.patient,user.doctor,prescription)
                 variables['notification'] = str('Prescription successfully created, email sent')
                 return render_to_response('index.html', variables)
             else:
@@ -527,6 +527,10 @@ def change_password(request):
             event=log(user=user,action="user_updatepassword",notes={})
             event.save()
             return HttpResponseRedirect('/')
+        else:
+            variables = RequestContext(request, {'user':user,'password_form':passform,'permissions':permissions,'appointments':appointments,'unconfirmed':unconfirmed})
+            return render_to_response('account/password.html', variables)
+
     else:
 
         passform = PasswordChangeForm(user)
