@@ -85,6 +85,8 @@ def home(request):
             if permissions == 'doctor':
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
                 cal_form.fields['hospital'].queryset = user.doctor.hospital.all()
+                if appointment.confirmed ==False:
+                    cal_form.fields['attachments'].widget = forms.HiddenInput()
             elif permissions == 'nurse':
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
                 cal_form.fields['type'].widget = forms.HiddenInput()
@@ -107,7 +109,6 @@ def home(request):
             variables['released'] = appointment.released
             variables['cal_form'] = cal_form
             variables['confirmed'] = confirmed
-            print(str(confirmed))
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
             if permissions == 'nurse':
@@ -140,7 +141,8 @@ def home(request):
                     attachment.save()
                 event=log(user=user,action="new_appt",notes={})
                 event.save()
-                variables['notification'] = str('Appointment successfully created')
+                if permissions == 'patient':
+                    variables['notification'] = str('Please wait your doctor to confirm.')
                 return render_to_response('index.html', variables)
             else:
                 if permissions == 'doctor':
@@ -347,7 +349,6 @@ def doc_register_page(request):
 def register_page(request):
 
     if request.method == 'POST':
-        print(str(request.POST))
         userform = UserForm(request.POST)
         patientform = PatientForm(request.POST, request.FILES)
         if userform.is_valid() and patientform.is_valid():
@@ -383,7 +384,6 @@ def update_profile(request):
     user = request.user
     permissions = get_permissions(user)
     if request.method == 'POST':
-        print(str(request.POST))
         updateform = UpdateUserForm(request.POST, instance = user)
         p_updateform = UpdatePatientForm(request.POST, instance = user.patient)
         if updateform.is_valid() and p_updateform.is_valid():
@@ -599,7 +599,6 @@ def export_file(request):
         appointments = user.nurse.calendarevent_set.all()
     elif permissions == 'doctor':
         appointments = user.doctor.calendarevent_set.all()
-    print(str(appointments))
     html_string = render_to_string('export/template.html', {'user': user,'permissions':permissions,'appointments':appointments})
 
     html = HTML(string=html_string)
