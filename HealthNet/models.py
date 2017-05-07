@@ -120,10 +120,9 @@ class Prescription(models.Model):
         return drug_desc
 
     def refill(self):
-        # decrement refills
-        if self.refills_remaining < 0:
-            return
-        self.refills_remaining -=1
+        # decrement refills if refills > 0
+        if self.refills_remaining > 0:
+            self.refills_remaining -=1
         return
 
 class Export(models.Model):

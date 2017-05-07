@@ -56,10 +56,10 @@ class PatientForm(forms.ModelForm):
                 self.add_error('date_of_birth', forms.ValidationError(message))
         if height and weight:
             if height <=0:
-                message = 'Height cannot be negative'
+                message = 'Height cannot be negative or 0'
                 self.add_error('height', forms.ValidationError(message))
             if weight <=0:
-                message = 'Weight cannot be negative'
+                message = 'Weight cannot be negative or 0'
                 self.add_error('weight', forms.ValidationError(message))
         if doctor and hospital:
             if not hospital in doctor.hospital.all():
@@ -82,6 +82,14 @@ class PrescriptionForm(forms.ModelForm):
     class Meta:
         model = Prescription
         fields = ['patient', 'drug_name', 'dosage', 'side_effects', 'refills_remaining']
+    def clean(self):
+        clean_data = super(PrescriptionForm, self).clean()
+        refills = clean_data.get('refills_remaining')
+        dosage = clean_data.get('dosage')
+        if refills:
+            if refills < 0:
+                message = 'refills remaining cannot be negative'
+                self.add_error('refills_remaining', forms.ValidationError(message))
 
 class UpdateUserForm(forms.ModelForm):
     email = forms.EmailField(required=True)
