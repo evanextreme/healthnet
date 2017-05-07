@@ -1,31 +1,26 @@
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import auth
-from django.template.context_processors import csrf
-from django.template import loader, Context
-from django.contrib.auth import logout
-from HealthNet.forms import *
-from django.template import RequestContext
-from django.shortcuts import render_to_response
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from EventLog.models import log
-from HealthNet.models import *
+from django.contrib.auth import logout, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, render_to_response
+from django.template.context_processors import csrf
+from django.template import loader, Context, RequestContext
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from io import BytesIO
+from itertools import chain
+from reportlab.pdfgen import canvas
+from weasyprint import HTML
+from Calendar.forms import CalendarEventForm, UpdateCalendarEventForm
 from Calendar.models import CalendarEvent, Attachment
 from Calendar.util import events_to_json, calendar_options
-from Calendar.forms import CalendarEventForm, UpdateCalendarEventForm
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.decorators import login_required
+from EventLog.models import log
 from HealthNet.email import *
-from io import BytesIO
-from reportlab.pdfgen import canvas
-from django.contrib.auth import authenticate
-from itertools import chain
+from HealthNet.forms import *
+from HealthNet.models import *
 
-from weasyprint import HTML
-
-
-
+#main index functions
 @csrf_exempt
 def home(request):
     user = request.user
@@ -42,9 +37,10 @@ def home(request):
     notification = ''
     error = ''
 
+    #if user logs in first time, the help documentation will show up.
     if (permissions == 'patient' and user.patient.new_user) or (permissions == 'nurse' and user.nurse.new_user) or (permissions == 'doctor' and user.doctor.new_user):
         opentap = 'open'
-    #If user is admin, redirect to admin dashboard
+    
     if permissions == 'patient':
         prescriptions = user.patient.prescription_set.all()
         appointments = user.patient.calendarevent_set.all()
@@ -63,14 +59,17 @@ def home(request):
         hospitalnumber = user.doctor.hospital.all().count()
         user.doctor.new_user = False
         user.doctor.save()
-
+    
+    #if user is admin, redirect to admin dashboard
     elif permissions == 'admin':
         return HttpResponseRedirect('/admin')
 
     variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed,'hospitalnumber':hospitalnumber,'attachmentnumber':attachmentnumber,'appointments':appointments,'appointment':appointment,'notification':notification,'error':error})
 
+    #if any action takes
     if request.method == 'POST':
         appointment = CalendarEvent()
+        #if has an appointment id, act as "update appointment"
         if 'appointmentId' in request.POST:
             post_id = request.POST['appointmentId']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
@@ -112,6 +111,7 @@ def home(request):
             variables['attachmentnumber'] = attachmentnumber
             variables['cal_form'] = cal_form
             return render_to_response('appointments/update.html', variables)
+        #if click "create", act as "create appointment"
         elif 'Create' in request.POST:
             if permissions == 'nurse':
                 post_id = request.POST['patient']
@@ -135,7 +135,6 @@ def home(request):
                 if permissions == 'doctor' or permissions == 'nurse':
                     appointment.confirmed = True
                     appointment.color = '#00b0ff'
-                    #TODO change from confirmation email to creation email
                     appointment_confirmation_email(appointment.patient,appointment.doctor,appointment)
                 appointment.save()
                 for each in cal_form.cleaned_data['attachments']:
@@ -164,6 +163,8 @@ def home(request):
                 variables['cal_form'] = cal_form
                 variables['error'] = 'new_appointment'
                 return render_to_response("index.html",variables)
+        
+        #if click "update", act as "update appointment"
         elif 'Update' in request.POST:
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
@@ -206,6 +207,8 @@ def home(request):
                 variables['cal_form'] = cal_form
                 variables['error'] = 'update_appointment'
                 return render_to_response("index.html",variables)
+        
+        #if click "delete", act as "delete appointment"
         elif 'Delete' in request.POST:
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
@@ -216,6 +219,7 @@ def home(request):
             variables['notification'] = str('Appointment successfully deleted, email sent')
             return render_to_response('index.html', variables)
 
+        #if click "release", act as "release attachment"
         elif 'Release' in request.POST:
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
@@ -227,6 +231,7 @@ def home(request):
             variables['notification'] = str('Appointment successfully released, email sent')
             return render_to_response('index.html', variables)
 
+        #if click "create prescription", act as "create prescription"
         elif 'create_prescription' in request.POST:
             form = PrescriptionForm(request.POST)
             if form.is_valid():
@@ -244,6 +249,7 @@ def home(request):
                 variables['error'] = 'create_prescription'
                 return render_to_response("index.html",variables)
 
+        #if click "admit", act as "admit patient to hospital"
         elif 'admit_patient' in request.POST:
             post_id = request.POST['admit_patient']
             patient = Patient.patients.get(patient_id=post_id)
@@ -254,6 +260,7 @@ def home(request):
             variables['notification'] = str('{} {} successfully admitted').format(patient.user.first_name,patient.user.last_name)
             return render_to_response('index.html',variables)
 
+        #if click "discharge", act as "discharge patient from hospital"
         elif 'discharge_patient' in request.POST:
             post_id = request.POST['discharge_patient']
             patient = Patient.patients.get(patient_id=post_id)
@@ -264,6 +271,8 @@ def home(request):
             variables['notification'] = str('{} {} successfully discharged').format(patient.user.first_name,patient.user.last_name)
 
             return render_to_response('index.html',variables)
+        
+        #if click "update patient", act as "update patient's medical information"
         elif 'update_patient' in request.POST:
 
             post_id = request.POST['patient_id']
@@ -275,6 +284,7 @@ def home(request):
 
             return render_to_response('index.html',variables)
 
+        #if click "edit prescription", act as "edit patient's prescription"
         elif 'update_prescription' in request.POST:
             post_id = request.POST['update_prescription']
             prescription = Prescription.prescriptions.get(prescription_id = post_id)
@@ -290,6 +300,7 @@ def home(request):
                 variables['error'] = 'update_prescription'
                 return render_to_response("index.html",variables)
 
+        #if click "refill", act as "refill the prescription"
         elif 'refill_prescription' in request.POST:
             post_id = request.POST['refill_prescription']
             prescription = Prescription.prescriptions.get(prescription_id = post_id)
@@ -299,6 +310,7 @@ def home(request):
             event.save()
             return render_to_response('index.html', variables)
 
+        #if click "delete prescription", act as "delete prescription"
         elif 'remove_prescription' in request.POST:
             post_id = request.POST['remove_prescription']
             prescription = Prescription.prescriptions.get(prescription_id = post_id)
@@ -311,6 +323,7 @@ def home(request):
         variables['cal_form'] = CalendarEventForm()
         return render_to_response('index.html',variables)
 
+#for doctor to confirm the appointment
 def confirmed_appointments(user):
     appointments = user.doctor.calendarevent_set.all()
     unconfirmed = 0
@@ -319,10 +332,12 @@ def confirmed_appointments(user):
             unconfirmed += 1
     return unconfirmed
 
+#logout function
 def logout_page(request):
     logout(request)
     return HttpResponseRedirect('/')
 
+#for admit to register doctors and nurse
 @csrf_exempt
 def doc_register_page(request):
     if request.method == 'POST':
@@ -349,6 +364,7 @@ def doc_register_page(request):
     variables=RequestContext(request,{'userform':userform, 'docform':docform,'permissions':permissions})
     return render_to_response("admin/register.html",variables)
 
+#for patient registration
 @csrf_exempt
 def register_page(request):
 
@@ -364,13 +380,11 @@ def register_page(request):
             user.save()
 
             patient = patientform.save(commit=False)
-
             patient.user = user
             patient.save()
 
             event = log(user=patient.user, action="user_registered",notes={})
             event.save()
-
             return render_to_response("registration/register_confirmed.html")
         else:
             variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
@@ -383,6 +397,7 @@ def register_page(request):
         variables=RequestContext(request,{'userform':userform, 'patientform':patientform})
         return render_to_response("registration/register.html",variables)
 
+#for user to update his/her personal profile
 @csrf_exempt
 def update_profile(request):
     user = request.user
@@ -411,6 +426,7 @@ def update_profile(request):
     variables = RequestContext(request, {'user':user,'update_form':updateform, 'p_updateform':p_updateform,'permissions':permissions})
     return render_to_response('account/profile.html', variables)
 
+#for doctor to update patient's medical information
 @csrf_exempt
 def update_patient(request):
     user = request.user
@@ -421,6 +437,7 @@ def update_patient(request):
         patientform = EmployeeUpdatePatientForm(instance = patient)
         return render_to_response('patients/update.html', {'user':user,'patientform':patientform,'permissions':permissions},RequestContext(request))
 
+#for doctor and nurse to view patient's prescriptions
 @csrf_exempt
 def get_prescriptions(request):
     user = request.user
@@ -433,6 +450,7 @@ def get_prescriptions(request):
         prescriptions = patient.prescription_set.all()
         return render_to_response('prescriptions/index.html', {'user':user,'patient':patient,'prescriptions':prescriptions,'permissions':permissions},RequestContext(request))
 
+#for doctor to update patient's perscriptions
 @csrf_exempt
 def update_prescription(request):
     user = request.user
@@ -442,6 +460,7 @@ def update_prescription(request):
     prescriptionform = PrescriptionForm(instance = prescription)
     return render_to_response('prescriptions/update.html', {'user':user, 'prescription':prescription, 'prescriptionform':prescriptionform, 'permissions':permissions}, RequestContext(request))
 
+#for doctor to refill patient's perscription
 @csrf_exempt
 def edit_prescription(request):
     user = request.user
@@ -464,6 +483,7 @@ def edit_prescription(request):
             return render_to_response('account/prescriptions.html', {'user':user, 'permissions':permissions,'prescriptions':prescriptions}, RequestContext(request))
         return render_to_response('account/edit_prescription.html', {'user':user, 'prescriptionform':form,'prescription':prescription, 'permissions':permissions}, RequestContext(request))
 
+#for doctor to create new prescription
 @csrf_exempt
 def new_prescription(request):
     user = request.user
@@ -474,6 +494,7 @@ def new_prescription(request):
 
     return render_to_response('prescriptions/new.html', {'user':user, 'prescriptionform':form, 'permissions':permissions}, RequestContext(request))
 
+#for doctor and nurse transfer patient into another hospital
 @csrf_exempt
 def change_hospital(request):
     user = request.user
@@ -488,7 +509,7 @@ def change_hospital(request):
     variables = RequestContext(request, {'user':user,'hospital_change_form':hospital_change_form})
     return render_to_response('account/change_hospital.html', variables)
 
-
+#for user to change password
 @csrf_exempt
 def change_password(request):
     prescriptions = ''
@@ -512,7 +533,7 @@ def change_password(request):
         variables = RequestContext(request, {'user':user,'password_form':passform,'permissions':permissions,'appointments':appointments,'unconfirmed':unconfirmed})
         return render_to_response('account/password.html', variables)
 
-
+#check how many unconfirmed appointments for the doctor and show the number in the dashboard
 def account(request):
     user = request.user
     permissions = get_permissions(user)
@@ -525,6 +546,7 @@ def account(request):
     variables = RequestContext(request, {'user':user,'permissions':permissions,'unconfirmed':unconfirmed})
     return render_to_response('account/index.html', variables)
 
+#for patient view prescriptions
 @csrf_exempt
 def prescriptions(request):
     user = request.user
@@ -533,6 +555,7 @@ def prescriptions(request):
     variables = RequestContext(request, {'user':user,'permissions':permissions, 'prescriptions':prescriptions})
     return render_to_response('account/prescriptions.html', variables)
 
+#for doctor and nurse view their patients
 def patients(request):
     user = request.user
     permissions = get_permissions(user)
@@ -545,7 +568,7 @@ def patients(request):
         variables = RequestContext(request, {'user':user,'patients':patients,'permissions':permissions})
         return render_to_response('patients/index.html',variables)
 
-
+#for user to create new appointment
 @csrf_exempt
 def new_appt(request):
     user = request.user
@@ -586,6 +609,7 @@ def new_appt(request):
         variables=RequestContext(request,{'user':user,'cal_form':cal_form,'hospitalnumber':hospitalnumber,'justone':justone,'permissions':permissions})
         return render_to_response("appointments/new.html",variables)
 
+#for doctor to create new test
 def new_test(request):
     user = request.user
     if request.method == 'POST':
@@ -594,6 +618,7 @@ def new_test(request):
             for each in form.cleaned_data['attachments']:
                 Attachment.objects.create(file=each)
 
+#for patient to export his/her information
 def export_file(request):
     user = request.user
     permissions = get_permissions(user)
@@ -615,9 +640,9 @@ def export_file(request):
         event=log(user=user,action="user_export_file",notes={})
         event.save()
         return response
-
     return response
 
+#get user's permission
 def get_permissions(user):
     if hasattr(user, 'patient'):
         return 'patient'
@@ -630,6 +655,7 @@ def get_permissions(user):
     else:
         return 'none'
 
+#get user's all appointments
 def all_events(request):
     user = request.user
     permissions = get_permissions(user)
@@ -641,6 +667,7 @@ def all_events(request):
         appointments = user.nurse.hospital.calendarevent_set.all()
     return HttpResponse(events_to_json(appointments), content_type='application/json')
 
+#for doctor and nurse to get the patient card for each of their patients
 @csrf_exempt
 def get_card(request):
     if 'patientid' in request.POST:
@@ -649,6 +676,7 @@ def get_card(request):
         variables = {'user':patient.user}
         return(render_to_response('card/patientplus.html',variables))
 
+#for nurse to get his/her patients from his/her hospital
 def get_nurse_patients(nurse):
     doctors = nurse.hospital.doctor_set.all()
     nurse_patients = Patient.patients.none()

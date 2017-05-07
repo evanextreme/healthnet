@@ -1,20 +1,19 @@
-
+<!--attachments-listed page-->
 <script src="/static/js/healthnet.js"></script>
-  {% for attachment in attachments %}
-
-    <div class="card-panel grey lighten-5 z-depth-1">
-      <div class="row valign-wrapper">
-        <div class="col s4">
-          <img src={{attachment.file.url}} alt="No Photo" class="responsive-img">
+{% for attachment in attachments %}
+  <div class="card-panel grey lighten-5 z-depth-1">
+    <div class="row valign-wrapper">
+      <div class="col s4">
+        <img src={{attachment.file.url}} alt="No Photo" class="responsive-img">
+      </div>
+      <div class="col s6 card-stacked">
+        <div class="card-content">
+          <p>{{attachment}}</p>
         </div>
-        <div class="col s6 card-stacked">
-          <div class="card-content">
-            <p>{{attachment}}</p>
-          </div>
-          <div class="card-content">
-            <a class="btn" onclick="downloadAttachment('{{attachment.file.url}}')" href="#" >Open File</a>
-          </div>
+        <div class="card-content">
+          <a class="btn" onclick="downloadAttachment('{{attachment.file.url}}')" href="#" >Open File</a>
         </div>
       </div>
     </div>
-  {% endfor %}
+  </div>
+{% endfor %}

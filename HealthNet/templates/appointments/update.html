@@ -1,88 +1,85 @@
+<!--existed appointment update page-->
 {% load staticfiles %}
 {% load material_form %}
 
-  <!-- Dropdown Structure -->
 <div class="modal-content">
-    <h4>
-      {% if confirmed == 'True' and permissions == 'patient' %}View
-      {% else %}Update{% endif %}
-       Appointment{% if permissions == 'doctor'%}/Test{% endif %}</h4>
-    {% if permissions == 'patient' %}
+  <!--title changes due to the different of user-->
+  <h4>
+    {% if confirmed == 'True' and permissions == 'patient' %}View 
+    {% else %}Update {% endif %}
+    Appointment{% if permissions == 'doctor'%}/Test{% endif %}
+  </h4>
+  {% if permissions == 'patient' %}
     <h5>with {{user.patient.doctor}} at {{appointment.hospital}}</h5>
-    {% elif permissions == 'doctor' %}
+  {% elif permissions == 'doctor' %}
     <h5>with {{appointment.patient}} {% if hospitalnumber == 1 %}at {{appointment.hospital}}{% endif %}</h5>
-    {% elif permissions == 'nurse' %}
+  {% elif permissions == 'nurse' %}
     <h5>between {{appointment.doctor}} and {{appointment.patient}} at {{appointment.hospital}}</h5>
-    {% endif %}
-
-        {% csrf_token %}
-        {% form form=cal_form %}
-        {% endform %}
-
-
-        {% if permissions != 'patient' or released == 'True' %}
-
-                {% for attachment in attachments %}
-
-                  <div class="card-panel grey lighten-5 z-depth-1">
-                    <div class="row valign-wrapper">
-                      <div class="col s4">
-                        <img src={{attachment.file.url}} alt="No Photo" class="responsive-img">
-                      </div>
-                      <div class="col s6 card-stacked">
-                        <div class="card-content">
-                          <p>{{attachment}}</p>
-                        </div>
-                        <div class="card-content">
-                          <a class="btn" onclick="downloadAttachment('{{attachment.file.url}}')" href="#" >Open File</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                {% endfor %}
-
-
-        {% endif %}
-    </ul>
+  {% endif %}
+  
+  {% csrf_token %}
+  {% form form=cal_form %}{% endform %}
+  
+  <!--list all attachments if either they are released or the user is not patient-->
+  {% if permissions != 'patient' or released == 'True' %}
+    {% for attachment in attachments %}
+      <div class="card-panel grey lighten-5 z-depth-1">
+        <div class="row valign-wrapper">
+          <div class="col s4">
+            <img src={{attachment.file.url}} alt="No Photo" class="responsive-img">
+          </div>
+          <div class="col s6 card-stacked">
+            <div class="card-content">
+              <p>{{attachment}}</p>
+            </div>
+            <div class="card-content">
+              <a class="btn" onclick="downloadAttachment('{{attachment.file.url}}')" href="#" >Open File</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
 </div>
+
+<!--buttons for existed appointment: delete, release attachments, update and cancel-->
 <div class="modal-footer">
-
-
-    {% if confirmed == 'True' and permissions == 'patient'%}
+  <!--if the appointment has already been confirmed, the patient cannot delete it-->
+  {% if confirmed == 'True' and permissions == 'patient'%}
     <a class="left btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('Sorry, but this appointment has already been confirmed! Please contact your hospital or doctor to reschedule.',12000);">
       <i class="material-icons left">delete</i>Delete
     </a>
-    {% elif permissions == 'doctor' or permissions == 'patient'%}
+  {% elif permissions == 'doctor' or permissions == 'patient'%}
     <button class="left waves-effect waves-red btn-flat" type="submit" name="Delete">
       <i class="material-icons left">delete</i>Delete
     </button>
-    {% endif %}
-    <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
-    {% if confirmed == 'False' and permissions == 'doctor' or confirmed == 'False' and permissions == 'nurse'%}
+  {% endif %}
+  <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
+  <!--for doctor: if an appointment has not been confirmed, confirmed button shows up, else update button shows up-->
+  {% if confirmed == 'False' and permissions == 'doctor' or confirmed == 'False' and permissions == 'nurse'%}
     <button class="modal-action modal-close waves-effect waves-light btn red" type="submit" name="Update">Confirm</button>
-    {% elif confirmed == 'False' and permissions == 'patient' or confirmed == 'True' and permissions == 'doctor' or confirmed == 'True' and permissions == 'nurse' %}
+  {% elif confirmed == 'False' and permissions == 'patient' or confirmed == 'True' and permissions == 'doctor' or confirmed == 'True' and permissions == 'nurse' %}
     <button class="modal-action modal-close waves-effect waves-red btn-flat" type="submit" name="Update">Update</button>
-    {% elif confirmed == 'True' and permissions == 'patient'%}
+  <!--for patient: if an appointment has already been confirmed, cannot modify it any more-->
+  {% elif confirmed == 'True' and permissions == 'patient'%}
     <a class="btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('Sorry, but this appointment has already been confirmed! Please contact your hospital or doctor to reschedule.',12000);">Update</a>
+  {% endif %}
+
+  <!--if there is attachment, release button shows up, else will be hidden-->
+  <!--if already released, grey and cannot be clicked any more-->
+  {% if attachmentnumber != 0 %}
+    {% if released == False and permissions == 'doctor' %}
+      <button class="modal-action modal-close waves-effect waves-light btn red" type="submit" name="Release">Release</button>
+    {% elif released == True and permissions == 'doctor' %}
+      <a class="btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('The results of this appointment/test have already been released',12000);">Release</a>
     {% endif %}
-    {% if attachmentnumber != 0 %}
-        {% if released == False and permissions == 'doctor' %}
-            <button class="modal-action modal-close waves-effect waves-light btn red" type="submit" name="Release">
-              Release
-            </button>
-        {% elif released == True and permissions == 'doctor' %}
-            <a class="btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('The results of this appointment/test have already been released',12000);">
-            Release
-            </a>
-        {% endif %}
-    {% endif %}
+  {% endif %}
 </div>
 
 <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
 <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
 {% include 'material/includes/material_css.html' %}
 {% include 'material/includes/material_js.html' %}
-
 <script type="text/javascript">
     $(document).ready(function(){
       $('.tooltipped').tooltip({delay: 50});
