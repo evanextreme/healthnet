@@ -1,0 +1,30 @@
+<html>
+<head>
+  <title>Test</title>
+  <style>
+    body {
+      background-color: #f7f7f7;
+    }
+  </style>
+</head>
+<body>
+  <h1>myHealth Export for </h1>
+  <hr>
+    <h1>{{user.first_name}} {{user.last_name}}</h1>
+    <span class="black-text">Email: {{user.email}}</span><br>
+    <span class="black-text">Date of Birth: {{user.patient.date_of_birth}}</span><br>
+    <span class="black-text">Preferred Hospital: {{user.patient.hospital}}</span><br>
+    <span class="black-text">Admitted:  {% if user.patient.admitted == True %}Yes{% else %}No{% endif %}</span><br>
+    <span class="black-text">Height: {{user.patient.height}} inches</span><br>
+    <span class="black-text">Weight: {{user.patient.weight}} pounds</span><br>
+    <hr>
+  <h3>Appointments/Tests<h3>
+  {% for appointment in appointments %}
+    <hr>
+    <h5>{{appointment.title}} with Dr. {{appointment.doctor.user.first_name}} {{appointment.doctor.user.last_name}}<h5>
+    <p>Hospital: {{appointment.hospital}}</p>
+    <p>Start: {{appointment.start}}</p>
+    <p>End: {{appointment.end}}</p>
+  {% endfor %}
+</body>
+</html>
