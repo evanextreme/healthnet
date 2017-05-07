@@ -22,7 +22,7 @@ from reportlab.pdfgen import canvas
 from django.contrib.auth import authenticate
 from itertools import chain
 
-#from weasyprint import HTML
+from weasyprint import HTML
 
 
 
@@ -77,11 +77,14 @@ def home(request):
             attachments = appointment.attachment_set.all()
             attachmentnumber= appointment.attachment_set.all().count()
             cal_form = UpdateCalendarEventForm(instance=appointment)
-            confirmed = 'False'
             if appointment.confirmed == False:
-                confirmed = 'False'
+                variables['confirmed'] = 'False'
             else:
-                confirmed = 'True'
+                variables['confirmed'] = 'True'
+            if appointment.released == False:
+                variables['released'] = 'False'
+            else:
+                variables['released'] = 'True'
             if permissions == 'doctor':
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
                 cal_form.fields['hospital'].queryset = user.doctor.hospital.all()
@@ -107,9 +110,7 @@ def home(request):
             variables['appointment'] = appointment
             variables['attachments'] = attachments
             variables['attachmentnumber'] = attachmentnumber
-            variables['released'] = appointment.released
             variables['cal_form'] = cal_form
-            variables['confirmed'] = confirmed
             return render_to_response('appointments/update.html', variables)
         elif 'Create' in request.POST:
             if permissions == 'nurse':
