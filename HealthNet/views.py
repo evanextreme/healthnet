@@ -38,6 +38,7 @@ def home(request):
     appointments = ''
     appointment = ''
     hospitalnumber = ''
+    attachmentnumber = ''
     notification = ''
     error = ''
 
@@ -66,7 +67,7 @@ def home(request):
     elif permissions == 'admin':
         return HttpResponseRedirect('/admin')
 
-    variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed,'hospitalnumber':hospitalnumber,'appointments':appointments,'appointment':appointment,'notification':notification,'error':error})
+    variables = RequestContext(request, {'user':user,'opentap':opentap,'calendar_config_options':calendar_options(event_url, OPTIONS),'permissions':permissions,'prescriptions':prescriptions,'patients':patients,'unconfirmed':unconfirmed,'hospitalnumber':hospitalnumber,'attachmentnumber':attachmentnumber,'appointments':appointments,'appointment':appointment,'notification':notification,'error':error})
 
     if request.method == 'POST':
         appointment = CalendarEvent()
@@ -74,6 +75,7 @@ def home(request):
             post_id = request.POST['appointmentId']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             attachments = appointment.attachment_set.all()
+            attachmentnumber= appointment.attachment_set.all().count()
             cal_form = UpdateCalendarEventForm(instance=appointment)
             confirmed = 'False'
             if appointment.confirmed == False:
@@ -82,16 +84,16 @@ def home(request):
                 confirmed = 'True'
             if permissions == 'doctor':
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
-                cal_form.fields['patient'].widget = forms.HiddenInput()
+                cal_form.fields['hospital'].queryset = user.doctor.hospital.all()
             elif permissions == 'nurse':
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
                 cal_form.fields['type'].widget = forms.HiddenInput()
                 cal_form.fields['attachments'].widget = forms.HiddenInput()
             elif permissions == 'patient':
-                cal_form.fields['patient'].widget = forms.HiddenInput()
                 cal_form.fields['doctor'].widget = forms.HiddenInput()
                 cal_form.fields['type'].widget = forms.HiddenInput()
                 cal_form.fields['attachments'].widget = forms.HiddenInput()
+            cal_form.fields['patient'].widget = forms.HiddenInput()
             if permissions != 'doctor' or hospitalnumber == 1:
                 cal_form.fields['hospital'].widget = forms.HiddenInput()
             if permissions == 'patient' and appointment.confirmed:
@@ -101,6 +103,7 @@ def home(request):
                 cal_form.fields['all_day'].widget.attrs['disabled'] = True
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
             variables['appointment'] = appointment
+            variables['attachmentnumber'] = attachmentnumber
             variables['released'] = appointment.released
             variables['cal_form'] = cal_form
             variables['confirmed'] = confirmed
@@ -555,7 +558,9 @@ def new_appt(request):
                 cal_form.fields['hospital'].widget = forms.HiddenInput()
             else:
                 cal_form = CalendarEventForm(initial={'doctor': user.doctor})
+                cal_form.fields['hospital'].queryset = user.doctor.hospital.all()
             cal_form.fields['doctor'].widget = forms.HiddenInput()
+            cal_form.fields['patient'].queryset = user.doctor.patient_set.all()
         elif permissions == 'nurse':
             cal_form = CalendarEventForm(initial={'hospital': user.nurse.hospital})
             cal_form.fields['doctor'].widget = forms.HiddenInput()
