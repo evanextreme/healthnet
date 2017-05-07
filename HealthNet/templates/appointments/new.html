@@ -1,25 +1,29 @@
+<!--new appointment creation page-->
 {% load staticfiles %}
 {% load material_form %}
-
 <!DOCTYPE html>
+
+<!--title changes due to different user-->
 <div class="modal-content">
-  <h4>New Appointment{% if permissions == 'doctor' %}/Test{% endif %}</h4>
-  {% if permissions == 'patient' %}<h5> with {{user.patient.doctor}} at {{user.patient.hospital}}</h5>{% endif %}
-  {% if permissions == 'doctor' and hospitalnumber == 1 %}<h5> at {{justone}}</h5>{% endif %}
-      {% csrf_token %}
-      {% form form=cal_form %}{% endform %}
+    <h4>New Appointment{% if permissions == 'doctor' %}/Test{% endif %}</h4>
+    {% if permissions == 'patient' %}
+      <h5> with {{user.patient.doctor}} at {{user.patient.hospital}}</h5>
+    {% endif %}
+    {% if permissions == 'doctor' and hospitalnumber == 1 %}
+      <h5> at {{justone}}</h5>
+    {% endif %}
+    {% csrf_token %}
+    {% form form=cal_form %}{% endform %}
 </div>
+
+<!--buttons for creating appointment: cancel and create-->
 <div class="modal-footer">
     <a class="modal-action modal-close waves-effect waves-blue btn-flat" href="/">Cancel</a>
     <button class="modal-action modal-close waves-effect waves-light btn red" onclick="Materialize.toast('Appointment successfully created!',4000);" type="submit" name="Create">Create</button>
 </div>
 
-
 <script type="text/javascript" src="{% static 'materialize/bin/materialize.js' %}"></script>
 <script src="{% static 'material/js/jquery-2.2.0.js' %}"></script>
 {% include 'material/includes/material_css.html' %}
 {% include 'material/includes/material_js.html' %}
-<script type="text/javascript"> $(document).ready(function(){
-    $('.modal').modal();
-    })
-</script>
+<script type="text/javascript">$(document).ready(function(){$('.modal').modal();})</script>

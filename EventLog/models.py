@@ -29,7 +29,7 @@ class Log(models.Model):
     #ordered by time
     class Meta:
         ordering = ["-timestamp"]
-#
+#log: takes user, action and notes and create a Log
 def log(user, action, notes=None):
         if (user is not None and not user.is_authenticated()):
             user = None
@@ -43,6 +43,7 @@ def log(user, action, notes=None):
         event_logged.send(sender=Log, event=event)
         return event
 
+#deny the admin for deleteing the logs
 def log_delete(sender, instance, **kwargs):
     raise PermissionDenied
     
