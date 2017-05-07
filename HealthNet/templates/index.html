@@ -37,11 +37,11 @@
 
           {% endif %}
 
-
-          {% for appointment in appointments %}
+          {% if appointments != '' %}
           <ul class="collapsible" data-collapsible="accordion">
-          <li>
+          {% for appointment in appointments %}
           {% if permissions != 'patient' or appointment.released == True %}
+          <li>
           <div class="collapsible-header">Results from {{appointment.title}} on {{appointment.start}}</div>
           <div id="" style="border-bottom: 0px" class="collapsible-body">
             {{appointment.attachment_cards}}
@@ -50,6 +50,7 @@
           {% endif %}
           {% endfor %}
           </ul>
+          {% endif %}
           {% elif permissions == 'doctor' or permissions == 'nurse' %}
               <br><br>
               <ul class="collapsible" data-collapsible="accordion">

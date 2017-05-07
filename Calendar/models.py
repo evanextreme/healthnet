@@ -44,7 +44,7 @@ class CalendarEvent(models.Model):
     hospital = models.ForeignKey(Hospital, default=None)
     doctor = models.ForeignKey(Doctor, default=None)
     patient = models.ForeignKey(Patient, default=None)
-    
+
 
     confirmed = models.BooleanField(default=False)
     released = models.BooleanField(default=False)
@@ -58,7 +58,7 @@ class CalendarEvent(models.Model):
         return self.title
     def __unicode__(self):
         return self.title
-    def attachment_cards(self):
+    def attachments(self):
         variables = {'attachments':self.attachment_set.all()}
         return(render_to_string('appointments/attachments.html',variables))
 
