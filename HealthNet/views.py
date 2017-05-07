@@ -105,6 +105,7 @@ def home(request):
                 cal_form.fields['all_day'].widget.attrs['disabled'] = True
             cal_form.fields['appointment_id'].widget = forms.HiddenInput()
             variables['appointment'] = appointment
+            variables['attachments'] = attachments
             variables['attachmentnumber'] = attachmentnumber
             variables['released'] = appointment.released
             variables['cal_form'] = cal_form
@@ -166,6 +167,7 @@ def home(request):
             post_id = request.POST['appointment_id']
             appointment = CalendarEvent.appointments.get(appointment_id=post_id)
             cal_form = UpdateCalendarEventForm(request.POST, request.FILES, instance=appointment)
+            print(str(request.FILES))
             if cal_form.is_valid():
                 appointment = cal_form.save()
                 if permissions == 'doctor' and appointment.confirmed == False:
@@ -175,6 +177,7 @@ def home(request):
                     variables['unconfirmed'] = confirmed_appointments(user)
                     variables['appointments'] = user.doctor.calendarevent_set.all()
                 for each in cal_form.cleaned_data['attachments']:
+                    print('HIT HIT')
                     attachment = Attachment.objects.create(file=each,appointment=appointment)
                     attachment.save()
                 appointment.save()

@@ -22,21 +22,25 @@
 
         {% if permissions != 'patient' or released == 'True' %}
 
-              {% if attachments %}
-              <ul class="collapsible" data-collapsible="accordion">
-              <li>
                 {% for attachment in attachments %}
-                <div class="collapsible-header"><i class="material-icons">filter_drama</i>{{attachment.file.name}}</div>
 
-                <div class="collapsible-body"><p>
-
-                  <img src="{{attachment.file.url}}" alt="Mountain View" style="maxwidth:500px;maxheight:350px;">
-                  <a class="btn" href="{{attachment.file.url}}" download >Download File</a>
-                </p></div>
+                  <div class="card-panel grey lighten-5 z-depth-1">
+                    <div class="row valign-wrapper">
+                      <div class="col s4">
+                        <img src={{attachment.file.url}} alt="No Photo" class="responsive-img">
+                      </div>
+                      <div class="col s6 card-stacked">
+                        <div class="card-content">
+                          <p>{{attachment}}</p>
+                        </div>
+                        <div class="card-content">
+                          <a class="btn" onclick="downloadAttachment('{{attachment.file.url}}')" href="#" >Open File</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 {% endfor %}
-              </li>
-              </ul>
-              {% endif %}
+
 
         {% endif %}
     </ul>
