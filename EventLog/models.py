@@ -18,21 +18,23 @@ class Log(models.Model):
     timestamp = models.DateTimeField(default=timezone.now, db_index=True)
     #the abbreviation of the action
     action = models.CharField(max_length=50, db_index=True)
-    #addtional notes
+    #addtional notes if necessary
     notes = jsonfield.JSONField()
 
+    #urls for each log
     @property
     def template_fragment_name(self):
         return "eventlog/{}.html".format(self.action.lower())
-
+    
+    #ordered by time
     class Meta:
         ordering = ["-timestamp"]
-        
+#
 def log(user, action, notes=None):
         if (user is not None and not user.is_authenticated()):
             user = None
         if notes is None:
-            extra = {}
+            notes = {}
         event = Log.objects.create(
             user=user,
             action=action,
