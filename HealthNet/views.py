@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from io import BytesIO
 from itertools import chain
 from reportlab.pdfgen import canvas
-#from weasyprint import HTML
+from weasyprint import HTML
 from Calendar.forms import CalendarEventForm, UpdateCalendarEventForm
 from Calendar.models import CalendarEvent, Attachment
 from Calendar.util import events_to_json, calendar_options
