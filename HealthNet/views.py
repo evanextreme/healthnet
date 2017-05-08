@@ -32,6 +32,8 @@ def home(request):
     unconfirmed = 0
     appointments = ''
     appointment = ''
+    confirmed = False
+    released = False
     hospitalnumber = ''
     attachmentnumber = ''
     notification = ''

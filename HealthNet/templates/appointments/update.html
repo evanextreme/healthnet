@@ -67,10 +67,10 @@
 
   <!--if there is attachment, release button shows up, else will be hidden-->
   <!--if already released, grey and cannot be clicked any more-->
-  {% if attachmentnumber != 0 %}
-    {% if released == False and permissions == 'doctor' %}
+  {% if attachmentnumber != 0 and permissions == 'doctor' %}
+    {% if released == 'False' %}
       <button class="modal-action modal-close waves-effect waves-light btn red" type="submit" name="Release">Release</button>
-    {% elif released == True and permissions == 'doctor' %}
+    {% elif released == 'True' %}
       <a class="btn grey grey-text lighten-2 btn-flat" onclick="Materialize.toast('The results of this appointment/test have already been released',12000);">Release</a>
     {% endif %}
   {% endif %}
