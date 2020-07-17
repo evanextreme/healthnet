@@ -1,4 +1,4 @@
-Django==1.10.5
+Django==1.11.29
 django-registration
 django-datetime-widget
 django-materialize-css
